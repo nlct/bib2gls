@@ -602,7 +602,7 @@ public class Gls2Bib extends BibGlsConverter
       }
       else
       {
-         return false;
+         return super.parseArg(deque, arg, returnVals);
       }
 
       return true;

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.IllformedLocaleException;
 import java.util.Date;
+import java.util.ArrayDeque;
 import java.io.*;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -66,10 +67,11 @@ import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 import com.dickimawbooks.bibgls.common.*;
 
-public class Bib2Gls implements TeXApp
+public class Bib2Gls extends BibGlsTeXApp
 {
-   public Bib2Gls(int debug, int verbose, String langTag)
-     throws IOException,InterruptedException,Bib2GlsException
+   @Override
+   protected void preInitMessages()
+    throws Bib2GlsException,IOException
    {
       kpsewhichResults = new HashMap<String,String>();
 
@@ -83,24 +85,30 @@ public class Bib2Gls implements TeXApp
          pendingWriter = null;
       }
 
-      debugLevel = debug;
-      verboseLevel = verbose;
-      shownVersion = false;
-
-      if (debug > 0 && verbose > -1)
+      if (debugLevel > 0 && verboseLevel > SILENT)
       {
          version();
-         shownVersion = true;
+      }
+   }
+
+   @Override
+   protected void postInitMessages()
+    throws Bib2GlsException,IOException
+   {
+      try
+      {
+         initSecuritySettings();
+      }
+      catch (InterruptedException e)
+      {
+         // kpsewhich interrupted?
+         warningMessage("error.interrupted");
+         debug(e);
       }
 
-      initMessages(langTag);
-
-      initSecuritySettings();
-
-      if (verboseLevel >= 0 && !shownVersion)
+      if (verboseLevel >= NORMAL)
       {
          version();
-         shownVersion = true;
       }
 
       formatMap = new HashMap<String,String>();
@@ -1881,7 +1889,7 @@ public class Bib2Gls implements TeXApp
          strVal = strVal.replaceAll("^,|,$", "");
       }
 
-      if (verboseLevel > 0 && (!original.equals(strVal) || debugLevel > 0))
+      if (verboseLevel > NORMAL && (!original.equals(strVal) || debugLevel > 0))
       {
          logMessage(String.format("%s: %s -> %s",
           isList? "labelify-list" : "labelify", original, strVal));
@@ -1912,11 +1920,9 @@ public class Bib2Gls implements TeXApp
    /*
     * Process the command line arguments and do the main action.
     */ 
-   public void process(String[] args) 
+   public void process() 
      throws IOException,InterruptedException,Bib2GlsException
    {
-      parseArgs(args);
-
       if (saveRecordCount)
       {
          recordCount = new HashMap<GlsRecord,Integer>();
@@ -2762,7 +2768,7 @@ public class Bib2Gls implements TeXApp
                && glossariesExtraVersion.compareTo(GLOSSARIES_EXTRA_1_46) >= 0
              );
 
-      if (verboseLevel > 0)
+      if (verboseLevel > NORMAL)
       {
          Locale l = getDefaultLocale();
 
@@ -3055,12 +3061,6 @@ public class Bib2Gls implements TeXApp
    public Charset getTeXLogCharset()
    {
       return texLogCharset == null ? getDefaultCharset() : texLogCharset;
-   }
-
-   @Override
-   public Charset getDefaultCharset()
-   {
-      return defaultCharset;
    }
 
    public boolean useCiteAsRecord()
@@ -4418,6 +4418,7 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   @Override
    public void logMessageNoLn(String message)
    {
       if (logWriter != null)
@@ -4430,6 +4431,7 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   @Override
    public void logMessage(String message)
    {
       if (logWriter != null)
@@ -4442,6 +4444,7 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   @Override
    public void logMessage()
    {
       if (logWriter != null)
@@ -4454,50 +4457,68 @@ public class Bib2Gls implements TeXApp
       }
    }
 
-   public void logAndPrintMessageNoLn(String message)
+   @Override
+   public void error(Exception e)
    {
-      logMessageNoLn(message);
-      System.out.print(message);
-   }
+      if (e instanceof TeXSyntaxException)
+      {
+         TeXParser p = ((TeXSyntaxException)e).getParser();
 
-   public void logAndPrintMessage(String message)
-   {
-      logMessage(message);
-      System.out.println(message);
-   }
+         // Only trigger an error when parsing bib files, otherwise
+         // warn.
 
-   public void logAndPrintMessage()
-   {
-      logMessage();
-      System.out.println();
-   }
+         if (p == null || p.getListener() instanceof Bib2GlsBibParser)
+         {
+            error(((TeXSyntaxException)e).getMessage(this));
+         }
+         else
+         {
+            warning(((TeXSyntaxException)e).getMessage(this));
 
-   public int getDebugLevel()
-   {
-      return debugLevel;
-   }
+            if (debugLevel > 0)
+            {
+               e.printStackTrace();
 
-   public int getVerboseLevel()
-   {
-      return verboseLevel;
-   }
+               for (StackTraceElement elem : e.getStackTrace())
+               {
+                  logMessage(elem.toString());
+               }
+            }
 
-   public void debugMessage(String key, Object... params)
-   {
+            return;
+         }
+      }
+      else if (e instanceof NoSuchFileException)
+      {
+         error(getMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND,
+          ((NoSuchFileException)e).getFile()));
+      }
+      else
+      {
+         String msg = e.getMessage();
+
+         if (msg == null)
+         {
+            msg = e.getClass().getSimpleName();
+         }
+
+         error(msg);
+      }
+
       if (debugLevel > 0)
       {
-         logAndPrintMessage(getMessage(key, params));
+         e.printStackTrace();
+
+         for (StackTraceElement elem : e.getStackTrace())
+         {
+            logMessage(elem.toString());
+         }
       }
+
+      exitCode = 2;
    }
 
-   public void debug(String message)
-   {
-      if (debugLevel > 0)
-      {
-         logAndPrintMessage(message);
-      }
-   }
-
+   @Override
    public void debug(Throwable e)
    {
       if (debugLevel > 0)
@@ -4552,15 +4573,6 @@ public class Bib2Gls implements TeXApp
          {
             e.printStackTrace(pendingWriter);
          }
-      }
-   }
-
-   public void debug()
-   {
-      if (debugLevel > 0)
-      {
-         System.out.println();
-         logMessage();
       }
    }
 
@@ -4809,360 +4821,6 @@ public class Bib2Gls implements TeXApp
       return builder.toString();
    }
 
-   /*
-    * TeXApp method (texparserlib.jar) needs defining,
-    * but not needed for the purposes of this application.
-    */ 
-   @Override
-   public void epstopdf(File epsFile, File pdfFile)
-     throws IOException,InterruptedException
-   {
-      if (debugLevel > 0)
-      {// shouldn't happen
-         System.err.format(
-           "Ignoring unexpected request to convert %s to %s%n",
-           epsFile.toString(), pdfFile.toString());
-      }
-   }
-
-   /*
-    *  TeXApp method needs defining, but not needed for
-    *  the purposes of this application.
-    */ 
-   @Override
-   public void wmftoeps(File wmfFile, File epsFile)
-     throws IOException,InterruptedException
-   {
-      if (debugLevel > 0)
-      {// shouldn't happen
-         System.err.format(
-           "Ignoring unexpected request to convert %s to %s%n",
-           wmfFile.toString(), epsFile.toString());
-      }
-   }
-
-   /*
-    *  TeXApp method needs defining, but not needed for
-    *  the purposes of this application.
-    */ 
-   @Override
-   public void convertimage(int inPage, String[] inOptions, File inFile,
-     String[] outOptions, File outFile)
-     throws IOException,InterruptedException
-   {
-      if (debugLevel > 0)
-      {// shouldn't happen
-         System.err.format(
-           "Ignoring unexpected request to convert %s to %s%n",
-           inFile.toString(), outFile.toString());
-      }
-   }
-
-   /*
-    *  TeXApp method. This is used by the TeX parser library
-    *  when substituting deprecated commands, but this is
-    *  only likely to occur when obtaining the sort value.
-    *  Any deprecated commands in the bib fields will be copied
-    *  to the glstex file.
-    */ 
-   @Override
-   public void substituting(TeXParser parser, String original, 
-     String replacement)
-   {
-      verboseMessage("warning.substituting", original, replacement);
-   }
-
-   /*
-    *  TeXApp method used for progress updates for long actions,
-    *  such as loading datatool files, which isn't relevant here.
-    */ 
-   @Override
-   public void progress(int percent)
-   {
-   }
-
-   /*
-    *  TeXApp method used for obtaining a message from a given label. 
-    */ 
-
-   @Override
-   public String getMessage(String label, Object... params)
-   {
-      if (messages == null)
-      {// message system hasn't been initialised
-
-         String param = (params.length == 0 ? "" : params[0].toString());
-
-         for (int i = 1; i < params.length; i++)
-         {
-            param += ","+params[0].toString();
-         }
-
-         return String.format("%s[%s]", label, param);
-      }
-
-      String msg = label;
-
-      try
-      {
-         msg = messages.getMessage(label, params);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning("Can't find message for label: "+label, e);
-      }
-
-      return msg;
-   }
-
-   public String getMessage(TeXParser parser, String label, Object... params)
-   {
-      if (parser == null)
-      {
-         return getMessage(label, params);
-      }
-
-      int lineNum = parser.getLineNumber();
-      File file = parser.getCurrentFile();
-
-      if (lineNum == -1 || file == null)
-      {
-         return getMessage(label, params);
-      }
-      else
-      {
-         return fileLineMessage(file, lineNum, getMessage(label, params));
-      }
-   }
-
-   public String getMessageWithFallback(String label,
-       String fallbackFormat, Object... params)
-   {
-      if (messages == null)
-      {// message system hasn't been initialised
-
-         MessageFormat fmt = new MessageFormat(fallbackFormat);
-         return fmt.format(fallbackFormat, params);
-      }
-
-      try
-      {
-         return messages.getMessage(label, params);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning("Can't find message for label: "+label, e);
-
-         MessageFormat fmt = new MessageFormat(fallbackFormat);
-         return fmt.format(fallbackFormat, params);
-      }
-   }
-
-   public String getMessageIfExists(String label)
-   {
-      if (messages == null) return null;
-
-      String text = messages.getMessageIfExists(label);
-
-      if (text == null && getDebugLevel() > 0)
-      {
-         debug("No message for label '"+label+"'");
-      }
-
-      return text;
-   }
-
-   public String getChoiceMessage(String label, int argIdx,
-     String choiceLabel, int numChoices, Object... params)
-   {
-      if (messages == null)
-      {// message system hasn't been initialised
-
-         String param = (params.length == 0 ? "" : params[0].toString());
-
-         for (int i = 1; i < params.length; i++)
-         {
-            param += ","+params[0].toString();
-         }
-
-         return String.format("%s[%s]", label, param);
-      }
-
-      String msg = label;
-
-      try
-      {
-         msg = messages.getChoiceMessage(label, argIdx,
-            choiceLabel, numChoices, params);
-      }
-      catch (IllegalArgumentException e)
-      {
-         warning("Can't find message for label: "+label, e);
-      }
-
-      return msg;
-   }
-
-   public String getLocalisationText(String prefix, Locale locale, String suffix,
-     String defaultValue)
-   {
-      if (locale != null)
-      {
-         String langTag = locale.toLanguageTag();
-
-         String text = getMessageIfExists(String.format("%s.%s.%s",
-            prefix, langTag, suffix));
-
-         if (text != null)
-         {
-            return text;
-         }
-
-         String country = locale.getCountry();
-         String language = locale.getLanguage();
-
-         if (country != null && !country.isEmpty()
-             && language != null && !language.isEmpty())
-         {
-            String tag = String.format("%s-%s", language, country);
-
-            if (!tag.equals(langTag))
-            {
-               text = getMessageIfExists(String.format("%s.%s.%s",
-                  prefix, tag, suffix));
-
-               if (text != null)
-               {
-                  return text;
-               }
-            }
-         }
-
-         if (language != null && !language.isEmpty() && !language.equals(langTag))
-         {
-            text = getMessageIfExists(String.format("%s.%s.%s",
-               prefix, language, suffix));
-
-            if (text != null)
-            {
-               return text;
-            }
-         }
-      }
-
-      return defaultValue;
-   }
-
-   public String getLocalisationText(String prefix, Locale locale, String suffix)
-   {
-      String text = getLocalisationTextIfExists(prefix, locale, suffix);
-
-      if (text == null)
-      {
-         warning(String.format("Can't find message for label: %s.%s", prefix, suffix));
-         text = String.format("%s.%s", prefix, suffix);
-      }
-
-      return text;
-   }
-
-   public String getLocalisationTextIfExists(String prefix, Locale locale, String suffix)
-   {
-      if (locale != null)
-      {
-         String text = getLocalisationText(prefix, locale, suffix, null);
-
-         if (text != null)
-         {
-            return text;
-         }
-      }
-
-      if (defaultLocale != null && !defaultLocale.equals(locale))
-      {
-         String text = getLocalisationText(prefix, defaultLocale, suffix, null);
-
-         if (text != null)
-         {
-            return text;
-         }
-      }
-
-      if (docLocale != null 
-            && (locale == null || !locale.toLanguageTag().equals(docLocale)))
-      {
-         String text = getMessageIfExists(String.format("%s.%s.%s",
-            prefix, docLocale, suffix));
-
-         if (text != null)
-         {
-            return text;
-         }
-      }
-
-      return getMessageIfExists(String.format("%s.%s", prefix, suffix));
-   }
-
-
-   /*
-    *  TeXApp method for providing informational messages to the user.
-    */ 
-   @Override
-   public void message(String text)
-   {
-      if (verboseLevel >= 0)
-      {
-         System.out.println(text);
-      }
-
-      logMessage(text);
-   }
-
-   public void verboseMessage(String key, Object... params)
-   {
-      verbose(getMessage(key, params));
-   }
-
-   public void verbose(String text)
-   {
-      if (verboseLevel > 0)
-      {
-         System.out.println(text);
-      }
-
-      logMessage(text);
-   }
-
-   public void verbose()
-   {
-      if (verboseLevel > 0)
-      {
-         System.out.println();
-      }
-
-      logMessage();
-   }
-
-   public void verbose(TeXParser parser, String message)
-   {
-      int lineNum = parser.getLineNumber();
-      File file = parser.getCurrentFile();
-
-      if (lineNum != -1 && file != null)
-      {
-         message = fileLineMessage(file, lineNum, message);
-      }
-
-      verbose(message);
-   }
-
-   public static String fileLineMessage(File file, int lineNum,
-     String message)
-   {
-      return String.format("%s:%d: %s", file.toString(), lineNum,
-         message);
-   }
-
    public static boolean isScriptDigit(int cp)
    {
       return isSubscriptDigit(cp) || isSuperscriptDigit(cp);
@@ -5313,203 +4971,6 @@ public class Bib2Gls implements TeXApp
       }
    }
 
-   /*
-    *  TeXApp method for providing warning messages.
-    */ 
-   @Override
-   public void warning(TeXParser parser, String message)
-   {
-      if (verboseLevel >= 0)
-      {
-         int lineNum = parser.getLineNumber();
-         File file = parser.getCurrentFile();
-
-         if (lineNum == -1 || file == null)
-         {
-            warning(message);
-         }
-         else
-         {
-            warning(file, lineNum, message);
-         }
-      }
-   }
-
-   public void warning(File file, int line, String message)
-   {
-      if (verboseLevel >= 0)
-      {
-         warning(fileLineMessage(file, line, message));
-      }
-   }
-
-   public void warning(File file, int line, String message, Exception e)
-   {
-      if (verboseLevel >= 0)
-      {
-         warning(fileLineMessage(file, line, message), e);
-      }
-   }
-
-   public void warning(String message)
-   {
-      message = getMessageWithFallback("warning.title",
-         "Warning: {0}", message);
-
-      if (verboseLevel >= 0)
-      {
-         System.err.println(message);
-      }
-
-      logMessage(message);
-   }
-
-   public void warningMessage(String key, Object... params)
-   {
-      warning(getMessage(key, params));
-   }
-
-   public void warning()
-   {
-      if (verboseLevel >= 0)
-      {
-         System.err.println();
-      }
-
-      logMessage();
-   }
-
-   public void warning(String message, Exception e)
-   {
-      if (verboseLevel >= 0)
-      {
-         System.err.println(message);
-      }
-
-      logMessage(message);
-
-      if (debugLevel > 0)
-      {
-         e.printStackTrace();
-
-         for (StackTraceElement elem : e.getStackTrace())
-         {
-            logMessage(elem.toString());
-         }
-      }
-   }
-
-   /*
-    *  TeXApp method for providing error messages.
-    */ 
-   @Override
-   public void error(Exception e)
-   {
-      if (e instanceof TeXSyntaxException)
-      {
-         TeXParser p = ((TeXSyntaxException)e).getParser();
-
-         // Only trigger an error when parsing bib files, otherwise
-         // warn.
-
-         if (p == null || p.getListener() instanceof Bib2GlsBibParser)
-         {
-            error(((TeXSyntaxException)e).getMessage(this));
-         }
-         else
-         {
-            warning(((TeXSyntaxException)e).getMessage(this));
-
-            if (debugLevel > 0)
-            {
-               e.printStackTrace();
-
-               for (StackTraceElement elem : e.getStackTrace())
-               {
-                  logMessage(elem.toString());
-               }
-            }
-
-            return;
-         }
-      }
-      else if (e instanceof NoSuchFileException)
-      {
-         error(getMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND, 
-          ((NoSuchFileException)e).getFile()));
-      }
-      else
-      {
-         String msg = e.getMessage();
-
-         if (msg == null)
-         {
-            msg = e.getClass().getSimpleName();
-         }
-
-         error(msg);
-      }
-
-      if (debugLevel > 0)
-      {
-         e.printStackTrace();
-
-         for (StackTraceElement elem : e.getStackTrace())
-         {
-            logMessage(elem.toString());
-         }
-      }
-
-      exitCode = 2;
-   }
-
-   public void error(String msg)
-   {
-      msg = getMessageWithFallback("error.title", "Error: {0}", msg);
-
-      System.err.println(msg);
-      logMessage(msg);
-   }
-
-   /*
-    *  TeXApp method needs defining, but shouldn't be needed for
-    *  the purposes of this application. This is mainly used by
-    *  the TeX parser library to copy images to a designated output
-    *  directory when performing LaTeX -> LaTeX or LaTeX -> HTML
-    *  actions.
-    */ 
-   @Override
-   public void copyFile(File orgFile, File newFile)
-     throws IOException,InterruptedException
-   {
-      if (debugLevel > 0)
-      {
-         System.err.format(
-           "Ignoring unexpected request to copy files %s -> %s%n",
-           orgFile.toString(), newFile.toString());
-      }
-   }
-
-   /*
-    * TeXApp method needs defining, but unlikely to be needed for
-    * the purposes of this application. (It doesn't make any 
-    * sense to have something like \read-1 in a bib field.)
-    * Just return empty string.
-    */ 
-   @Override
-   public String requestUserInput(String message)
-     throws IOException
-   {
-      if (debugLevel > 0)
-      {
-         System.err.format(
-           "Ignoring unexpected request for user input. Message: %s%n",
-           message);
-      }
-
-      return "";
-   }
-
    @Override
    public String getApplicationName()
    {
@@ -5517,143 +4978,9 @@ public class Bib2Gls implements TeXApp
    }
 
    @Override
-   public String getApplicationVersion()
+   public String getCopyrightStartYear()
    {
-      return VERSION;
-   }
-
-   public void version()
-   {
-      System.out.println(getMessageWithFallback("about.version",
-        "{0} version {1} ({2})", NAME, VERSION, DATE));
-   }
-
-   public void license()
-   {
-      System.out.println("https://github.com/nlct/bib2gls");
-      System.out.println();
-      System.out.format("Copyright 2017-%s Nicola Talbot%n",
-       DATE.substring(0,4));
-      System.out.println(getMessage("about.license"));
-   }
-
-   public void libraryVersion()
-   {
-      System.out.println();
-      System.out.println(getMessageWithFallback("about.library.version",
-        "Bundled with {0} version {1} ({2})", 
-        "texparserlib.jar", TeXParser.VERSION, TeXParser.VERSION_DATE));
-      System.out.println("https://github.com/nlct/texparser");
-   }
-
-   private void printSyntaxItem(String message)
-   {
-      String[] split = message.split("\t", 2);
-
-      if (split.length == 2)
-      {
-         String desc = split[1].replaceAll(" *\\n", " ");
-
-         int syntaxLength = split[0].length();
-         int descLength = desc.length();
-
-         System.out.print("  "+split[0]);
-
-         int numSpaces = SYNTAX_ITEM_TAB - syntaxLength - 2;
-
-         if (numSpaces <= 0)
-         {
-            numSpaces = 2;
-         }
-
-         int indent = syntaxLength+2+numSpaces;
-
-         int width = SYNTAX_ITEM_LINEWIDTH-indent;
-
-         for (int i = 0; i < numSpaces; i++)
-         {
-            System.out.print(' ');
-         }
-
-         if (width >= descLength)
-         {
-            System.out.println(desc);
-         }
-         else
-         {
-            BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(desc);
-
-            int start = boundary.first();
-            int n = 0;
-
-            int defWidth = SYNTAX_ITEM_LINEWIDTH - SYNTAX_ITEM_TAB;
-            numSpaces = SYNTAX_ITEM_TAB;
-
-            for (int end = boundary.next();
-               end != BreakIterator.DONE;
-               start = end, end = boundary.next())
-            {
-               int len = end-start;
-               n += len;
-
-               if (n >= width)
-               {
-                  System.out.println();
-
-                  for (int i = 0; i < numSpaces; i++)
-                  {
-                     System.out.print(' ');
-                  }
-
-                  n = len;
-                  width = defWidth;
-               }
-
-               System.out.print(desc.substring(start,end));
-            }
-
-            System.out.println();
-
-         }
-      }
-      else if (split.length == 1)
-      {
-         String desc = split[0].replaceAll(" *\\n", " ");
-
-         int descLength = desc.length();
-
-         if (descLength <= SYNTAX_ITEM_LINEWIDTH)
-         {
-            System.out.println(desc);
-         }
-         else
-         {
-            BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(desc);
-
-            int start = boundary.first();
-            int n = 0;
-
-            for (int end = boundary.next();
-               end != BreakIterator.DONE;
-               start = end, end = boundary.next())
-            {
-               int len = end-start;
-               n += len;
-
-               if (n >= SYNTAX_ITEM_LINEWIDTH)
-               {
-                  System.out.println();
-                  n = len;
-               }
-
-               System.out.print(desc.substring(start,end));
-            }
-
-            System.out.println();
-         }
-      }
+      return "2017";
    }
 
    public void help()
@@ -5805,160 +5132,29 @@ public class Bib2Gls implements TeXApp
       System.out.println(getMessage("syntax.furtherinfo"));
       System.out.println();
 
-      System.out.println(getMessage("syntax.tutorial", NAME, "texdoc bib2gls-begin"));
-      System.out.println(getMessage("syntax.userguide", NAME, "texdoc bib2gls"));
-      System.out.println(getMessage("syntax.ctan", NAME,
-         "https://ctan.org/pkg/bib2gls"));
-      System.out.println(getMessage("syntax.home", NAME,
-        "https://www.dickimaw-books.com/software/bib2gls/"));
-      System.out.println(getMessage("syntax.faq", NAME,
-        "https://www.dickimaw-books.com/faq.php?category=bib2gls"));
+      furtherInfo();
 
       System.exit(0);
    }
 
-   private String getLanguageFileName(String prefix, String tag)
+
+   @Override
+   protected Locale initMessageLocale(Locale locale)
    {
-      return String.format("/resources/%s-%s.xml", prefix, tag);
-   }
-
-   private URL getLanguageUrl(String prefix, Locale locale, String defaultTag)
-   {
-      String lang = locale.toLanguageTag();
-
-      String name = getLanguageFileName(prefix, lang);
-
-      URL url = getClass().getResource(name);
-
-      String jar = null;
-
-      if (debugLevel > 0)
-      {
-         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
-               .toString();
-      }
-
-      if (url == null)
-      {
-         if (jar != null)
-         {
-            debug(String.format("Can't find language resource: %s!%s",
-               jar, name));
-         }
-
-         lang = locale.getLanguage();
-
-         name = getLanguageFileName(prefix, lang);
-
-         debug("Trying: "+name);
-
-         url = getClass().getResource(name);
-
-         if (url == null)
-         {
-            debug(String.format("Can't find language resource: %s!%s",
-                    jar, name));
-
-            String script = locale.getScript();
-
-            if (script != null && !script.isEmpty())
-            {
-               name = getLanguageFileName(prefix, 
-                  String.format("%s-%s", lang, script));
-
-               debug("Trying: "+name);
-
-               url = getClass().getResource(name);
-
-               if (url == null && defaultTag != null && !lang.equals(defaultTag))
-               {
-                  debug(String.format(
-                    "Can't find language resource: %s!%s%nDefaulting to '%s'",
-                    jar, name, defaultTag));
-
-                  url = getClass().getResource(
-                    getLanguageFileName(prefix, defaultTag));
-               }
-            }
-            else if (defaultTag != null && !lang.equals(defaultTag))
-            {
-               if (debugLevel > 0)
-               {
-                  debug(String.format("Defaulting to '%s'", defaultTag));
-               }
-
-               url = getClass().getResource(
-                  getLanguageFileName(prefix, defaultTag));
-            }
-         }
-      }
-
-      return url;
-   }
-
-   private void initMessages(String langTag) throws Bib2GlsException,IOException
-   {
-      Locale locale;
-
-      if (langTag == null || "".equals(langTag))
-      {
-         if (defaultLocale == null)
-         {
-            locale = Locale.getDefault();
-         }
-         else
-         {
-            locale = defaultLocale;
-         }
-      }
-      else
-      {
-         try
-         {
-            setDocDefaultLocale(langTag);
-            locale = getDefaultLocale();
-         }
-         catch (IllformedLocaleException e)
-         {
-            locale = Locale.getDefault();
-            setDocDefaultLocale(locale);
-            error(e.getMessage());
-            debug(e);
-         }
-      }
-
-      URL url = getLanguageUrl("bib2gls", locale, "en");
-
-      if (url == null)
-      {
-         throw new Bib2GlsException("Can't find language resource file.");
-      }
-
-      InputStream in = null;
-
       try
       {
-         debug("Reading "+url);
-
-         in = url.openStream();
-
-         Properties prop = new Properties();
-
-         prop.loadFromXML(in);
-
-         in.close();
-         in = null;
-
-         messages = new Bib2GlsMessages(prop);
+         setDocDefaultLocale(langTag);
+         locale = getDefaultLocale();
       }
-      finally
+      catch (IllformedLocaleException e)
       {
-         if (in != null)
-         {
-            in.close();
-            in = null;
-         }
+         locale = Locale.getDefault();
+         setDocDefaultLocale(locale);
+         error(e.getMessage());
+         debug(e);
       }
+
+      return locale;
    }
 
    public void addExtraProperties(Locale locale)
@@ -6108,930 +5304,654 @@ public class Bib2Gls implements TeXApp
       return !trimExceptFields.contains(field);
    }
 
-   private static int parseArgVal(String[] args, int i, Object[] argVal)
+   protected void setDebugLevel(int level)
    {
-      String[] sp; 
-
-      if (args[i].startsWith("--"))
+      if (level < 0)
       {
-         sp = args[i].split("=", 2);
-      }
-      else
-      {
-         sp = new String[]{args[i]};
+         throw new IllegalArgumentException(getMessage(
+           "error.invalid.opt.minint.value", "--debug",
+             level, 0));
       }
 
-      argVal[0] = sp[0];
+      debugLevel = level;
 
-      if (sp.length == 2)
+      if (level > 0)
       {
-         argVal[1] = sp[1];
-         return i;
+         verboseLevel = DEBUG;
       }
-
-      if (i == args.length-1 || args[i+1].startsWith("-"))
-      {
-         argVal[1] = null;
-         return i; 
-      }
-
-      argVal[1] = args[++i];
-
-      return i;
    }
 
-   private int parseArgInt(String[] args, int i, Object[] argVal)
+   @Override
+   protected void initSettings()
+    throws Bib2GlsSyntaxException
    {
-      return parseArgInt(args, i, argVal, this);
-   }
-
-   private int parseArgInt(String[] args, int i, Object[] argVal,
-     int defVal)
-   {
-      return parseArgInt(args, i, argVal, defVal, this);
-   }
-
-   private static int parseArgInt(String[] args, int i, Object[] argVal,
-     Bib2Gls bib2gls)
-   {
-      i = parseArgVal(args, i, argVal);
-
-      if (argVal[1] != null)
-      {
-         try
-         {
-            argVal[1] = Integer.valueOf((String)argVal[1]);
-         }
-         catch (NumberFormatException e)
-         {
-            if (bib2gls == null)
-            {
-               throw new IllegalArgumentException("Invalid integer argument",
-                 e);
-            }
-            else
-            {
-               throw new IllegalArgumentException(bib2gls.getMessage(
-                 "error.invalid.opt.int.value", argVal[0], argVal[1]), e);
-            }
-         }
-      }
-
-      return i;
-   }
-
-   private static int parseArgInt(String[] args, int i, Object[] argVal,
-     int defVal, Bib2Gls bib2gls)
-   {
-      i = parseArgVal(args, i, argVal);
-
-      if (argVal[1] == null)
-      {
-         argVal[1] = Integer.valueOf(defVal);
-      }
-      else
-      {
-         try
-         {
-            argVal[1] = Integer.valueOf((String)argVal[1]);
-         }
-         catch (NumberFormatException e)
-         {
-            argVal[1] = Integer.valueOf(defVal);
-            return i-1;
-         }
-      }
-
-      return i;
-   }
-
-   private static boolean isArg(String arg, String shortArg, String longArg)
-   {
-      return arg.equals("-"+shortArg) || arg.equals("--"+longArg) 
-        || arg.startsWith("--"+longArg+"=");
-   }
-
-   private static boolean isArg(String arg, String longArg)
-   {
-      return arg.equals("--"+longArg) || arg.startsWith("--"+longArg+"=");
-   }
-
-   private void parseArgs(String[] args)
-     throws IOException,Bib2GlsSyntaxException
-   {
-      String dirName = null;
-      String auxFileName = null;
-      String logName = null;
-      boolean provideknownGlossaries=false;
-
+      provideknownGlossaries=false;
       mfirstucProtectWasSet = false;
       mfirstucMProtectWasSet = false;
 
       debugMessage("message.parsing.args");
 
       recordCountRule = new RecordCountRule(this);
+   }
 
-      Object[] argVal = new Object[2];
-
-      for (int i = 0; i < args.length; i++)
+   @Override
+   protected int argCount(String arg)
+   {
+      if (
+           arg.equals("-t") || arg.equals("--log-file")
+        || arg.equals("-p") || arg.equals("--packages")
+        || arg.equals("--custom-packages")
+        || arg.equals("-k") || arg.equals("--ignore-packages")
+        || arg.equals("--merge-nameref-on")
+        || arg.equals("-u") || arg.equals("--mfirstuc-protection")
+        || arg.equals("--shortcuts")
+        || arg.equals("--nested-link-check")
+        || arg.equals("-d") || arg.equals("--dir")
+        || arg.equals("-m") || arg.equals("--map-format")
+        || arg.equals("--retain-formats")
+        || arg.equals("-r") || arg.equals("--record-count-rule")
+        || arg.equals("--tex-encoding")
+        || arg.equals("--log-encoding")
+        || arg.equals("--trim-only-fields")
+        || arg.equals("--trim-except-fields")
+         )
       {
-         if (isArg(args[i], "debug"))
+         return 1;
+      }
+
+      return 0;
+   }
+
+   @Override
+   protected void parseArg(ArrayDeque<String> deque, String arg)
+    throws Bib2GlsSyntaxException
+   {
+      if (auxFileName == null)
+      {
+         auxFileName = arg;
+      }
+      else
+      {
+         throw new Bib2GlsSyntaxException(getMessage("error.only.one.aux"));
+      }
+   }
+
+   @Override
+   protected boolean parseArg(ArrayDeque<String> deque, String arg,
+      BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {  
+      if (isArg(deque, arg, "-t", "--log-file", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            i = parseArgInt(args, i, argVal, 1 << 30);
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
 
-            int level = ((Integer)argVal[1]).intValue();
+         logName = returnVals[0].toString();
+      }
+      else if (isListArg(deque, arg, "-p", "--packages", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
 
-            if (level < 0)
+         for (String sty : returnVals[0].listValue())
+         {
+            if (isKnownPackage(sty))
             {
-               throw new IllegalArgumentException(getMessage(
-                 "error.invalid.opt.minint.value", argVal[0],
-                   level, 0));
-            }
-
-            debugLevel = level;
-            verboseLevel = debugLevel;
-         }
-         else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
-         {
-            debugLevel = 0;
-         }
-         else if (args[i].equals("--debug-mode"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            debugLevel = 0;
-
-            String[] split = argVal[1].toString().split(",");
-      
-            for (String mode : split)
-            {
-               mode = mode.trim();
-
-               if (mode.equals("all"))
-               {
-                  debugLevel = Integer.MAX_VALUE;
-               }
-               else if (mode.equals("io"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_IO;
-               }
-               else if (mode.equals("popped"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_POPPED;
-               }
-               else if (mode.equals("decl"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_DECL;
-               }
-               else if (mode.equals("sty-data"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_STY_DATA;
-               }
-               else if (mode.equals("expansion"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION;
-               }
-               else if (mode.equals("expansion-list"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_LIST;
-               }
-               else if (mode.equals("expansion-once"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE;
-               }
-               else if (mode.equals("expansion-once-list"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
-               }
-               else if (mode.equals("process"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING;
-               }
-               else if (mode.equals("process-stack"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK;
-               }
-               else if (mode.equals("process-stack-list"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK_LIST;
-               }
-               else if (mode.equals("cs"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_CS;
-               }
-               else if (mode.equals("process-generic-cs"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
-               }
-               else if (mode.equals("catcode"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_CATCODE;
-               }
-               else if (mode.equals("read"))
-               {
-                  debugLevel = debugLevel | TeXParser.DEBUG_READ;
-               }
-               else
-               {
-                  throw new Bib2GlsSyntaxException(
-                    getMessage("error.syntax.unknown_debug_mode", mode));
-               }
-            }
-
-            verboseLevel = 1;
-         }
-         else if (args[i].equals("--verbose"))
-         {
-            verboseLevel = 1;
-         }
-         else if (args[i].equals("--no-verbose") 
-           || args[i].equals("--noverbose"))
-         {
-            verboseLevel = 0;
-         }
-         else if (args[i].equals("--silent") || args[i].equals("--quiet")
-                  || args[i].equals("-q"))
-         {
-            verboseLevel = -1;
-         }
-         else if (isArg(args[i], "l", "locale"))
-         {
-            // already dealt with, but need to increment index and
-            // perform syntax check.
-
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-         }
-         else if (args[i].equals("-h") || args[i].equals("--help"))
-         {
-            help();
-         }
-         else if (args[i].equals("-v") || args[i].equals("--version"))
-         {
-            if (!shownVersion)
-            {
-               version();
-            }
-
-            license();
-            libraryVersion();
-            System.exit(0);
-         }
-         else if (isArg(args[i], "t", "log-file"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            logName = (String)argVal[1];
-         }
-         else if (isArg(args[i], "p", "packages"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
-
-            for (String sty : styList)
-            {
-               if (isKnownPackage(sty))
-               {
-                  packages.add(sty);
-               }
-               else
-               {
-                  throw new Bib2GlsSyntaxException(
-                     getMessage("error.unsupported.package", sty, 
-                     "--custom-packages"));
-               }
-            }
-         }
-         else if (isArg(args[i], "custom-packages"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
-
-            if (customPackages == null)
-            {
-               customPackages = new Vector<String>();
-            }
-
-            for (String sty : styList)
-            {
-               if (isKnownPackage(sty))
-               {
-                  throw new Bib2GlsSyntaxException(
-                     getMessage("error.supported.package", sty, 
-                     "--packages"));
-               }
-               else
-               {
-                  customPackages.add(sty);
-               }
-            }
-         }
-         else if (isArg(args[i], "k", "ignore-packages"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] styList = ((String)argVal[1]).trim().split("\\s*,\\s*");
-
-            if (ignorePackages == null)
-            {
-               ignorePackages = new Vector<String>();
-            }
-
-            for (String sty : styList)
-            {
-               if (isKnownPackage(sty))
-               {
-                  ignorePackages.add(sty);
-               }
-               else
-               {
-                  warningMessage("error.invalid.opt.value", argVal[0], sty);
-               }
-            }
-         }
-         else if (args[i].equals("--list-known-packages"))
-         {
-            System.out.println(getMessage("message.list.known.packages.auto"));
-
-            for (int j = 0; j < AUTO_SUPPORT_PACKAGES.length; j++)
-            {
-               if (j%5 == 0)
-               {
-                  if (j > 0)
-                  {
-                     System.out.print(",");
-                  }
-
-                  System.out.println();
-                  System.out.print("\t");
-               }
-               else
-               {
-                  System.out.print(", ");
-               }
-
-               System.out.print(AUTO_SUPPORT_PACKAGES[j]);
-            }
-
-            System.out.println();
-            System.out.println();
-
-            System.out.println(getMessage("message.list.known.packages.extra"));
-
-            for (int j = 0; j < EXTRA_SUPPORTED_PACKAGES.length; j++)
-            {
-               if (j%5 == 0)
-               {
-                  if (j > 0)
-                  {
-                     System.out.print(",");
-                  }
-
-                  System.out.println();
-                  System.out.print("\t");
-               }
-               else
-               {
-                  System.out.print(", ");
-               }
-
-               System.out.print(EXTRA_SUPPORTED_PACKAGES[j]);
-            }
-
-            System.out.println();
-
-            System.out.println(getMessage("message.list.known.packages.info"));
-
-            System.exit(0);
-         }
-         else if (args[i].equals("--expand-fields"))
-         {
-            expandFields = true;
-         }
-         else if (args[i].equals("--no-expand-fields"))
-         {
-            expandFields = false;
-         }
-         else if (args[i].equals("--warn-non-bib-fields"))
-         {
-            checkNonBibFields = true;
-         }
-         else if (args[i].equals("--no-warn-non-bib-fields"))
-         {
-            checkNonBibFields = false;
-         }
-         else if (args[i].equals("--warn-unknown-entry-types"))
-         {
-            warnUnknownEntryTypes = true;
-         }
-         else if (args[i].equals("--no-warn-unknown-entry-types"))
-         {
-            warnUnknownEntryTypes = false;
-         }
-         else if (args[i].equals("--interpret"))
-         {
-            interpret = true;
-         }
-         else if (args[i].equals("--no-interpret"))
-         {
-            interpret = false;
-         }
-         else if (args[i].equals("--break-space"))
-         {
-            useNonBreakSpace = false;
-         }
-         else if (args[i].equals("--no-break-space"))
-         {
-            useNonBreakSpace = true;
-         }
-         else if (args[i].equals("--obey-aux-catcode"))
-         {
-            allowAuxCatChangers = true;
-         }
-         else if (args[i].equals("--no-obey-aux-catcode"))
-         {
-            allowAuxCatChangers = false;
-         }
-         else if (args[i].equals("--cite-as-record"))
-         {
-            useCiteAsRecord = true;
-         }
-         else if (args[i].equals("--no-cite-as-record"))
-         {
-            useCiteAsRecord = false;
-         }
-         else if (args[i].equals("--merge-wrglossary-records"))
-         {
-            mergeWrGlossaryLocations = true;
-         }
-         else if (args[i].equals("--no-merge-wrglossary-records"))
-         {
-            mergeWrGlossaryLocations = false;
-         }
-         else if (isArg(args[i], "merge-nameref-on"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            if (arg.equals("href"))
-            {
-               mergeNameRefOn = MERGE_NAMEREF_ON_HREF;
-            }
-            else if (arg.equals("title"))
-            {
-               mergeNameRefOn = MERGE_NAMEREF_ON_TITLE;
-            }
-            else if (arg.equals("location"))
-            {
-               mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
-            }
-            else if (arg.equals("hcounter"))
-            {
-               mergeNameRefOn = MERGE_NAMEREF_ON_HCOUNTER;
+               packages.add(sty);
             }
             else
             {
                throw new Bib2GlsSyntaxException(
-                 getMessage("error.invalid.choice.value", argVal[0], arg));
+                  getMessage("error.unsupported.package", sty, 
+                  "--custom-packages"));
             }
          }
-         else if (args[i].equals("--force-cross-resource-refs") 
-                   || args[i].equals("-x"))
+      }
+      else if (isListArg(deque, arg, "--custom-packages", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            forceCrossResourceRefs = true;
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
          }
-         else if (args[i].equals("--no-force-cross-resource-refs"))
-         {
-            forceCrossResourceRefs = false;
-         }
-         else if (args[i].equals("--support-unicode-script"))
-         {
-            supportUnicodeSubSuperScripts = true;
-         }
-         else if (args[i].equals("--no-support-unicode-script"))
-         {
-            supportUnicodeSubSuperScripts = false;
-         }
-         else if (args[i].equals("--replace-quotes"))
-         {
-            replaceQuotes = true;
-         }
-         else if (args[i].equals("--no-replace-quotes"))
-         {
-            replaceQuotes = false;
-         }
-         else if (args[i].equals("--collapse-same-location-range"))
-         {
-            collapseSamePageRange = true;
-         }
-         else if (args[i].equals("--no-collapse-same-location-range"))
-         {
-            collapseSamePageRange = false;
-         }
-         else if (args[i].equals("--no-mfirstuc-protection"))
-         {
-            mfirstucProtect = false;
-            mfirstucProtectWasSet = true;
-         }
-         else if (isArg(args[i], "u", "mfirstuc-protection"))
-         {
-            i = parseArgVal(args, i, argVal);
 
-            mfirstucProtect = true;
-            mfirstucProtectWasSet = true;
+         if (customPackages == null)
+         {
+            customPackages = new Vector<String>();
+         }
 
-            String arg = (String)argVal[1];
-
-            if (arg == null)
+         for (String sty : returnVals[0].listValue())
+         {
+            if (isKnownPackage(sty))
             {
                throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            if (arg.equals("all"))
-            {
-               mfirstucProtectFields = null;
-            }
-            else if (arg.isEmpty())
-            {
-               mfirstucProtect = false;
+                  getMessage("error.supported.package", sty, 
+                  "--packages"));
             }
             else
             {
-               mfirstucProtectFields = arg.split(" *, *");
+               customPackages.add(sty);
             }
          }
-         else if (args[i].equals("--no-mfirstuc-math-protection"))
+      }
+      else if (isListArg(deque, arg, "-k", "--ignore-packages", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            mfirstucMProtect = false;
-            mfirstucMProtectWasSet = true;
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
          }
-         else if (args[i].equals("--mfirstuc-math-protection"))
+
+         if (ignorePackages == null)
          {
-            mfirstucMProtect = true;
-            mfirstucMProtectWasSet = true;
+            ignorePackages = new Vector<String>();
          }
-         else if (isArg(args[i], "shortcuts"))
+
+         for (String sty : returnVals[0].listValue())
          {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
+            if (isKnownPackage(sty))
             {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            try
-            {
-               setShortCuts(arg);
-            }
-            catch (IllegalArgumentException e)
-            {
-               throw new Bib2GlsSyntaxException(
-                 getMessage("error.invalid.choice.value", 
-                 argVal[0], arg), e);
-            }
-         }
-         else if (isArg(args[i], "nested-link-check"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                 getMessage("error.missing.value", argVal[0]));
-            }
-
-            if (arg.equals("none") || arg.isEmpty())
-            {
-               nestedLinkCheckFields = null;
+               ignorePackages.add(sty);
             }
             else
             {
-               nestedLinkCheckFields = arg.split(" *, *");
+               warningMessage("error.invalid.opt.value", arg, sty);
             }
          }
-         else if (args[i].equals("--no-nested-link-check"))
+      }
+      else if (arg.equals("--list-known-packages"))
+      {
+         System.out.println(getMessage("message.list.known.packages.auto"));
+
+         for (int j = 0; j < AUTO_SUPPORT_PACKAGES.length; j++)
          {
-            nestedLinkCheckFields = null;
-         }
-         else if (isArg(args[i], "d", "dir"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
+            if (j%5 == 0)
             {
-               throw new Bib2GlsSyntaxException(
-                 getMessage("error.missing.value", argVal[0]));
-            }
-
-            dirName = (String)argVal[1];
-         }
-         else if (isArg(args[i], "m", "map-format"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] split = arg.trim().split(" *, *");
-
-            for (String value : split)
-            {
-               String[] values = value.split(" *: *");
-
-               if (values.length != 2)
+               if (j > 0)
                {
-                  throw new Bib2GlsSyntaxException(
-                    getMessage("error.invalid.opt.value", argVal[0], arg));
+                  System.out.print(",");
                }
 
-               formatMap.put(values[0], values[1]);
+               System.out.println();
+               System.out.print("\t");
             }
-         }
-         else if (isArg(args[i], "retain-formats"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
+            else
             {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
+               System.out.print(", ");
             }
 
-            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
+            System.out.print(AUTO_SUPPORT_PACKAGES[j]);
+         }
 
-            if (retainFormatList == null)
+         System.out.println();
+         System.out.println();
+
+         System.out.println(getMessage("message.list.known.packages.extra"));
+
+         for (int j = 0; j < EXTRA_SUPPORTED_PACKAGES.length; j++)
+         {
+            if (j%5 == 0)
             {
-               retainFormatList = new Vector<String>();
-            }
+               if (j > 0)
+               {
+                  System.out.print(",");
+               }
 
-            for (String field : fieldList)
+               System.out.println();
+               System.out.print("\t");
+            }
+            else
             {
-               retainFormatList.add(field);
-            }
-         }
-         else if (args[i].equals("--no-retain-formats"))
-         {
-            retainFormatList = null;
-         }
-         else if (args[i].equals("--group") || args[i].equals("-g"))
-         {
-            addGroupField = true;
-         }
-         else if (args[i].equals("--no-group"))
-         {
-            addGroupField = false;
-         }
-         else if (isArg(args[i], "r", "record-count-rule"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
+               System.out.print(", ");
             }
 
-            recordCountRule.setRule((String)argVal[1]);
-            saveRecordCount = true;
+            System.out.print(EXTRA_SUPPORTED_PACKAGES[j]);
          }
-         else if (args[i].equals("--record-count") || args[i].equals("-c"))
+
+         System.out.println();
+
+         System.out.println(getMessage("message.list.known.packages.info"));
+
+         System.exit(0);
+      }
+      else if (arg.equals("--expand-fields"))
+      {
+         expandFields = true;
+      }
+      else if (arg.equals("--no-expand-fields"))
+      {
+         expandFields = false;
+      }
+      else if (arg.equals("--warn-non-bib-fields"))
+      {
+         checkNonBibFields = true;
+      }
+      else if (arg.equals("--no-warn-non-bib-fields"))
+      {
+         checkNonBibFields = false;
+      }
+      else if (arg.equals("--warn-unknown-entry-types"))
+      {
+         warnUnknownEntryTypes = true;
+      }
+      else if (arg.equals("--no-warn-unknown-entry-types"))
+      {
+         warnUnknownEntryTypes = false;
+      }
+      else if (arg.equals("--interpret"))
+      {
+         interpret = true;
+      }
+      else if (arg.equals("--no-interpret"))
+      {
+         interpret = false;
+      }
+      else if (arg.equals("--break-space"))
+      {
+         useNonBreakSpace = false;
+      }
+      else if (arg.equals("--no-break-space"))
+      {
+         useNonBreakSpace = true;
+      }
+      else if (arg.equals("--obey-aux-catcode"))
+      {
+         allowAuxCatChangers = true;
+      }
+      else if (arg.equals("--no-obey-aux-catcode"))
+      {
+         allowAuxCatChangers = false;
+      }
+      else if (arg.equals("--cite-as-record"))
+      {
+         useCiteAsRecord = true;
+      }
+      else if (arg.equals("--no-cite-as-record"))
+      {
+         useCiteAsRecord = false;
+      }
+      else if (arg.equals("--merge-wrglossary-records"))
+      {
+         mergeWrGlossaryLocations = true;
+      }
+      else if (arg.equals("--no-merge-wrglossary-records"))
+      {
+         mergeWrGlossaryLocations = false;
+      }
+      else if (isArg(deque, arg, "--merge-nameref-on", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            saveRecordCount = true;
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
          }
-         else if (args[i].equals("--no-record-count"))
+
+         String val = returnVals[0].toString();
+
+         if (val.equals("href"))
          {
-            saveRecordCount = false;
-            saveRecordCountUnit = false;
+            mergeNameRefOn = MERGE_NAMEREF_ON_HREF;
          }
-         else if (args[i].equals("--record-count-unit") || args[i].equals("-n"))
+         else if (val.equals("title"))
          {
-            saveRecordCountUnit = true;
-            saveRecordCount = true;
+            mergeNameRefOn = MERGE_NAMEREF_ON_TITLE;
          }
-         else if (args[i].equals("--no-record-count-unit"))
+         else if (val.equals("location"))
          {
-            saveRecordCountUnit = false;
+            mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
          }
-         else if (isArg(args[i], "D", "date-in-header"))
+         else if (val.equals("hcounter"))
          {
-            dateInHeader = true;
-         }
-         else if (args[i].equals("--no-date-in-header"))
-         {
-            dateInHeader = false;
-         }
-         else if (isArg(args[i], "tex-encoding"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            try
-            {
-               texCharset = Charset.forName(arg);
-            }
-            catch (UnsupportedCharsetException e)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.unknown.charset", arg), e);
-            }
-         }
-         else if (isArg(args[i], "default-encoding"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            try
-            {
-               defaultCharset = Charset.forName(arg);
-            }
-            catch (UnsupportedCharsetException e)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.unknown.charset", arg), e);
-            }
-         }
-         else if (isArg(args[i], "log-encoding"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            String arg = (String)argVal[1];
-
-            if (arg == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            try
-            {
-               texLogCharset = Charset.forName(arg);
-            }
-            catch (UnsupportedCharsetException e)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.unknown.charset", arg), e);
-            }
-         }
-         else if (args[i].equals("--trim-fields"))
-         {
-            trimFields = true;
-            trimOnlyFields = null;
-            trimExceptFields = null;
-         }
-         else if (args[i].equals("--no-trim-fields"))
-         {
-            trimFields = false;
-            trimOnlyFields = null;
-            trimExceptFields = null;
-         }
-         else if (isArg(args[i], "trim-only-fields"))
-         {
-            if (trimExceptFields != null)
-            {
-               throw new Bib2GlsSyntaxException(
-                 getMessage("error.option.clash",
-                  "--trim-only-fields", "--trim-except-fields"));
-            }
-
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
-
-            if (trimOnlyFields == null)
-            {
-               trimOnlyFields = new Vector<String>();
-            }
-
-            for (String field : fieldList)
-            {
-               trimOnlyFields.add(field);
-            }
-
-            trimFields = true;
-         }
-         else if (isArg(args[i], "trim-except-fields"))
-         {
-            if (trimOnlyFields != null)
-            {
-               throw new Bib2GlsSyntaxException(
-                 getMessage("error.option.clash",
-                  "--trim-only-fields", "--trim-except-fields"));
-            }
-
-            i = parseArgVal(args, i, argVal);
-
-            if (argVal[1] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.missing.value", argVal[0]));
-            }
-
-            String[] fieldList = ((String)argVal[1]).trim().split("\\s*,\\s*");
-
-            if (trimExceptFields == null)
-            {
-               trimExceptFields = new Vector<String>();
-            }
-
-            for (String field : fieldList)
-            {
-               trimExceptFields.add(field);
-            }
-
-            trimFields = true;
-         }
-         else if (args[i].equals("--provide-glossaries"))
-         {
-            provideknownGlossaries=true;
-         }
-         else if (args[i].equals("--no-provide-glossaries"))
-         {
-            provideknownGlossaries=false;
-         }
-         else if (args[i].startsWith("-"))
-         {
-            throw new Bib2GlsSyntaxException(getMessage(
-              "error.syntax.unknown_option", args[i]));
-         }
-         else if (auxFileName == null)
-         {
-            auxFileName = args[i];
+            mergeNameRefOn = MERGE_NAMEREF_ON_HCOUNTER;
          }
          else
          {
-            throw new Bib2GlsSyntaxException(getMessage("error.only.one.aux"));
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.invalid.choice.value", arg, val));
          }
       }
+      else if (arg.equals("--force-cross-resource-refs") 
+                || arg.equals("-x"))
+      {
+         forceCrossResourceRefs = true;
+      }
+      else if (arg.equals("--no-force-cross-resource-refs"))
+      {
+         forceCrossResourceRefs = false;
+      }
+      else if (arg.equals("--support-unicode-script"))
+      {
+         supportUnicodeSubSuperScripts = true;
+      }
+      else if (arg.equals("--no-support-unicode-script"))
+      {
+         supportUnicodeSubSuperScripts = false;
+      }
+      else if (arg.equals("--replace-quotes"))
+      {
+         replaceQuotes = true;
+      }
+      else if (arg.equals("--no-replace-quotes"))
+      {
+         replaceQuotes = false;
+      }
+      else if (arg.equals("--collapse-same-location-range"))
+      {
+         collapseSamePageRange = true;
+      }
+      else if (arg.equals("--no-collapse-same-location-range"))
+      {
+         collapseSamePageRange = false;
+      }
+      else if (arg.equals("--no-mfirstuc-protection"))
+      {
+         mfirstucProtect = false;
+         mfirstucProtectWasSet = true;
+      }
+      else if (isArg(deque, arg, "-u", "--mfirstuc-protection", returnVals))
+      {
+         mfirstucProtect = true;
+         mfirstucProtectWasSet = true;
 
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         String val = returnVals[0].toString();
+
+         if (val.equals("all"))
+         {
+            mfirstucProtectFields = null;
+         }
+         else if (val.isEmpty())
+         {
+            mfirstucProtect = false;
+         }
+         else
+         {
+            mfirstucProtectFields = val.split(" *, *");
+         }
+      }
+      else if (arg.equals("--no-mfirstuc-math-protection"))
+      {
+         mfirstucMProtect = false;
+         mfirstucMProtectWasSet = true;
+      }
+      else if (arg.equals("--mfirstuc-math-protection"))
+      {
+         mfirstucMProtect = true;
+         mfirstucMProtectWasSet = true;
+      }
+      else if (isArg(deque, arg, "--shortcuts", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         try
+         {
+            setShortCuts(returnVals[0].toString());
+         }
+         catch (IllegalArgumentException e)
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.invalid.choice.value", 
+              arg, returnVals[0]), e);
+         }
+      }
+      else if (isArg(deque, arg, "--nested-link-check", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.missing.value", arg));
+         }
+
+         String val = returnVals[0].toString();
+
+         if (val.equals("none") || val.isEmpty())
+         {
+            nestedLinkCheckFields = null;
+         }
+         else
+         {
+            nestedLinkCheckFields = val.split(" *, *");
+         }
+      }
+      else if (arg.equals("--no-nested-link-check"))
+      {
+         nestedLinkCheckFields = null;
+      }
+      else if (isArg(deque, arg, "-d", "--dir", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.missing.value", arg));
+         }
+
+         dirName = returnVals[0].toString();
+      }
+      else if (isListArg(deque, arg, "-m", "--map-format", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         for (String value : returnVals[0].listValue())
+         {
+            String[] values = value.split(" *: *");
+
+            if (values.length != 2)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.invalid.opt.value", arg, returnVals[0]));
+            }
+
+            formatMap.put(values[0], values[1]);
+         }
+      }
+      else if (isListArg(deque, arg, "--retain-formats", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         if (retainFormatList == null)
+         {
+            retainFormatList = new Vector<String>();
+         }
+
+         for (String field : returnVals[0].listValue())
+         {
+            retainFormatList.add(field);
+         }
+      }
+      else if (arg.equals("--no-retain-formats"))
+      {
+         retainFormatList = null;
+      }
+      else if (arg.equals("--group") || arg.equals("-g"))
+      {
+         addGroupField = true;
+      }
+      else if (arg.equals("--no-group"))
+      {
+         addGroupField = false;
+      }
+      else if (isArg(deque, arg, "-r", "--record-count-rule", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         recordCountRule.setRule(returnVals[0].toString());
+         saveRecordCount = true;
+      }
+      else if (arg.equals("--record-count") || arg.equals("-c"))
+      {
+         saveRecordCount = true;
+      }
+      else if (arg.equals("--no-record-count"))
+      {
+         saveRecordCount = false;
+         saveRecordCountUnit = false;
+      }
+      else if (arg.equals("--record-count-unit") || arg.equals("-n"))
+      {
+         saveRecordCountUnit = true;
+         saveRecordCount = true;
+      }
+      else if (arg.equals("--no-record-count-unit"))
+      {
+         saveRecordCountUnit = false;
+      }
+      else if (arg.equals("-D") || arg.equals("--date-in-header"))
+      {
+         dateInHeader = true;
+      }
+      else if (arg.equals("--no-date-in-header"))
+      {
+         dateInHeader = false;
+      }
+      else if (isArg(deque, arg, "--tex-encoding", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         try
+         {
+            texCharset = Charset.forName(returnVals[0].toString());
+         }
+         catch (UnsupportedCharsetException e)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.unknown.charset", returnVals[0]), e);
+         }
+      }
+      else if (isArg(deque, arg, "--log-encoding", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         try
+         {
+            texLogCharset = Charset.forName(returnVals[0].toString());
+         }
+         catch (UnsupportedCharsetException e)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.unknown.charset", returnVals[0]), e);
+         }
+      }
+      else if (arg.equals("--trim-fields"))
+      {
+         trimFields = true;
+         trimOnlyFields = null;
+         trimExceptFields = null;
+      }
+      else if (arg.equals("--no-trim-fields"))
+      {
+         trimFields = false;
+         trimOnlyFields = null;
+         trimExceptFields = null;
+      }
+      else if (isListArg(deque, arg, "--trim-only-fields", returnVals))
+      {
+         if (trimExceptFields != null)
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.option.clash",
+               "--trim-only-fields", "--trim-except-fields"));
+         }
+
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         if (trimOnlyFields == null)
+         {
+            trimOnlyFields = new Vector<String>();
+         }
+
+         for (String field : returnVals[0].listValue())
+         {
+            trimOnlyFields.add(field);
+         }
+
+         trimFields = true;
+      }
+      else if (isListArg(deque, arg, "--trim-except-fields", returnVals))
+      {
+         if (trimOnlyFields != null)
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.option.clash",
+               "--trim-only-fields", "--trim-except-fields"));
+         }
+
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         if (trimExceptFields == null)
+         {
+            trimExceptFields = new Vector<String>();
+         }
+
+         for (String field : returnVals[0].listValue())
+         {
+            trimExceptFields.add(field);
+         }
+
+         trimFields = true;
+      }
+      else if (arg.equals("--provide-glossaries"))
+      {
+         provideknownGlossaries=true;
+      }
+      else if (arg.equals("--no-provide-glossaries"))
+      {
+         provideknownGlossaries=false;
+      }
+      else
+      {
+         return false;
+      }
+         
+      return true;
+   }
+
+   @Override
+   protected void postSettings()
+    throws Bib2GlsSyntaxException,IOException
+   {
       if (provideknownGlossaries)
       {
          knownGlossaries = new Vector<String>();
@@ -7174,60 +6094,12 @@ public class Bib2Gls implements TeXApp
    public static void main(String[] args)
    {
       Bib2Gls bib2gls = null;
-      int debug = 0;
-      int verbose = 0;
-      String langTag = null;
-      Object[] argVal = new Object[2];
-
-      // Quickly check for options that are needed before parseArgs().
-
-      for (int i = 0; i < args.length; i++)
-      {
-         if (isArg(args[i], "debug"))
-         {
-            try
-            {
-               i = parseArgInt(args, i, argVal, 1, null);
-
-               debug = ((Integer)argVal[1]).intValue();
-            }
-            catch (Exception e)
-            {
-               debug = 1;
-            }
-         }
-         else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
-         {
-            debug = 0;
-         }
-         else if (args[i].equals("--silent")
-               || args[i].equals("--quiet") || args[i].equals("-q")
-               // don't show version for help
-               || args[i].equals("--help") || args[i].equals("-h"))
-         {
-            verbose = -1;
-         }
-         else if (args[i].equals("--verbose"))
-         {
-            verbose = 1;
-         }
-         else if (args[i].equals("--noverbose"))
-         {
-            verbose = 0;
-         }
-         else if (isArg(args[i], "l", "locale"))
-         {
-            i = parseArgVal(args, i, argVal);
-
-            langTag = (String)argVal[1];
-         }
-      }
 
       try
       {
-         bib2gls = new Bib2Gls(debug, verbose, langTag);
-
-         bib2gls.process(args);
+         bib2gls = new Bib2Gls();
+         bib2gls.initialise(args);
+         bib2gls.process();
 
          if (bib2gls.exitCode != 0)
          {
@@ -7246,10 +6118,7 @@ public class Bib2Gls implements TeXApp
          {
             System.err.println("Fatal error: "+e.getMessage());
 
-            if (debug > 0)
-            {
-               e.printStackTrace();
-            }
+            e.printStackTrace();
          }
          else
          {
@@ -7261,10 +6130,11 @@ public class Bib2Gls implements TeXApp
    }
 
    public static final String NAME = "bib2gls";
-   public static final String VERSION = "3.9";
-   public static final String DATE = "2024-01-30";
-   public int debugLevel = 0;
-   public int verboseLevel = 0;
+
+   String dirName = null;
+   String auxFileName = null;
+   String logName = null;
+   boolean provideknownGlossaries=false;
 
    private char openout_any='p';
    private char openin_any='a';
@@ -7278,6 +6148,7 @@ public class Bib2Gls implements TeXApp
    private PrintWriter logWriter=null;
    private StringWriter pending = null;
    private PrintWriter pendingWriter = null;
+   private int exitCode = 0;
 
    public static final Pattern PATTERN_PACKAGE = Pattern.compile(
        "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");
@@ -7395,8 +6266,6 @@ public class Bib2Gls implements TeXApp
 
    private Charset texCharset = null, texLogCharset;
 
-   private Charset defaultCharset = Charset.defaultCharset();
-
    private boolean useCiteAsRecord=false;
 
    private boolean mergeWrGlossaryLocations = true;
@@ -7407,8 +6276,6 @@ public class Bib2Gls implements TeXApp
    private static final byte MERGE_NAMEREF_ON_TITLE=(byte)1;
    private static final byte MERGE_NAMEREF_ON_LOCATION=(byte)2;
    private static final byte MERGE_NAMEREF_ON_HCOUNTER=(byte)3;
-
-   private Bib2GlsMessages messages;
 
    private boolean mfirstucProtect = true;
    private boolean mfirstucMProtect = true;
@@ -7425,9 +6292,6 @@ public class Bib2Gls implements TeXApp
    private boolean checkAbbrvShortcuts = false;
 
    private GlsResource currentResource = null;
-
-   private String docLocale = null;
-   private Locale defaultLocale = null;
 
    private boolean trimFields = false;
 
@@ -7536,10 +6400,6 @@ public class Bib2Gls implements TeXApp
 
    private boolean replaceQuotes = false;
 
-   private int exitCode;
-
-   private boolean shownVersion = false;
-
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",
      "long", "longplural", "short", "shortplural", "symbol"};
@@ -7597,9 +6457,6 @@ public class Bib2Gls implements TeXApp
            MINUS,
            SUBSCRIPT_INT_PATTERN,
            SUPERSCRIPT_INT_PATTERN));
-
-   public static final int SYNTAX_ITEM_LINEWIDTH=78;
-   public static final int SYNTAX_ITEM_TAB=30;
 
    public static final int TRUNCATE_MAX_OBJECTS=40;
    public static final int TRUNCATE_MAX_CHARS=160;

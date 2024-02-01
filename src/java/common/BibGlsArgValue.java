@@ -20,7 +20,7 @@ package com.dickimawbooks.bibgls.common;
 
 public class BibGlsArgValue
 {
-   protected BibGlsArgValue(String value)
+   public BibGlsArgValue(String value)
    {
       if (value == null)
       {
@@ -28,6 +28,12 @@ public class BibGlsArgValue
       }
 
       stringValue = value;
+   }
+
+   public BibGlsArgValue(String value, int intVal)
+   {
+      this(value);
+      this.intValue = intVal;
    }
 
    public static BibGlsArgValue create(BibGlsTeXApp texApp, String option,

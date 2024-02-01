@@ -32,6 +32,10 @@ import java.io.*;
 import java.net.URL;
 
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 import com.dickimawbooks.texparserlib.*;
 
@@ -46,15 +50,28 @@ public abstract class BibGlsTeXApp implements TeXApp
    {
       ArrayDeque<String> deque = preparse(args);
 
+      preInitMessages();
+
       initMessages();
 
       postInitMessages();
 
       parseArgs(deque);
+
+      setDebugLevel(debugLevel);
+   }
+
+   protected void preInitMessages()
+    throws Bib2GlsException,IOException
+   {
    }
 
    protected void postInitMessages()
     throws Bib2GlsException,IOException
+   {
+   }
+
+   protected void setDebugLevel(int debug)
    {
    }
 
@@ -63,19 +80,76 @@ public abstract class BibGlsTeXApp implements TeXApp
       return (verboseLevel == SILENT);
    }
 
+   public int getDebugLevel()
+   {     
+      return debugLevel;
+   }     
+         
+   public int getVerboseLevel()
+   {
+      return verboseLevel;
+   }  
+
+   public void logMessageNoLn(String msg)
+   {
+   }
+
+   public void logMessage(String msg)
+   {
+   }
+
+   public void logMessage()
+   {
+   }
+
+   public void logAndPrintMessageNoLn(String message)
+   {
+      logMessageNoLn(message);
+      System.out.print(message);
+   }
+
+   public void logAndPrintMessage(String message)
+   {     
+      logMessage(message);
+      System.out.println(message);
+   }
+            
+   public void logAndPrintMessage()
+   {     
+      logMessage();
+      System.out.println();
+   }     
+
+   public void debug()
+   { 
+      if (debugLevel > 0)
+      {  
+         System.out.println();
+         logMessage();
+      }  
+   }        
+
    public void debug(String message)
    {
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {
-         System.out.println(message);
+         logAndPrintMessage(message);
       }
    }
 
    public void debug(Throwable e)
    {
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {
          e.printStackTrace();
+      }
+   }
+
+   public void debugMessage(String key, Object... params)
+   {
+      if (debugLevel > 0)
+      {
+         logAndPrintMessage(getMessage(key, params));
       }
    }
 
@@ -103,13 +177,24 @@ public abstract class BibGlsTeXApp implements TeXApp
       return isReadAccessAllowed(path.getFile());
    }
 
+   /*
+    *  TeXApp method. This is used by the TeX parser library
+    *  when substituting deprecated commands.
+    */   
    @Override
    public void substituting(TeXParser parser, String original,
      String replacement)
    {  
-      debug(getMessage("warning.substituting", original, replacement));
+      verboseMessage("warning.substituting", original, replacement);
    }
 
+   /*
+    *  TeXApp method needs defining, but shouldn't be needed for
+    *  the purposes of this application. This is mainly used by
+    *  the TeX parser library to copy images to a designated output
+    *  directory when performing LaTeX -> LaTeX or LaTeX -> HTML
+    *  actions.
+    */ 
    @Override
    public void copyFile(File orgFile, File newFile)
      throws IOException,InterruptedException
@@ -122,6 +207,12 @@ public abstract class BibGlsTeXApp implements TeXApp
       }
    }
 
+   /*
+    * TeXApp method needs defining, but unlikely to be needed for
+    * the purposes of this application. (It doesn't make any 
+    * sense to have something like \read-1 in a bib field.)
+    * Just return empty string.
+    */ 
    @Override
    public String requestUserInput(String message)
      throws IOException
@@ -144,7 +235,7 @@ public abstract class BibGlsTeXApp implements TeXApp
    public void epstopdf(File epsFile, File pdfFile)
      throws IOException,InterruptedException
    {
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
@@ -160,7 +251,7 @@ public abstract class BibGlsTeXApp implements TeXApp
    public void wmftoeps(File wmfFile, File epsFile)
      throws IOException,InterruptedException
    {
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
@@ -177,7 +268,7 @@ public abstract class BibGlsTeXApp implements TeXApp
      String[] outOptions, File outFile)
      throws IOException,InterruptedException
    {
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {// shouldn't happen
          System.err.format(
            "Ignoring unexpected request to convert %s to %s%n",
@@ -186,7 +277,8 @@ public abstract class BibGlsTeXApp implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method used for progress updates for long actions,
+    *  such as loading datatool files.
     */ 
    @Override
    public void progress(int percent)
@@ -264,7 +356,7 @@ public abstract class BibGlsTeXApp implements TeXApp
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method used for obtaining a message from a given label.
     */ 
    @Override
    public String getMessage(String label, Object... params)
@@ -339,6 +431,20 @@ public abstract class BibGlsTeXApp implements TeXApp
       }
    }
 
+   public String getMessageIfExists(String label)
+   {
+      if (messages == null) return null;
+   
+      String text = messages.getMessageIfExists(label);
+
+      if (text == null && getDebugLevel() > 0)
+      {
+         debug("No message for label '"+label+"'");
+      }
+
+      return text;
+   }
+
    public String getChoiceMessage(String label, int argIdx,
      String choiceLabel, int numChoices, Object... params)
    {
@@ -370,16 +476,118 @@ public abstract class BibGlsTeXApp implements TeXApp
       return msg;
    }
 
+   public String getLocalisationText(String prefix, Locale locale, String suffix,
+     String defaultValue)
+   {
+      if (locale != null)
+      {
+         String langTag = locale.toLanguageTag();
+
+         String text = getMessageIfExists(String.format("%s.%s.%s",
+            prefix, langTag, suffix));
+
+         if (text != null)
+         {
+            return text;
+         }
+
+         String country = locale.getCountry();
+         String language = locale.getLanguage();
+   
+         if (country != null && !country.isEmpty()
+             && language != null && !language.isEmpty())
+         {
+            String tag = String.format("%s-%s", language, country);
+   
+            if (!tag.equals(langTag))
+            {
+               text = getMessageIfExists(String.format("%s.%s.%s",
+                  prefix, tag, suffix));
+         
+               if (text != null)
+               {
+                  return text;
+               }
+            } 
+         }
+
+         if (language != null && !language.isEmpty() && !language.equals(langTag))
+         {
+            text = getMessageIfExists(String.format("%s.%s.%s",
+               prefix, language, suffix));
+
+            if (text != null)
+            {
+               return text;
+            }
+         }
+      }
+
+      return defaultValue;
+   }
+
+   public String getLocalisationText(String prefix, Locale locale, String suffix)
+   {
+      String text = getLocalisationTextIfExists(prefix, locale, suffix);
+
+      if (text == null)
+      {
+         warning(String.format("Can't find message for label: %s.%s", prefix, suffix));
+         text = String.format("%s.%s", prefix, suffix);
+      }
+
+      return text;
+   }
+
+   public String getLocalisationTextIfExists(String prefix, Locale locale, String suffix)
+   {
+      if (locale != null)
+      {
+         String text = getLocalisationText(prefix, locale, suffix, null);
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      if (defaultLocale != null && !defaultLocale.equals(locale))
+      {
+         String text = getLocalisationText(prefix, defaultLocale, suffix, null);
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      if (docLocale != null
+            && (locale == null || !locale.toLanguageTag().equals(docLocale)))
+      {
+         String text = getMessageIfExists(String.format("%s.%s.%s",
+            prefix, docLocale, suffix));
+
+         if (text != null)
+         {
+            return text;
+         }
+      }
+
+      return getMessageIfExists(String.format("%s.%s", prefix, suffix));
+   }
+
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing informational messages to the use.
     */ 
    @Override
    public void message(String text)
    {
-      if (verboseLevel != SILENT)
+      if (verboseLevel >= NORMAL)
       {
          System.out.println(text);
       }
+
+      logMessage(text);
    }
 
    public static String fileLineMessage(File file, int lineNum,
@@ -389,20 +597,57 @@ public abstract class BibGlsTeXApp implements TeXApp
          message);
    }
 
+   public void verboseMessage(String key, Object... params)
+   {
+      verbose(getMessage(key, params));
+   }
+
+   public void verbose(String text)
+   {
+      if (verboseLevel > NORMAL)
+      {
+         System.out.println(text);
+      }
+
+      logMessage(text);
+   }
+
+   public void verbose()
+   {
+      if (verboseLevel > NORMAL)
+      {
+         System.out.println();
+      }  
+
+      logMessage();
+   }     
+         
+   public void verbose(TeXParser parser, String message)
+   {     
+      int lineNum = parser.getLineNumber();
+      File file = parser.getCurrentFile();
+
+      if (lineNum != -1 && file != null)
+      {
+         message = fileLineMessage(file, lineNum, message);
+      }
+   
+      verbose(message);
+   }
 
    @Override
    public Charset getDefaultCharset()
    {
-      return charset == null ? Charset.defaultCharset() : charset;
+      return defaultCharset;
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing warning messages.
     */ 
    @Override
    public void warning(TeXParser parser, String message)
    {
-      if (verboseLevel != SILENT)
+      if (verboseLevel >= NORMAL)
       {
          int lineNum = parser.getLineNumber();
          File file = parser.getCurrentFile();
@@ -420,31 +665,46 @@ public abstract class BibGlsTeXApp implements TeXApp
 
    public void warning(File file, int line, String message)
    {
-      warning(fileLineMessage(file, line, message));
+      if (verboseLevel >= NORMAL)
+      {
+         warning(fileLineMessage(file, line, message));
+      }
    }
 
    public void warning(File file, int line, String message, Exception e)
    {
-      warning(fileLineMessage(file, line, message), e);
+      if (verboseLevel >= NORMAL)
+      {
+         warning(fileLineMessage(file, line, message), e);
+      }
    }
 
    public void warning(String message)
    {
-      if (verboseLevel != SILENT)
-      {
-         message = getMessageWithFallback("warning.title",
-            "Warning: {0}", message);
-
+      message = getMessageWithFallback("warning.title",
+         "Warning: {0}", message);
+   
+      if (verboseLevel >= NORMAL)
+      {    
          System.err.println(message);
       }
+
+      logMessage(message);
+   }
+
+   public void warningMessage(String key, Object... params)
+   {
+      warning(getMessage(key, params));
    }
 
    public void warning()
    {
-      if (verboseLevel != SILENT)
+      if (verboseLevel >= NORMAL)
       {
          System.err.println();
       }
+
+      logMessage();
    }
 
    public void warning(String message, Exception e)
@@ -452,23 +712,46 @@ public abstract class BibGlsTeXApp implements TeXApp
       if (verboseLevel >= NORMAL)
       {
          System.err.println(message);
+      }
 
-         if (verboseLevel >= DEBUG)
+      logMessage(message);
+
+      if (debugLevel > 0)
+      {  
+         e.printStackTrace();
+   
+         for (StackTraceElement elem : e.getStackTrace())
          {
-            e.printStackTrace();
+            logMessage(elem.toString());
          }
       }
    }
 
    /*
-    *  TeXApp method.
+    *  TeXApp method for providing error messages.
     */ 
    @Override
    public void error(Exception e)
    {
       if (e instanceof TeXSyntaxException)
       {
-         error(((TeXSyntaxException)e).getMessage(this));
+         warning(((TeXSyntaxException)e).getMessage(this));
+
+         if (debugLevel > 0)
+         {
+            e.printStackTrace();
+
+            for (StackTraceElement elem : e.getStackTrace())
+            {
+               logMessage(elem.toString());
+            }
+         }
+
+      }
+      else if (e instanceof NoSuchFileException)
+      {
+         error(getMessage(TeXSyntaxException.ERROR_FILE_NOT_FOUND,
+          ((NoSuchFileException)e).getFile()));
       }
       else
       {
@@ -482,9 +765,14 @@ public abstract class BibGlsTeXApp implements TeXApp
          error(msg);
       }
 
-      if (verboseLevel >= DEBUG)
+      if (debugLevel > 0)
       {
          e.printStackTrace();
+
+         for (StackTraceElement elem : e.getStackTrace())
+         {
+            logMessage(elem.toString());
+         }
       }
    }
 
@@ -493,6 +781,7 @@ public abstract class BibGlsTeXApp implements TeXApp
       msg = getMessageWithFallback("error.title", "Error: {0}", msg);
 
       System.err.println(msg);
+      logMessage(msg);
    }
 
    public String getLanguageFileName(String tag)
@@ -500,80 +789,36 @@ public abstract class BibGlsTeXApp implements TeXApp
       return String.format("/resources/bib2gls-%s.xml", tag);
    }
 
-   private void initMessages() throws Bib2GlsException,IOException
+   protected Locale initMessageLocale(Locale locale)
    {
-      Locale locale;
+      return Locale.forLanguageTag(langTag);
+   }
+
+   protected void initMessages() throws Bib2GlsException,IOException
+   {
+      Locale locale = null;
 
       if (langTag == null || "".equals(langTag))
       {
-         locale = Locale.getDefault();
+         if (defaultLocale == null)
+         {
+            locale = Locale.getDefault();
+         }
+         else 
+         {  
+            locale = defaultLocale;
+         }
       }
       else
       {
-         locale = Locale.forLanguageTag(langTag);
+         locale = initMessageLocale(locale);
       }
 
-      String lang = locale.toLanguageTag();
-
-      String name = getLanguageFileName(lang);
-
-      URL url = getClass().getResource(name);
-
-      String jar = "";
-
-      if (verboseLevel >= DEBUG)
-      {
-         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
-               .toString();
-      }
+      URL url = getLanguageUrl("bib2gls", locale, "en");
 
       if (url == null)
       {
-         debug(String.format("Can't find language resource: %s!%s", jar, name));
-
-         lang = locale.getLanguage();
-
-         name = getLanguageFileName(lang);
-
-         debug("Trying: "+name);
-
-         url = getClass().getResource(name);
-
-         if (url == null)
-         {
-            debug(String.format("Can't find language resource: %s!%s",
-                    jar, name));
-
-            String script = locale.getScript();
-
-            if (script != null && !script.isEmpty())
-            {
-               name = getLanguageFileName(String.format("%s-%s", lang, script));
-
-               debug("Trying: "+name);
-
-               url = getClass().getResource(name);
-
-               if (url == null && !lang.equals("en"))
-               {
-                  debug(String.format(
-                    "Can't find language resource: %s!%s%nDefaulting to 'en'",
-                    jar, name));
-
-                  url = getClass().getResource(getLanguageFileName("en"));
-               }
-            }
-            else if (!lang.equals("en"))
-            {
-               debug("Defaulting to 'en'");
-               url = getClass().getResource(getLanguageFileName("en"));
-            }
-
-            if (url == null)
-            {
-               throw new Bib2GlsException("Can't find language resource file.");
-            }
-         }
+         throw new Bib2GlsException("Can't find language resource file.");
       }
 
       InputStream in = null;
@@ -598,8 +843,88 @@ public abstract class BibGlsTeXApp implements TeXApp
          if (in != null)
          {
             in.close();
+            in = null;
          }
       }
+   }
+
+   protected String getLanguageFileName(String prefix, String tag)
+   {   
+      return String.format("/resources/%s-%s.xml", prefix, tag);
+   } 
+
+   protected URL getLanguageUrl(String prefix, Locale locale, String defaultTag)
+   {        
+      String lang = locale.toLanguageTag();
+    
+      String name = getLanguageFileName(prefix, lang);
+
+      URL url = getClass().getResource(name);
+       
+      String jar = null;
+
+      if (debugLevel > 0)
+      {  
+         jar = getClass().getProtectionDomain().getCodeSource().getLocation()
+               .toString();
+      }     
+
+      if (url == null)
+      {
+         if (jar != null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+               jar, name));
+         }
+
+         lang = locale.getLanguage();
+
+         name = getLanguageFileName(prefix, lang);
+
+         debug("Trying: "+name);
+
+         url = getClass().getResource(name);
+
+         if (url == null)
+         {
+            debug(String.format("Can't find language resource: %s!%s",
+                    jar, name));
+
+            String script = locale.getScript();
+
+            if (script != null && !script.isEmpty())
+            {
+               name = getLanguageFileName(prefix,
+                  String.format("%s-%s", lang, script));
+
+               debug("Trying: "+name);
+
+               url = getClass().getResource(name);
+
+               if (url == null && defaultTag != null && !lang.equals(defaultTag))
+               {
+                  debug(String.format(
+                    "Can't find language resource: %s!%s%nDefaulting to '%s'",
+                    jar, name, defaultTag));
+
+                  url = getClass().getResource(
+                    getLanguageFileName(prefix, defaultTag));
+               }
+            }
+            else if (defaultTag != null && !lang.equals(defaultTag))
+            {
+               if (debugLevel > 0)
+               {
+                  debug(String.format("Defaulting to '%s'", defaultTag));
+               }
+
+               url = getClass().getResource(
+                  getLanguageFileName(prefix, defaultTag));
+            }
+         }
+      }
+
+      return url;
    }
 
    public void printSyntaxItem(String message)
@@ -714,8 +1039,12 @@ public abstract class BibGlsTeXApp implements TeXApp
 
    public void version()
    {
-      System.out.println(getMessageWithFallback("about.version",
-        "{0} version {1} ({2})", getApplicationName(), VERSION, DATE));
+      if (!shownVersion)
+      {
+         System.out.println(getMessageWithFallback("about.version",
+           "{0} version {1} ({2})", getApplicationName(), VERSION, DATE));
+         shownVersion = true;
+      }
    }
 
    public void license()
@@ -771,7 +1100,7 @@ public abstract class BibGlsTeXApp implements TeXApp
 
       for (int i = 0; i < args.length; i++)
       {
-         if (args[i].equals("--locale"))
+         if (args[i].equals("--locale") || args[i].equals("-"))
          {
             if (i == args.length-1)
             {
@@ -783,7 +1112,30 @@ public abstract class BibGlsTeXApp implements TeXApp
          }
          else if (args[i].equals("--debug"))
          {
-            verboseLevel = DEBUG;
+            debugLevel = 1;
+
+            if (i + 1 < args.length)
+            {
+               // optional numeric argument
+
+               try
+               {
+                  debugLevel = Integer.parseInt(args[i+1]);
+                  i++;
+               }
+               catch (NumberFormatException e)
+               {
+               }
+            }
+
+            if (debugLevel > 0)
+            {
+               verboseLevel = DEBUG;
+            }
+         }
+         else if (args[i].equals("--no-debug") || args[i].equals("--nodebug"))
+         {
+            debugLevel = 0;
          }
          else if (args[i].equals("--silent")
                  || args[i].equals("--quiet")
@@ -792,6 +1144,11 @@ public abstract class BibGlsTeXApp implements TeXApp
             verboseLevel = SILENT;
          }
          else if (args[i].equals("--verbose"))
+         {
+            verboseLevel = VERBOSE;
+         }
+         else if (args[i].equals("--no-verbose")
+               || args[i].equals("--noverbose"))
          {
             verboseLevel = NORMAL;
          }
@@ -838,13 +1195,6 @@ public abstract class BibGlsTeXApp implements TeXApp
       return deque;
    }
 
-   protected boolean parseArg(ArrayDeque<String> deque, String arg,
-      BibGlsArgValue[] returnVals)
-    throws Bib2GlsSyntaxException
-   {
-      return false;
-   }
-
    /**
     * Gets the number of required arguments for a command line
     * switch. This should return the number or -1 for a single
@@ -859,7 +1209,7 @@ public abstract class BibGlsTeXApp implements TeXApp
      String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, null, returnVals, BibGlsArgValueType.STRING);
+      return isArg(deque, arg, null, longName, returnVals, BibGlsArgValueType.STRING);
    }
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
@@ -867,14 +1217,14 @@ public abstract class BibGlsTeXApp implements TeXApp
      BibGlsArgValueType type)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, null, returnVals, type);
+      return isArg(deque, arg, null, longName, returnVals, type);
    }
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
-     String longName, String shortName, BibGlsArgValue[] returnVals)
+     String shortName, String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, shortName, returnVals,
+      return isArg(deque, arg, shortName, longName, returnVals,
          BibGlsArgValueType.STRING);
    }
 
@@ -882,15 +1232,15 @@ public abstract class BibGlsTeXApp implements TeXApp
      String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, null, returnVals,
+      return isArg(deque, arg, null, longName, returnVals,
          BibGlsArgValueType.INT);
    }
 
    protected boolean isIntArg(ArrayDeque<String> deque, String arg,
-     String longName, String shortName, BibGlsArgValue[] returnVals)
+     String shortName, String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, shortName, returnVals,
+      return isArg(deque, arg, shortName, longName, returnVals,
          BibGlsArgValueType.INT);
    }
 
@@ -898,20 +1248,20 @@ public abstract class BibGlsTeXApp implements TeXApp
      String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, null, returnVals,
+      return isArg(deque, arg, null, longName, returnVals,
          BibGlsArgValueType.LIST);
    }
 
    protected boolean isListArg(ArrayDeque<String> deque, String arg,
-     String longName, String shortName, BibGlsArgValue[] returnVals)
+     String shortName, String longName, BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, shortName, returnVals,
+      return isArg(deque, arg, shortName, longName, returnVals,
          BibGlsArgValueType.LIST);
    }
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
-     String longName, String shortName, BibGlsArgValue[] returnVals,
+     String shortName, String longName, BibGlsArgValue[] returnVals,
      BibGlsArgValueType type)
     throws Bib2GlsSyntaxException
    {
@@ -994,26 +1344,273 @@ public abstract class BibGlsTeXApp implements TeXApp
       return true;
    }
 
-   protected abstract void parseArgs(ArrayDeque<String> deque)
+   protected boolean isIntArg(ArrayDeque<String> deque, String arg,
+     String longName, BibGlsArgValue[] returnVals, int defValue)
+    throws Bib2GlsSyntaxException
+   {
+      return isIntArg(deque, arg, null, longName, returnVals, defValue);
+   }
+
+   /**
+    * Test for switch that takes a single optional integer argument.
+    */ 
+   protected boolean isIntArg(ArrayDeque<String> deque, String arg,
+     String shortName, String longName, BibGlsArgValue[] returnVals,
+     int defValue)
+    throws Bib2GlsSyntaxException
+   {
+      String[] split = arg.split("=", 2);
+
+      if (split[0].equals(longName))
+      {
+         if (split.length == 1)
+         {
+            String val = deque.peekFirst();
+
+            if (val == null)
+            {
+               returnVals[0] = null;
+            }
+            else
+            {
+               try
+               {
+                  int i = Integer.parseInt(val);
+                  returnVals[0] = new BibGlsArgValue(deque.poll(), i);
+               }
+               catch (NumberFormatException e)
+               {
+                  returnVals[0] = null;
+               }
+            }
+         }
+         else
+         {
+            returnVals[0] = BibGlsArgValue.create(this, split[0], split[1], 
+              BibGlsArgValueType.INT);
+         }
+      }
+      else if (shortName != null && arg.equals(shortName))
+      {
+         String val = deque.peekFirst();
+
+         if (val == null)
+         {
+            returnVals[0] = null;
+         }
+         else
+         {
+            try
+            {
+               int i = Integer.parseInt(val);
+               returnVals[0] = new BibGlsArgValue(deque.poll(), i);
+            }
+            catch (NumberFormatException e)
+            {
+               returnVals[0] = null;
+            }
+         }
+      }
+      else
+      {
+         return false;
+      }
+
+      return true;
+   }
+
+
+   /**
+    * Parse command line word that doesn't starts with "-" if recognised.
+    * @return true if successful or false if not valid 
+    */
+   protected abstract void parseArg(ArrayDeque<String> deque, String arg)
     throws Bib2GlsSyntaxException;
+
+   /**
+    * Parse command line argument that starts with "-" if recognised.
+    * @return true if successful or false if not valid 
+    */
+   protected abstract boolean parseArg(ArrayDeque<String> deque, String arg,
+      BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException;
+
+   protected abstract void initSettings()
+    throws Bib2GlsSyntaxException;
+
+   protected abstract void postSettings()
+    throws Bib2GlsSyntaxException,IOException;
+
+   protected int maxArgParams()
+   {
+      return 1;
+   }
+
+   protected abstract void help();
+
+   protected void parseArgs(ArrayDeque<String> deque)
+    throws Bib2GlsSyntaxException,IOException
+   {
+      String arg;
+      BibGlsArgValue[] returnVals = new BibGlsArgValue[maxArgParams()];
+
+      initSettings();
+
+      while ((arg = deque.poll()) != null)
+      {
+         if (arg.equals("--help") || arg.equals("-h"))
+         {
+            help();
+            System.exit(0);
+         }
+         else if (arg.equals("--version") || arg.equals("-v"))
+         {
+            version();
+            license();
+            libraryVersion();
+            System.exit(0);
+         }
+         else if (isListArg(deque, arg, "--debug-mode", returnVals))
+         {        
+            debugLevel = 0;
+
+            for (String mode : returnVals[0].listValue())
+            {
+               mode = mode.trim();
+
+               if (mode.equals("all"))
+               {
+                  debugLevel = Integer.MAX_VALUE;
+               }
+               else if (mode.equals("io"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_IO;
+               }
+               else if (mode.equals("popped"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_POPPED;
+               }
+               else if (mode.equals("decl"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_DECL;
+               }
+               else if (mode.equals("sty-data"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_STY_DATA;
+               }
+               else if (mode.equals("expansion"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION;
+               }
+               else if (mode.equals("expansion-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_LIST;
+               }
+               else if (mode.equals("expansion-once"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE;
+               }
+               else if (mode.equals("expansion-once-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
+               }
+               else if (mode.equals("process"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING;
+               }
+               else if (mode.equals("process-stack"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK;
+               }
+               else if (mode.equals("process-stack-list"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK_LIST;
+               }
+               else if (mode.equals("cs"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_CS;
+               }
+               else if (mode.equals("process-generic-cs"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
+               }
+               else if (mode.equals("catcode"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_CATCODE;
+               }
+               else if (mode.equals("read"))
+               {
+                  debugLevel = debugLevel | TeXParser.DEBUG_READ;
+               }
+               else
+               {
+                  throw new Bib2GlsSyntaxException(
+                    getMessage("error.syntax.unknown_debug_mode", mode));
+               }
+            }
+
+            verboseLevel = DEBUG;
+         }
+         else if (isArg(deque, arg, "default-encoding", returnVals))
+         {
+            if (returnVals[0] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", arg));
+            }
+
+            try
+            {
+               defaultCharset = Charset.forName(arg);
+            }
+            catch (UnsupportedCharsetException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.unknown.charset", arg), e);
+            }
+         }
+         else if (arg.startsWith("-"))
+         {
+            if (!parseArg(deque, arg, returnVals))
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("common.unknown.arg",
+                  arg, "--help"));
+            }
+         }
+         else
+         {
+            parseArg(deque, arg);
+         }
+      }
+
+      postSettings();
+   }
 
    protected void furtherInfo()
    {
+      System.out.println(getMessage("syntax.tutorial", "bib2gls", "texdoc bib2gls-begin"));
       System.out.println(getMessage("syntax.userguide", "bib2gls", "texdoc bib2gls"));
       System.out.println(getMessage("syntax.ctan", "bib2gls",
          "https://ctan.org/pkg/bib2gls"));
       System.out.println(getMessage("syntax.home", "bib2gls",
         "https://www.dickimaw-books.com/software/bib2gls/"));
+      System.out.println(getMessage("syntax.faq", "bib2gls",
+        "https://www.dickimaw-books.com/faq.php?category=bib2gls"));
    }
 
-   protected Charset charset = Charset.defaultCharset();
+   protected Charset defaultCharset = Charset.defaultCharset();
+   protected Locale defaultLocale = null;
 
    protected Bib2GlsMessages messages;
 
-   public static final int SILENT=0, NORMAL=1, DEBUG=2;
+   public static final int SILENT=-1, NORMAL=0, VERBOSE=1, DEBUG=2;
 
    protected String langTag = null;
+   protected int debugLevel = 0;
    protected int verboseLevel=NORMAL;
+   protected boolean shownVersion = false;
+   protected String docLocale = null;
 
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;

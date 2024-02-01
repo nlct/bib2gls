@@ -71,6 +71,11 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return parser;
    }
 
+   public Charset getCharSet()
+   {
+      return charset == null ? getDefaultCharset() : charset;
+   }
+
    public BibGlsConverterListener getListener()
    {
       return listener;
@@ -117,133 +122,129 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    }
 
    @Override
-   protected void parseArgs(ArrayDeque<String> deque)
+   protected boolean parseArg(ArrayDeque<String> deque, String arg,
+      BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      String arg;
-      BibGlsArgValue[] returnVals = new BibGlsArgValue[2];
-
-      while ((arg = deque.poll()) != null)
+      if (isArg(deque, arg, "--texenc", returnVals))
       {
-         if (arg.equals("--help") || arg.equals("-h"))
+         if (returnVals[0] == null)
          {
-            help();
-            System.exit(0);
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.encoding.value",
+               arg));
          }
-         else if (arg.equals("--version") || arg.equals("-v"))
-         {
-            version();
-            license();
-            libraryVersion();
-            System.exit(0);
-         }
-         else if (isArg(deque, arg, "--texenc", returnVals))
-         {
-            if (returnVals[0] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("common.missing.encoding.value",
-                  arg));
-            }
 
-            charset = Charset.forName(returnVals[0].toString());
-         }
-         else if (isArg(deque, arg, "--bibenc", returnVals))
+         charset = Charset.forName(returnVals[0].toString());
+      }
+      else if (isArg(deque, arg, "--bibenc", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            if (returnVals[0] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("common.missing.encoding.value",
-                  arg));
-            }
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.encoding.value",
+               arg));
+         }
 
-            bibCharsetName = returnVals[0].toString();
-         }
-         else if (isArg(deque, arg, "--space-sub", "-s", returnVals))
+         bibCharsetName = returnVals[0].toString();
+      }
+      else if (isArg(deque, arg, "-s", "--space-sub", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            if (returnVals[0] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("common.missing.arg.value",
-                  arg));
-            }
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
 
-            spaceSub = returnVals[0].toString();
+         spaceSub = returnVals[0].toString();
 
-            if (" ".equals(spaceSub))
-            {
-               spaceSub = null;
-            }
-         }
-         else if (arg.equals("--overwrite"))
+         if (" ".equals(spaceSub))
          {
-            overwriteFiles = true;
+            spaceSub = null;
          }
-         else if (arg.equals("--no-overwrite"))
+      }
+      else if (arg.equals("--overwrite"))
+      {
+         overwriteFiles = true;
+      }
+      else if (arg.equals("--no-overwrite"))
+      {
+         overwriteFiles = false;
+      }
+      else if (arg.equals("--no-ignore-fields"))
+      {
+         customIgnoreFields = null;
+      }
+      else if (isListArg(deque, arg, "-f", "--ignore-fields", returnVals))
+      {
+         if (returnVals[0] == null)
          {
-            overwriteFiles = false;
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
          }
-         else if (arg.equals("--no-ignore-fields"))
+
+         if (returnVals[0].toString().isEmpty())
          {
             customIgnoreFields = null;
          }
-         else if (isListArg(deque, arg, "--ignore-fields", "-f", returnVals))
+         else
          {
-            if (returnVals[0] == null)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("common.missing.arg.value",
-                  arg));
-            }
+            addCustomIgnoreField(returnVals[0].listValue());
+         }
+      }
+      else if (arg.equals("--preamble-only") || arg.equals("-p"))
+      {
+         preambleOnly = true;
+      }
+      else if (arg.equals("--no-preamble-only"))
+      {
+         preambleOnly = false;
+      }
+      else
+      {
+         return false;
+      }
 
-            if (returnVals[0].toString().isEmpty())
-            {
-               customIgnoreFields = null;
-            }
-            else
-            {
-               addCustomIgnoreField(returnVals[0].listValue());
-            }
-         }
-         else if (arg.equals("--preamble-only") || arg.equals("-p"))
+      return true;
+   }
+
+   protected void parseArg(ArrayDeque<String> deque, String arg)
+    throws Bib2GlsSyntaxException
+   {
+      if (texFile == null)
+      {
+         texFile = new File(arg);
+      }
+      else if (bibFile == null)
+      {
+         if (arg.toLowerCase().endsWith(".bib"))
          {
-            preambleOnly = true;
-         }
-         else if (arg.equals("--no-preamble-only"))
-         {
-            preambleOnly = false;
-         }
-         else if (arg.startsWith("-"))
-         {
-            if (!parseArg(deque, arg, returnVals))
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("common.unknown.arg",
-                  arg, "--help"));
-            }
-         }
-         else if (texFile == null)
-         {
-            texFile = new File(arg);
-         }
-         else if (bibFile == null)
-         {
-            if (arg.toLowerCase().endsWith(".bib"))
-            {
-               bibFile = new File(arg);
-            }
-            else
-            {
-               bibFile = new File(arg+".bib");
-            }
+            bibFile = new File(arg);
          }
          else
          {
-            throw new Bib2GlsSyntaxException(
-               getMessage("common.toomany.arg", "--help"));
+            bibFile = new File(arg+".bib");
          }
       }
+      else
+      {
+         throw new Bib2GlsSyntaxException(
+            getMessage("common.toomany.arg", "--help"));
+      }
+   }
 
+   @Override
+   protected void initSettings()
+    throws Bib2GlsSyntaxException
+   {
+   }
+
+   @Override
+   protected void postSettings()
+    throws Bib2GlsSyntaxException
+   {
       if (texFile == null)
       {
           throw new Bib2GlsSyntaxException(
@@ -261,7 +262,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
       if (bibCharsetName == null)
       {
-         bibCharsetName = charset.name();
+         bibCharsetName = defaultCharset.name();
       }
    }
 
@@ -418,6 +419,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    protected File texFile=null, bibFile=null;
 
    protected String bibCharsetName=null;
+   protected Charset charset;
 
    protected boolean overwriteFiles=true;
    protected boolean preambleOnly=false;

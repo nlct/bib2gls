@@ -246,7 +246,7 @@ public class DataTool2Bib extends BibGlsConverter
       BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
-      if (isArg(deque, arg, "--label", "-L", returnVals))
+      if (isArg(deque, arg, "-L", "--label", returnVals))
       {
          if (returnVals[0] == null)
          {
@@ -257,7 +257,7 @@ public class DataTool2Bib extends BibGlsConverter
 
          labelColumn = returnVals[0].toString();
       }
-      else if (isListArg(deque, arg, "--key-map", "-m", returnVals))
+      else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
       {
          if (returnVals[0] == null)
          {

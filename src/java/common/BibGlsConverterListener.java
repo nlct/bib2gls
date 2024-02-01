@@ -273,6 +273,12 @@ public class BibGlsConverterListener extends LaTeXParserListener
       return 4.4f*exValue;
    }
 
+   @Override
+   public Charset getCharSet()
+   {
+      return texApp.getCharSet();
+   }
+
    protected boolean preambleOnly;
    protected BibGlsConverter texApp;
 }

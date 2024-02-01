@@ -24,8 +24,8 @@ bib2gls-begin.pdf	: bib2gls-begin.tex bib2gls.bib bib2gls-cite.bib version.tex
 
 version.tex	: ../java/bib2gls/Bib2Gls.java
 		@echo "\\date{Version " > version.tex
-		@grep 'String VERSION = ' ../java/bib2gls/Bib2Gls.java | sed "s/public\sstatic\sfinal\sString\sVERSION\s=//" | tr -d "\"\; " >> version.tex
-		@grep 'String DATE = ' ../java/bib2gls/Bib2Gls.java | sed "s/public\sstatic\sfinal\sString\sDATE\s=//" | tr -d "\"\; " >> version.tex
+		@grep 'String VERSION = ' ../java/common/BibGlsTeXApp.java | sed "s/public\sstatic\sfinal\sString\sVERSION\s=//" | tr -d "\"\; " >> version.tex
+		@grep 'String DATE = ' ../java/common/BibGlsTeXApp.java | sed "s/public\sstatic\sfinal\sString\sDATE\s=//" | tr -d "\"\; " >> version.tex
 		@echo "}%" >> version.tex
 
 bib2gls.1	: bib2gls.pod
