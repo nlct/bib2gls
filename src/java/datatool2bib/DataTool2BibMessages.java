@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2024 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.gls2bib;
+package com.dickimawbooks.datatool2bib;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.text.MessageFormat;
 import java.text.ChoiceFormat;
 
-public class Gls2BibMessages extends Hashtable<String,MessageFormat>
+public class DataTool2BibMessages extends Hashtable<String,MessageFormat>
 {
-    public Gls2BibMessages(Properties props) throws Gls2BibException
+    public DataTool2BibMessages(Properties props) throws DataTool2BibException
     {
        super(props.isEmpty() ? 10 : props.size());
 
@@ -42,7 +42,7 @@ public class Gls2BibMessages extends Hashtable<String,MessageFormat>
           }
           catch (IllegalArgumentException e)
           {
-             throw new Gls2BibException(
+             throw new DataTool2BibException(
               String.format(
                "Property '%s': Invalid message format: %s", 
                key, e.getMessage()),

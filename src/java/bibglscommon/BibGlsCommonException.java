@@ -16,16 +16,16 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.gls2bib;
+package com.dickimawbooks.bibglscommon;
 
-public class Gls2BibException extends Exception
+public class BibGlsCommonException extends Exception
 {
-   public Gls2BibException(String message)
+   public BibGlsCommonException(String message)
    {
       super(message);
    }
 
-   public Gls2BibException(String message, Throwable cause)
+   public BibGlsCommonException(String message, Throwable cause)
    {
       super(message, cause);
    }

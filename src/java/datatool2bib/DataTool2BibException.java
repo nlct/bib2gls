@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2024 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,16 +16,16 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.gls2bib;
+package com.dickimawbooks.datatool2bib;
 
-public class Gls2BibSyntaxException extends Gls2BibException
+public class DataTool2BibException extends Exception
 {
-   public Gls2BibSyntaxException(String message)
+   public DataTool2BibException(String message)
    {
       super(message);
    }
 
-   public Gls2BibSyntaxException(String message, Throwable cause)
+   public DataTool2BibException(String message, Throwable cause)
    {
       super(message, cause);
    }
