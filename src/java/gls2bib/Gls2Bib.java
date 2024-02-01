@@ -61,10 +61,11 @@ import com.dickimawbooks.bibgls.common.*;
 
 public class Gls2Bib extends BibGlsCommon
 {
-   public Gls2Bib(String[] args)
+   @Override
+   protected void initialise(String[] args)
     throws Bib2GlsException,IOException
    {
-      super(args);
+      super.initialise(args);
 
       if (customIgnoreFields != null)
       {
@@ -145,9 +146,10 @@ public class Gls2Bib extends BibGlsCommon
       return spaceSub;
    }
 
-   protected void addPredefined()
+   @Override
+   protected void addPredefinedCommands()
    {
-      super.addPredefined();
+      super.addPredefinedCommands();
 
       parser.putControlSequence(
         new GenericCommand("glslongkey", null, createString("long")));
@@ -305,7 +307,7 @@ public class Gls2Bib extends BibGlsCommon
    }
 
    @Override
-   public void newcommand(boolean isRobust, Overwrite overwrite,
+   public boolean newcommandOverride(boolean isRobust, Overwrite overwrite,
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
@@ -317,12 +319,11 @@ public class Gls2Bib extends BibGlsCommon
          // definition
 
          message(getMessage("gls2bib.override.newdualentry"));
-         addLaTeXCommand(csName, isShort, numParams, defValue, definition);
-         return;
+         listener.addLaTeXCommand(csName, isShort, numParams, defValue, definition);
+         return true;
       }
 
-      super.newcommand(isRobust, overwrite, type, csName, isShort,
-        numParams, defValue, definition);
+      return false;
    }
 
    public void addData(GlsData entryData)
@@ -358,7 +359,7 @@ public class Gls2Bib extends BibGlsCommon
 
    public void process() throws IOException,Bib2GlsException
    {
-      requirepackage("etoolbox", null);
+      listener.requirepackage("etoolbox", null);
 
       data = new Vector<GlsData>();
 
@@ -601,36 +602,6 @@ public class Gls2Bib extends BibGlsCommon
       return true;
    }
 
-   public static void main(String[] args)
-   {
-      try
-      {
-         Gls2Bib gls2bib = new Gls2Bib(args);
-
-         gls2bib.process();
-      }
-      catch (Bib2GlsSyntaxException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(1);
-      }
-      catch (Bib2GlsException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(3);
-      }
-      catch (IOException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(2);
-      }
-      catch (Exception e)
-      {
-         e.printStackTrace();
-         System.exit(4);
-      }
-   }
-
    public boolean fieldExpansionOn(String field)
    {
       if (expandFieldMap != null)
@@ -678,6 +649,12 @@ public class Gls2Bib extends BibGlsCommon
    public String getCopyrightStartYear()
    {
       return "2017";
+   }
+
+   public static void main(String[] args)
+   {
+      Gls2Bib gls2bib = new Gls2Bib();
+      gls2bib.run(args);
    }
 
    public static final String NAME = "convertgls2bib";

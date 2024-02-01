@@ -226,6 +226,7 @@ public class Bib2Gls implements TeXApp
       }
    }
 
+   @Override
    public boolean isReadAccessAllowed(TeXPath path)
    {
       debugMessage("message.checking.read", path);
@@ -285,6 +286,7 @@ public class Bib2Gls implements TeXApp
       return p.toAbsolutePath().normalize().startsWith(cwd);
    }
 
+   @Override
    public boolean isReadAccessAllowed(File file)
    {
       return isReadAccessAllowed(file.toPath());
@@ -414,11 +416,13 @@ public class Bib2Gls implements TeXApp
       texFiles.add(file);
    }
 
+   @Override
    public boolean isWriteAccessAllowed(TeXPath path)
    {
       return isWriteAccessAllowed(path.getPath());
    }
 
+   @Override
    public boolean isWriteAccessAllowed(File file)
    {
       return isWriteAccessAllowed(file.toPath());

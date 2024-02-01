@@ -48,15 +48,10 @@ import com.dickimawbooks.bibgls.common.*;
 
 public class DataTool2Bib extends BibGlsCommon
 {
-   public DataTool2Bib(String[] args)
-    throws Bib2GlsException,IOException
-   {
-      super(args);
-   }
-
+   @Override
    public void process() throws IOException,Bib2GlsException
    {
-      DataToolSty datatoolSty = (DataToolSty)requirepackage("datatool", null);
+      DataToolSty datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
 
       parser.parse(texFile, charset);
 
@@ -300,36 +295,6 @@ public class DataTool2Bib extends BibGlsCommon
       return true;
    }
 
-   public static void main(String[] args)
-   {
-      try
-      {
-         DataTool2Bib datatool2bib = new DataTool2Bib(args);
-
-         datatool2bib.process();
-      }
-      catch (Bib2GlsSyntaxException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(1);
-      }
-      catch (IOException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(2);
-      }
-      catch (Bib2GlsException e)
-      {
-         System.err.println(e.getMessage());
-         System.exit(3);
-      }
-      catch (Exception e)
-      {
-         e.printStackTrace();
-         System.exit(4);
-      }
-   }
-
    @Override
    public String getApplicationName()
    {
@@ -340,6 +305,12 @@ public class DataTool2Bib extends BibGlsCommon
    public String getCopyrightStartYear()
    {
       return "2024";
+   }
+
+   public static void main(String[] args)
+   {
+      DataTool2Bib datatool2bib = new DataTool2Bib();
+      datatool2bib.run(args);
    }
 
    public static final String NAME = "datatool2bib";
