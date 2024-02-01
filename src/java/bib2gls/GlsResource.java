@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibgls.bib2gls;
 
 import java.io.*;
 import java.util.*;
@@ -45,7 +45,7 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
-import com.dickimawbooks.bibglscommon.Bib2GlsException;
+import com.dickimawbooks.bibgls.common.Bib2GlsException;
 
 /**
  * Class representing a resource set. Each resource set is

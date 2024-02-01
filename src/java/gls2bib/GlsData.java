@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.gls2bib;
+package com.dickimawbooks.bibgls.gls2bib;
 
 import java.io.IOException;
 import java.io.PrintWriter;

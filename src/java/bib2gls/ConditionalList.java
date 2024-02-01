@@ -16,14 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibgls.bib2gls;
 
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
-import com.dickimawbooks.bibglscommon.*;
+import com.dickimawbooks.bibgls.common.Bib2GlsException;
 
 public class ConditionalList extends Vector<ConditionalListElement>
   implements Conditional

@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.gls2bib;
+package com.dickimawbooks.bibgls.gls2bib;
 
 /**
  * Converts .tex files containing <code>\\newglossaryentry</code> commands to a
@@ -57,7 +57,7 @@ import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.GobbleOptMandOpt;
 
-import com.dickimawbooks.bibglscommon.*;
+import com.dickimawbooks.bibgls.common.*;
 
 public class Gls2Bib extends BibGlsCommon
 {

@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.datatool2bib;
+package com.dickimawbooks.bibgls.datatool2bib;
 
 /**
  * Converts .tex files containing datatool.sty database commands to a
@@ -44,7 +44,7 @@ import java.nio.charset.Charset;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 
-import com.dickimawbooks.bibglscommon.*;
+import com.dickimawbooks.bibgls.common.*;
 
 public class DataTool2Bib extends BibGlsCommon
 {

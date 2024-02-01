@@ -16,11 +16,11 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibgls.bib2gls;
 
 import java.io.IOException;
 
-import com.dickimawbooks.bibglscommon.Bib2GlsException;
+import com.dickimawbooks.bibgls.common.Bib2GlsException;
 
 /**
  * Compares the value of a field element with the value of another field element.

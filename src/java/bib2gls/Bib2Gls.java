@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibgls.bib2gls;
 
 import java.util.Vector;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ import com.dickimawbooks.texparserlib.latex.mfirstuc.MakeFirstUc;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.CapitaliseWords;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
-import com.dickimawbooks.bibglscommon.*;
+import com.dickimawbooks.bibgls.common.*;
 
 public class Bib2Gls implements TeXApp
 {

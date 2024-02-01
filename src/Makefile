@@ -2,65 +2,65 @@ TARGET_VERSION := --release 8
 
 all	: lib/bib2gls.jar lib/convertgls2bib.jar lib/datatool2bib.jar
 
-lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bib2gls/Bib2Gls.class
+lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bibgls/bib2gls/Bib2Gls.class
 		cd classes; \
 		jar cmf ../java/bib2gls/Manifest.txt ../lib/bib2gls.jar \
-		com/dickimawbooks/bib2gls/*.class
+		com/dickimawbooks/bibgls/bib2gls/*.class
 
-classes/com/dickimawbooks/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bib2gls \
+classes/com/dickimawbooks/bibgls/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bibgls/bib2gls \
 	java/bib2gls/*.java lib/bibglscommon.jar
 	cd java/bib2gls; \
 	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
-classes/com/dickimawbooks/bib2gls	:
-	mkdir -p classes/com/dickimawbooks/bib2gls
+classes/com/dickimawbooks/bibgls/bib2gls	:
+	mkdir -p classes/com/dickimawbooks/bibgls/bib2gls
 
-lib/convertgls2bib.jar	: java/gls2bib/Manifest.txt classes/com/dickimawbooks/gls2bib/Gls2Bib.class
+lib/convertgls2bib.jar	: java/gls2bib/Manifest.txt classes/com/dickimawbooks/bibgls/gls2bib/Gls2Bib.class
 		cd classes; \
 		jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar \
-		com/dickimawbooks/gls2bib/*.class
+		com/dickimawbooks/bibgls/gls2bib/*.class
 
-classes/com/dickimawbooks/gls2bib/Gls2Bib.class	: classes/com/dickimawbooks/gls2bib \
+classes/com/dickimawbooks/bibgls/gls2bib/Gls2Bib.class	: classes/com/dickimawbooks/bibgls/gls2bib \
 	java/gls2bib/*.java lib/bibglscommon.jar
 	cd java/gls2bib; \
 	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
-classes/com/dickimawbooks/gls2bib	:
-	mkdir -p classes/com/dickimawbooks/gls2bib
+classes/com/dickimawbooks/bibgls/gls2bib	:
+	mkdir -p classes/com/dickimawbooks/bibgls/gls2bib
 
-lib/datatool2bib.jar	: java/datatool2bib/Manifest.txt classes/com/dickimawbooks/datatool2bib/DataTool2Bib.class
+lib/datatool2bib.jar	: java/datatool2bib/Manifest.txt classes/com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib.class
 		cd classes; \
 		jar cmf ../java/datatool2bib/Manifest.txt ../lib/datatool2bib.jar \
-		com/dickimawbooks/datatool2bib/*.class
+		com/dickimawbooks/bibgls/datatool2bib/*.class
 
-classes/com/dickimawbooks/datatool2bib/DataTool2Bib.class	: classes/com/dickimawbooks/datatool2bib \
+classes/com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib.class	: classes/com/dickimawbooks/bibgls/datatool2bib \
 	java/datatool2bib/*.java lib/bibglscommon.jar
 	cd java/datatool2bib; \
 	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
-classes/com/dickimawbooks/datatool2bib	:
-	mkdir -p classes/com/dickimawbooks/datatool2bib
+classes/com/dickimawbooks/bibgls/datatool2bib	:
+	mkdir -p classes/com/dickimawbooks/bibgls/datatool2bib
 
-lib/bibglscommon.jar	: classes/com/dickimawbooks/bibglscommon/BibGlsCommon.class
+lib/bibglscommon.jar	: classes/com/dickimawbooks/bibgls/common/BibGlsCommon.class
 		cd classes; \
 		jar cf ../lib/bibglscommon.jar \
-		com/dickimawbooks/bibglscommon/*.class
+		com/dickimawbooks/bibgls/common/*.class
 
-classes/com/dickimawbooks/bibglscommon/BibGlsCommon.class	: classes/com/dickimawbooks/bibglscommon \
-	java/bibglscommon/*.java
-	cd java/bibglscommon; \
+classes/com/dickimawbooks/bibgls/common/BibGlsCommon.class	: classes/com/dickimawbooks/bibgls/common \
+	java/common/*.java
+	cd java/common; \
 	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar *.java
 
-classes/com/dickimawbooks/bibglscommon	:
-	mkdir -p classes/com/dickimawbooks/bibglscommon
+classes/com/dickimawbooks/bibgls/common	:
+	mkdir -p classes/com/dickimawbooks/bibgls/common
 
 expl	: ../unstable/bib2gls.zip
 
@@ -78,9 +78,9 @@ expl	: ../unstable/bib2gls.zip
 	cd ../unstable; zip -r bib2gls.zip bib2gls/
 
 clean	:
-	\rm -f classes/com/dickimawbooks/bib2gls/*.class
-	\rm -f classes/com/dickimawbooks/gls2bib/*.class
-	\rm -f classes/com/dickimawbooks/bibglscommon/*.class
+	\rm -f classes/com/dickimawbooks/bibgls/bib2gls/*.class
+	\rm -f classes/com/dickimawbooks/bibgls/gls2bib/*.class
+	\rm -f classes/com/dickimawbooks/bibgls/common/*.class
 
 squeaky	:
 	\rm -f lib/bib2gls.jar

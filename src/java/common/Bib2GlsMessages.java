@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Nicola L.C. Talbot
+    Copyright (C) 2017-2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.datatool2bib;
+package com.dickimawbooks.bibgls.common;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -24,12 +24,17 @@ import java.util.Iterator;
 import java.text.MessageFormat;
 import java.text.ChoiceFormat;
 
-public class DataTool2BibMessages extends Hashtable<String,MessageFormat>
+public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
 {
-    public DataTool2BibMessages(Properties props) throws DataTool2BibException
+    public Bib2GlsMessages(Properties props) throws Bib2GlsException
     {
        super(props.isEmpty() ? 10 : props.size());
 
+       addProperties(props);
+    }
+
+    public void addProperties(Properties props) throws Bib2GlsException
+    {
        Iterator<Object> it = props.keySet().iterator();
 
        while (it.hasNext())
@@ -42,13 +47,25 @@ public class DataTool2BibMessages extends Hashtable<String,MessageFormat>
           }
           catch (IllegalArgumentException e)
           {
-             throw new DataTool2BibException(
+             throw new Bib2GlsException(
               String.format(
                "Property '%s': Invalid message format: %s", 
                key, e.getMessage()),
               e);
           }
        }
+    }
+
+    public String getMessageIfExists(String label, Object... args)
+    {
+       MessageFormat msg = get(label);
+
+       if (msg == null)
+       {
+          return null;
+       }
+
+       return msg.format(args);
     }
 
     public String getMessage(String label, Object... args)
@@ -63,6 +80,7 @@ public class DataTool2BibMessages extends Hashtable<String,MessageFormat>
 
        return msg.format(args);
     }
+
 
     public String getChoiceMessage(String label, int argIdx,
       String choiceLabel, int numChoices, Object... args)

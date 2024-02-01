@@ -16,7 +16,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibgls.bib2gls;
 
 import java.util.Vector;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
-import com.dickimawbooks.bibglscommon.Bib2GlsException;
+import com.dickimawbooks.bibgls.common.Bib2GlsException;
 
 /**
  * List of field value elements that should be concatenated.
