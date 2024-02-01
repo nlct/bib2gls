@@ -42,14 +42,14 @@ import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 
-public abstract class BibGlsCommon extends BibGlsTeXApp
+public abstract class BibGlsConverter extends BibGlsTeXApp
 {
    protected void initialise(String[] args)
     throws Bib2GlsException,IOException
    {
       super.initialise(args);
 
-      listener = new BibGlsCommonListener(this, preambleOnly);
+      listener = new BibGlsConverterListener(this, preambleOnly);
       parser = new TeXParser(listener);
    }
 
@@ -104,7 +104,7 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
     throws Bib2GlsSyntaxException
    {
       String arg;
-      String[] returnVals = new String[2];
+      BibGlsArgValue[] returnVals = new BibGlsArgValue[2];
 
       while ((arg = deque.poll()) != null)
       {
@@ -129,7 +129,7 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
                   arg));
             }
 
-            charset = Charset.forName(returnVals[0]);
+            charset = Charset.forName(returnVals[0].toString());
          }
          else if (isArg(deque, arg, "--bibenc", returnVals))
          {
@@ -140,7 +140,7 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
                   arg));
             }
 
-            bibCharsetName = returnVals[0];
+            bibCharsetName = returnVals[0].toString();
          }
          else if (isArg(deque, arg, "--space-sub", "-s", returnVals))
          {
@@ -151,7 +151,7 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
                   arg));
             }
 
-            spaceSub = returnVals[0];
+            spaceSub = returnVals[0].toString();
 
             if (" ".equals(spaceSub))
             {
@@ -166,7 +166,7 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
          {
             overwriteFiles = false;
          }
-         else if (isArg(deque, arg, "--ignore-fields", "-f", returnVals))
+         else if (isListArg(deque, arg, "--ignore-fields", "-f", returnVals))
          {
             if (returnVals[0] == null)
             {
@@ -175,15 +175,13 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
                   arg));
             }
 
-            String list = returnVals[0].trim();
-
-            if (list.isEmpty())
+            if (returnVals[0].toString().isEmpty())
             {
                customIgnoreFields = null;
             }
             else
             {
-               customIgnoreFields = list.split(" *, *");
+               customIgnoreFields = returnVals[0].listValue();
             }
          }
          else if (arg.equals("--preamble-only") || arg.equals("-p"))
@@ -395,6 +393,6 @@ public abstract class BibGlsCommon extends BibGlsTeXApp
    protected String[] customIgnoreFields = null;
 
    protected TeXParser parser;
-   protected BibGlsCommonListener listener;
+   protected BibGlsConverterListener listener;
 
 }

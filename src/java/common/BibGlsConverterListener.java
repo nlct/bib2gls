@@ -42,10 +42,10 @@ import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 
-public class BibGlsCommonListener extends LaTeXParserListener
+public class BibGlsConverterListener extends LaTeXParserListener
   implements Writeable
 {
-   public BibGlsCommonListener(BibGlsCommon texApp, boolean preambleOnly)
+   public BibGlsConverterListener(BibGlsConverter texApp, boolean preambleOnly)
    {
       super(null);
 
@@ -255,5 +255,5 @@ public class BibGlsCommonListener extends LaTeXParserListener
    }
 
    protected boolean preambleOnly;
-   protected BibGlsCommon texApp;
+   protected BibGlsConverter texApp;
 }

@@ -798,6 +798,18 @@ public abstract class BibGlsTeXApp implements TeXApp
 
                int n = argCount(split[0]);
 
+               if (n == -1)
+               {
+                  if (i + 1 < args.length && !args[i+1].startsWith("-"))
+                  {
+                     n = 1;
+                  }
+                  else
+                  {
+                     n = 0;
+                  }
+               }
+
                if (split.length == 2)
                {
                   n--;
@@ -820,24 +832,84 @@ public abstract class BibGlsTeXApp implements TeXApp
    }
 
    protected boolean parseArg(ArrayDeque<String> deque, String arg,
-      String[] returnVals)
+      BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
       return false;
    }
 
+   /**
+    * Gets the number of required arguments for a command line
+    * switch. This should return the number or -1 for a single
+    * optional argument (which should not start with "-").
+    * @param arg switch
+    * @return number of required arguments or -1 for a single
+    * optional argument
+    */ 
    protected abstract int argCount(String arg);
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
-     String longName, String[] returnVals)
+     String longName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
    {
-      return isArg(deque, arg, longName, null, returnVals);
+      return isArg(deque, arg, longName, null, returnVals, BibGlsArgValueType.STRING);
    }
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
-     String longName, String shortName, String[] returnVals)
+     String longName, BibGlsArgValue[] returnVals,
+     BibGlsArgValueType type)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, null, returnVals, type);
+   }
+
+   protected boolean isArg(ArrayDeque<String> deque, String arg,
+     String longName, String shortName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, shortName, returnVals,
+         BibGlsArgValueType.STRING);
+   }
+
+   protected boolean isIntArg(ArrayDeque<String> deque, String arg,
+     String longName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, null, returnVals,
+         BibGlsArgValueType.INT);
+   }
+
+   protected boolean isIntArg(ArrayDeque<String> deque, String arg,
+     String longName, String shortName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, shortName, returnVals,
+         BibGlsArgValueType.INT);
+   }
+
+   protected boolean isListArg(ArrayDeque<String> deque, String arg,
+     String longName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, null, returnVals,
+         BibGlsArgValueType.LIST);
+   }
+
+   protected boolean isListArg(ArrayDeque<String> deque, String arg,
+     String longName, String shortName, BibGlsArgValue[] returnVals)
+    throws Bib2GlsSyntaxException
+   {
+      return isArg(deque, arg, longName, shortName, returnVals,
+         BibGlsArgValueType.LIST);
+   }
+
+   protected boolean isArg(ArrayDeque<String> deque, String arg,
+     String longName, String shortName, BibGlsArgValue[] returnVals,
+     BibGlsArgValueType type)
+    throws Bib2GlsSyntaxException
    {
       String[] split = arg.split("=", 2);
+      String argName = split[0];
 
       int n = 0;
 
@@ -851,24 +923,55 @@ public abstract class BibGlsTeXApp implements TeXApp
          }
          else if (split.length == 1)
          {
-            returnVals[0] = deque.poll();
+            if (n == -1)
+            {
+               String val = deque.peekFirst();
+
+               if (val != null && !val.startsWith("-"))
+               {
+                  returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
+               }
+               else
+               {
+                  returnVals[0] = null;
+               }
+            }
+            else
+            {
+               returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
+            }
          }
          else
          {
-            returnVals[0] = split[1];
+            returnVals[0] = BibGlsArgValue.create(this, argName, split[1], type);
          }
       }
       else if (shortName != null && arg.equals(shortName))
       {
+         argName = shortName;
+
          n = argCount(shortName);
 
          if (n == 0)
          {
             returnVals[0] = null;
          }
+         else if (n == -1)
+         {
+            String val = deque.peekFirst();
+
+            if (val != null && !val.startsWith("-"))
+            {
+               returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
+            }
+            else
+            {
+               returnVals[0] = null;
+            }
+         }
          else
          {
-            returnVals[0] = deque.poll();
+            returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
          }
       }
       else
@@ -878,7 +981,7 @@ public abstract class BibGlsTeXApp implements TeXApp
 
       for (int i = 1; i < n; i++)
       {
-         returnVals[i] = deque.poll();
+         returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
       }
 
       return true;

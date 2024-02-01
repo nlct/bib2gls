@@ -59,7 +59,7 @@ import com.dickimawbooks.texparserlib.latex.GobbleOptMandOpt;
 
 import com.dickimawbooks.bibgls.common.*;
 
-public class Gls2Bib extends BibGlsCommon
+public class Gls2Bib extends BibGlsConverter
 {
    @Override
    protected void initialise(String[] args)
@@ -531,7 +531,7 @@ public class Gls2Bib extends BibGlsCommon
 
    @Override
    protected boolean parseArg(ArrayDeque<String> deque, String arg, 
-      String[] returnVals)
+      BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
       if (arg.equals("--ignore-sort"))

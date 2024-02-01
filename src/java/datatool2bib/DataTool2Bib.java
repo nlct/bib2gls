@@ -46,7 +46,7 @@ import com.dickimawbooks.texparserlib.latex.datatool.*;
 
 import com.dickimawbooks.bibgls.common.*;
 
-public class DataTool2Bib extends BibGlsCommon
+public class DataTool2Bib extends BibGlsConverter
 {
    @Override
    public void process() throws IOException,Bib2GlsException
@@ -243,7 +243,7 @@ public class DataTool2Bib extends BibGlsCommon
 
    @Override
    protected boolean parseArg(ArrayDeque<String> deque, String arg,
-      String[] returnVals)
+      BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
    {
       if (isArg(deque, arg, "--label", "-L", returnVals))
@@ -255,9 +255,9 @@ public class DataTool2Bib extends BibGlsCommon
                arg));
          }
 
-         labelColumn = returnVals[0];
+         labelColumn = returnVals[0].toString();
       }
-      else if (isArg(deque, arg, "--key-map", "-m", returnVals))
+      else if (isListArg(deque, arg, "--key-map", "-m", returnVals))
       {
          if (returnVals[0] == null)
          {
@@ -271,9 +271,7 @@ public class DataTool2Bib extends BibGlsCommon
             keyToFieldMap = new HashMap<String,String>();
          }
 
-         String[] split = returnVals[0].trim().split(" *, *");
-
-         for (String s : split)
+         for (String s : returnVals[0].listValue())
          {
             String[] map = s.split(" *= *");
 
