@@ -794,7 +794,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          in.close();
          in = null;
 
-         messages = new BibGlsCommonMessages(prop);
+         messages = new Bib2GlsMessages(prop);
       }
       finally
       {
@@ -1381,7 +1381,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
 
    protected String[] customIgnoreFields = null;
 
-   protected BibGlsCommonMessages messages;
+   protected Bib2GlsMessages messages;
 
    public static final int SILENT=0, NORMAL=1, DEBUG=2;
 
