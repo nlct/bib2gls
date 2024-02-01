@@ -48,7 +48,14 @@ public abstract class BibGlsTeXApp implements TeXApp
 
       initMessages();
 
+      postInitMessages();
+
       parseArgs(deque);
+   }
+
+   protected void postInitMessages()
+    throws Bib2GlsException,IOException
+   {
    }
 
    public boolean isSilent()

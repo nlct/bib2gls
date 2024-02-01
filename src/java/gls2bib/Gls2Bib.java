@@ -147,9 +147,9 @@ public class Gls2Bib extends BibGlsConverter
    }
 
    @Override
-   protected void addPredefinedCommands()
+   protected void addPredefinedCommands(TeXParser parser)
    {
-      super.addPredefinedCommands();
+      super.addPredefinedCommands(parser);
 
       parser.putControlSequence(
         new GenericCommand("glslongkey", null, createString("long")));

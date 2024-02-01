@@ -25,6 +25,7 @@ package com.dickimawbooks.bibgls.common;
 import java.util.Properties;
 import java.util.Locale;
 import java.util.ArrayDeque;
+import java.util.Vector;
 import java.text.MessageFormat;
 import java.text.BreakIterator;
 import java.io.*;
@@ -44,11 +45,10 @@ import com.dickimawbooks.texparserlib.latex.Overwrite;
 
 public abstract class BibGlsConverter extends BibGlsTeXApp
 {
-   protected void initialise(String[] args)
+   @Override
+   protected void postInitMessages()
     throws Bib2GlsException,IOException
    {
-      super.initialise(args);
-
       listener = new BibGlsConverterListener(this, preambleOnly);
       parser = new TeXParser(listener);
    }
@@ -64,7 +64,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return listener.createString(str);
    }
 
-   protected void addPredefinedCommands()
+   protected void addPredefinedCommands(TeXParser parser)
    {
       // don't complain about redefining unknown commands
       parser.putControlSequence(new NewCommand("renewcommand",
@@ -166,6 +166,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          {
             overwriteFiles = false;
          }
+         else if (arg.equals("--no-ignore-fields"))
+         {
+            customIgnoreFields = null;
+         }
          else if (isListArg(deque, arg, "--ignore-fields", "-f", returnVals))
          {
             if (returnVals[0] == null)
@@ -181,7 +185,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
             }
             else
             {
-               customIgnoreFields = returnVals[0].listValue();
+               addCustomIgnoreField(returnVals[0].listValue());
             }
          }
          else if (arg.equals("--preamble-only") || arg.equals("-p"))
@@ -241,6 +245,19 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       if (bibCharsetName == null)
       {
          bibCharsetName = charset.name();
+      }
+   }
+
+   public void addCustomIgnoreField(String... fields)
+   {
+      if (customIgnoreFields == null)
+      {
+         customIgnoreFields = new Vector<String>();
+      }
+
+      for (String f : fields)
+      {
+         customIgnoreFields.add(f);
       }
    }
 
@@ -390,7 +407,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected String spaceSub = null;
 
-   protected String[] customIgnoreFields = null;
+   protected Vector<String> customIgnoreFields = null;
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;

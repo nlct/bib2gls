@@ -72,7 +72,7 @@ public class BibGlsConverterListener extends LaTeXParserListener
    {
       super.addPredefined();
 
-      texApp.addPredefinedCommands();
+      texApp.addPredefinedCommands(getParser());
     }
 
    @Override
