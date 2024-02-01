@@ -49,12 +49,12 @@ import com.dickimawbooks.bibglscommon.*;
 public class DataTool2Bib extends BibGlsCommon
 {
    public DataTool2Bib(String[] args)
-    throws BibGlsCommonException,IOException
+    throws Bib2GlsException,IOException
    {
       super(args);
    }
 
-   public void process() throws IOException,BibGlsCommonException
+   public void process() throws IOException,Bib2GlsException
    {
       DataToolSty datatoolSty = (DataToolSty)requirepackage("datatool", null);
 
@@ -64,7 +64,7 @@ public class DataTool2Bib extends BibGlsCommon
 
       if (numDatabases == 0)
       {
-         throw new BibGlsCommonException(
+         throw new Bib2GlsException(
             getMessage("datatool2bib.no.databases"));
       }
       else if (numDatabases == 1)
@@ -249,13 +249,13 @@ public class DataTool2Bib extends BibGlsCommon
    @Override
    protected boolean parseArg(ArrayDeque<String> deque, String arg,
       String[] returnVals)
-    throws BibGlsCommonSyntaxException
+    throws Bib2GlsSyntaxException
    {
       if (isArg(deque, arg, "--label", "-L", returnVals))
       {
          if (returnVals[0] == null)
          {
-            throw new BibGlsCommonSyntaxException(
+            throw new Bib2GlsSyntaxException(
                getMessage("common.missing.arg.value",
                arg));
          }
@@ -266,7 +266,7 @@ public class DataTool2Bib extends BibGlsCommon
       {
          if (returnVals[0] == null)
          {
-            throw new BibGlsCommonSyntaxException(
+            throw new Bib2GlsSyntaxException(
                getMessage("common.missing.arg.value",
                arg));
          }
@@ -284,7 +284,7 @@ public class DataTool2Bib extends BibGlsCommon
 
             if (map.length != 2)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("datatool2bib.syntax.invalid_map",
                   s, arg));
             }
@@ -308,7 +308,7 @@ public class DataTool2Bib extends BibGlsCommon
 
          datatool2bib.process();
       }
-      catch (BibGlsCommonSyntaxException e)
+      catch (Bib2GlsSyntaxException e)
       {
          System.err.println(e.getMessage());
          System.exit(1);
@@ -318,7 +318,7 @@ public class DataTool2Bib extends BibGlsCommon
          System.err.println(e.getMessage());
          System.exit(2);
       }
-      catch (BibGlsCommonException e)
+      catch (Bib2GlsException e)
       {
          System.err.println(e.getMessage());
          System.exit(3);

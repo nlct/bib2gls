@@ -31,6 +31,7 @@ import java.text.BreakIterator;
 import java.util.HashMap;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2GlsEntryComparator extends SortComparator
 {

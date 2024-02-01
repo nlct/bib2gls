@@ -21,6 +21,9 @@ package com.dickimawbooks.bib2gls;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+import com.dickimawbooks.bibglscommon.Bib2GlsSyntaxException;
+
 public class RecordCountRule
 {
    public RecordCountRule(Bib2Gls bib2gls)

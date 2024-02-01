@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.*;
+
 public interface Conditional extends ConditionalListElement
 {
    /**

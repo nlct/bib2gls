@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2GlsBibTeXEntry extends Bib2GlsEntry 
  implements Bib2GlsMultiEntry

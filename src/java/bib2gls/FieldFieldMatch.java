@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Compares the value of a field element with the value of another field element.
  * If either field element evaluates to null, it will be treated as empty.

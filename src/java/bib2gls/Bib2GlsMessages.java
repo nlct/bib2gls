@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Iterator;
 import java.text.MessageFormat;
 import java.text.ChoiceFormat;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2GlsMessages extends Hashtable<String,MessageFormat>
 {

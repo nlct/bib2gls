@@ -28,6 +28,8 @@ import com.dickimawbooks.texparserlib.WhiteSpace;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Represents the TRIM quark.
  */

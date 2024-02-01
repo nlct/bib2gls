@@ -18,6 +18,7 @@
 */
 package com.dickimawbooks.bib2gls;
 
+import com.dickimawbooks.bibglscommon.*;
 /*
  * Corresponds to \multiglossaryentry (glossaries-extra.sty v1.48)
  */

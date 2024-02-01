@@ -16,16 +16,21 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package com.dickimawbooks.bib2gls;
+package com.dickimawbooks.bibglscommon;
 
-public class Bib2GlsException extends Exception
+/**
+ * Exception thrown on encountering invalid syntax will parsing
+ * command line options.
+ */
+
+public class Bib2GlsSyntaxException extends Bib2GlsException
 {
-   public Bib2GlsException(String message)
+   public Bib2GlsSyntaxException(String message)
    {
       super(message);
    }
 
-   public Bib2GlsException(String message, Throwable cause)
+   public Bib2GlsSyntaxException(String message, Throwable cause)
    {
       super(message, cause);
    }

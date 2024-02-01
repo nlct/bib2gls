@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.*;
+
 public interface ConditionalBinary extends ConditionalListElement
 {
    public boolean booleanValue(Bib2GlsEntry entry, Conditional cond1, Conditional cond2)

@@ -26,6 +26,8 @@ import com.dickimawbooks.texparserlib.TeXObjectList;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Represents the MGP quark. The group is from the most recent
  * successful pattern match in the conditional for the current field assignment list.

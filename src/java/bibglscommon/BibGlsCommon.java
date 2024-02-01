@@ -46,7 +46,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
   implements Writeable,TeXApp
 {
    public BibGlsCommon(String[] args)
-    throws BibGlsCommonException,IOException
+    throws Bib2GlsException,IOException
    {
       super(null);
 
@@ -703,7 +703,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
       return String.format("/resources/bib2gls-%s.xml", tag);
    }
 
-   private void initMessages() throws BibGlsCommonException,IOException
+   private void initMessages() throws Bib2GlsException,IOException
    {
       Locale locale;
 
@@ -774,7 +774,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
 
             if (url == null)
             {
-               throw new BibGlsCommonException("Can't find language resource file.");
+               throw new Bib2GlsException("Can't find language resource file.");
             }
          }
       }
@@ -963,7 +963,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
    }
    
    protected ArrayDeque<String> preparse(String[] args)
-     throws BibGlsCommonSyntaxException
+     throws Bib2GlsSyntaxException
    {
       ArrayDeque<String> deque = new ArrayDeque<String>(args.length);
 
@@ -978,7 +978,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (i == args.length-1)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                "Missing <lang tag> after "+args[i]);
             }
 
@@ -1031,7 +1031,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
 
    protected boolean parseArg(ArrayDeque<String> deque, String arg,
       String[] returnVals)
-    throws BibGlsCommonSyntaxException
+    throws Bib2GlsSyntaxException
    {
       return false;
    }
@@ -1108,7 +1108,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
    }
 
    protected void parseArgs(ArrayDeque<String> deque)
-    throws BibGlsCommonSyntaxException
+    throws Bib2GlsSyntaxException
    {
       String arg;
       String[] returnVals = new String[2];
@@ -1131,7 +1131,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (returnVals[0] == null)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("common.missing.encoding.value",
                   arg));
             }
@@ -1142,7 +1142,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (returnVals[0] == null)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("common.missing.encoding.value",
                   arg));
             }
@@ -1153,7 +1153,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (returnVals[0] == null)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("common.missing.arg.value",
                   arg));
             }
@@ -1177,7 +1177,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (returnVals[0] == null)
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("common.missing.arg.value",
                   arg));
             }
@@ -1205,7 +1205,7 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          {
             if (!parseArg(deque, arg, returnVals))
             {
-               throw new BibGlsCommonSyntaxException(
+               throw new Bib2GlsSyntaxException(
                   getMessage("common.unknown.arg",
                   arg, "--help"));
             }
@@ -1227,21 +1227,21 @@ public abstract class BibGlsCommon extends LaTeXParserListener
          }
          else
          {
-            throw new BibGlsCommonSyntaxException(
+            throw new Bib2GlsSyntaxException(
                getMessage("common.toomany.arg", "--help"));
          }
       }
 
       if (texFile == null)
       {
-          throw new BibGlsCommonSyntaxException(
+          throw new Bib2GlsSyntaxException(
            getMessage("common.missing.tex.arg",
               getMessage("common.syntax", getApplicationName()), "--help"));
       }
 
       if (bibFile == null)
       {
-          throw new BibGlsCommonSyntaxException(
+          throw new Bib2GlsSyntaxException(
             getMessage("common.missing.bib.arg",
               getMessage("common.syntax", getApplicationName()), "--help"));
       }

@@ -8,11 +8,11 @@ lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bib2gls/Bi
 		com/dickimawbooks/bib2gls/*.class
 
 classes/com/dickimawbooks/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bib2gls \
-	java/bib2gls/*.java
+	java/bib2gls/*.java lib/bibglscommon.jar
 	cd java/bib2gls; \
 	javac $(TARGET_VERSION) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	 -cp ../../lib/texparserlib.jar *.java
+	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
 classes/com/dickimawbooks/bib2gls	:
 	mkdir -p classes/com/dickimawbooks/bib2gls

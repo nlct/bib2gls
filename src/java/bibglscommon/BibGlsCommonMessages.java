@@ -26,7 +26,7 @@ import java.text.ChoiceFormat;
 
 public class BibGlsCommonMessages extends Hashtable<String,MessageFormat>
 {
-    public BibGlsCommonMessages(Properties props) throws BibGlsCommonException
+    public BibGlsCommonMessages(Properties props) throws Bib2GlsException
     {
        super(props.isEmpty() ? 10 : props.size());
 
@@ -42,7 +42,7 @@ public class BibGlsCommonMessages extends Hashtable<String,MessageFormat>
           }
           catch (IllegalArgumentException e)
           {
-             throw new BibGlsCommonException(
+             throw new Bib2GlsException(
               String.format(
                "Property '%s': Invalid message format: %s", 
                key, e.getMessage()),

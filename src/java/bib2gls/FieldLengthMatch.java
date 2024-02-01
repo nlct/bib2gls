@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Compares the length of a field element with a numeric value. Note that 
  * the length is the number of characters in the detokenized string

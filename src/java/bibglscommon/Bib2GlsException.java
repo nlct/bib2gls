@@ -18,14 +18,14 @@
 */
 package com.dickimawbooks.bibglscommon;
 
-public class BibGlsCommonException extends Exception
+public class Bib2GlsException extends Exception
 {
-   public BibGlsCommonException(String message)
+   public Bib2GlsException(String message)
    {
       super(message);
    }
 
-   public BibGlsCommonException(String message, Throwable cause)
+   public Bib2GlsException(String message, Throwable cause)
    {
       super(message, cause);
    }

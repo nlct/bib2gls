@@ -64,6 +64,7 @@ import com.dickimawbooks.texparserlib.latex.mfirstuc.MakeFirstUc;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.CapitaliseWords;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2Gls implements TeXApp
 {

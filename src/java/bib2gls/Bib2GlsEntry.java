@@ -36,6 +36,7 @@ import java.text.ParseException;
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2GlsEntry extends BibEntry
 {

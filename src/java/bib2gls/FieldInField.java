@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Tests if the value of a field element is a substring of 
  * the value of another field element.

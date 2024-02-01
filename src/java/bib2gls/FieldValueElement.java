@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.bib.BibValue;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 public interface FieldValueElement
 {
    /**

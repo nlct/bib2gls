@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.dickimawbooks.texparserlib.bib.BibValueList;
+import com.dickimawbooks.bibglscommon.*;
 
 public class Bib2GlsEntryRecordCountComparator extends Bib2GlsEntryNumericComparator
 {

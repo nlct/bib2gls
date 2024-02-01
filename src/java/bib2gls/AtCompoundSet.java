@@ -22,6 +22,7 @@ import java.io.*;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
+import com.dickimawbooks.bibglscommon.*;
 
 public class AtCompoundSet extends BibEntry
 {

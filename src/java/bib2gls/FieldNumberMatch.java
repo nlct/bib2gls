@@ -20,6 +20,8 @@ package com.dickimawbooks.bib2gls;
 
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Compares the value of a field element with a numeric value. Note that if
  * the provided numerical value is an Integer the field element value will

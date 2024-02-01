@@ -62,7 +62,7 @@ import com.dickimawbooks.bibglscommon.*;
 public class Gls2Bib extends BibGlsCommon
 {
    public Gls2Bib(String[] args)
-    throws BibGlsCommonException,IOException
+    throws Bib2GlsException,IOException
    {
       super(args);
 
@@ -356,7 +356,7 @@ public class Gls2Bib extends BibGlsCommon
       return null;
    }
 
-   public void process() throws IOException,BibGlsCommonException
+   public void process() throws IOException,Bib2GlsException
    {
       requirepackage("etoolbox", null);
 
@@ -377,7 +377,7 @@ public class Gls2Bib extends BibGlsCommon
       {
          if (data.isEmpty())
          {
-            throw new BibGlsCommonException(
+            throw new Bib2GlsException(
                getMessage("gls2bib.no.entries"));
          }
 
@@ -531,7 +531,7 @@ public class Gls2Bib extends BibGlsCommon
    @Override
    protected boolean parseArg(ArrayDeque<String> deque, String arg, 
       String[] returnVals)
-    throws BibGlsCommonSyntaxException
+    throws Bib2GlsSyntaxException
    {
       if (arg.equals("--ignore-sort"))
       {
@@ -609,12 +609,12 @@ public class Gls2Bib extends BibGlsCommon
 
          gls2bib.process();
       }
-      catch (BibGlsCommonSyntaxException e)
+      catch (Bib2GlsSyntaxException e)
       {
          System.err.println(e.getMessage());
          System.exit(1);
       }
-      catch (BibGlsCommonException e)
+      catch (Bib2GlsException e)
       {
          System.err.println(e.getMessage());
          System.exit(3);

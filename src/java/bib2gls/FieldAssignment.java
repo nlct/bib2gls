@@ -23,6 +23,8 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Used to store each field assignment specification (obtained from
  * the assign-fields option).

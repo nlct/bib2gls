@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.IOException;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Tests if a field element value matches a regular expression.
  * Any groups in the regular expression can be referenced with the

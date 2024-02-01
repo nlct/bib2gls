@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.bibglscommon.*;
 
 public class ConditionalList extends Vector<ConditionalListElement>
   implements Conditional

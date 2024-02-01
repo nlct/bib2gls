@@ -45,6 +45,8 @@ import com.dickimawbooks.texparserlib.latex.CsvList;
 import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Class representing a resource set. Each resource set is
  * identified by {@code \glsxtr@resource} in the aux file (which is

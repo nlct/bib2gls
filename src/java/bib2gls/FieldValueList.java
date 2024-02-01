@@ -25,6 +25,8 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * List of field value elements that should be concatenated.
  * The list itself implements FieldValueElement to allow either a

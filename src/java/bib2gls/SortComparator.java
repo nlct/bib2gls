@@ -27,6 +27,8 @@ import com.dickimawbooks.texparserlib.TeXCsRef;
 import com.dickimawbooks.texparserlib.TeXParserListener;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 {
    public SortComparator(Bib2Gls bib2gls,

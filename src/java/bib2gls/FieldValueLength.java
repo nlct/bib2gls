@@ -26,6 +26,8 @@ import com.dickimawbooks.texparserlib.TeXObjectList;
 import com.dickimawbooks.texparserlib.bib.BibValue;
 import com.dickimawbooks.texparserlib.bib.BibUserString;
 
+import com.dickimawbooks.bibglscommon.Bib2GlsException;
+
 /**
  * Represents the LEN quark. In a field element context, this quark
  * returns a string. The numeric conditional LEN quark is represented by
