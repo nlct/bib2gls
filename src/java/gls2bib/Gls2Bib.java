@@ -307,6 +307,12 @@ public class Gls2Bib extends BibGlsConverter
    }
 
    @Override
+   protected boolean isIgnoredPackage(String styName)
+   {
+      return styName.startsWith("glossar");
+   }
+
+   @Override
    public boolean newcommandOverride(boolean isRobust, Overwrite overwrite,
      String type, String csName, boolean isShort,
      int numParams, TeXObject defValue, TeXObject definition)

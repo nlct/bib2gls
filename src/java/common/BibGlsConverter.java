@@ -46,9 +46,11 @@ import com.dickimawbooks.texparserlib.latex.Overwrite;
 public abstract class BibGlsConverter extends BibGlsTeXApp
 {
    @Override
-   protected void postInitMessages()
+   protected void initialise(String[] args)
     throws Bib2GlsException,IOException
    {
+      super.initialise(args);
+
       listener = new BibGlsConverterListener(this, preambleOnly);
       parser = new TeXParser(listener);
    }
@@ -80,6 +82,11 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
      int numParams, TeXObject defValue, TeXObject definition)
    throws IOException
    {  
+      return false;
+   }
+
+   protected boolean isIgnoredPackage(String styName)
+   {
       return false;
    }
 

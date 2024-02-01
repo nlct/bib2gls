@@ -41,6 +41,8 @@ import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
+import com.dickimawbooks.texparserlib.latex.LaTeXSty;
+import com.dickimawbooks.texparserlib.latex.UnknownSty;
 
 public class BibGlsConverterListener extends LaTeXParserListener
   implements Writeable
@@ -91,6 +93,23 @@ public class BibGlsConverterListener extends LaTeXParserListener
         numParams, defValue, definition);
    }
 
+   protected boolean isIgnoredPackage(String styName)
+   {
+      return false;
+   }
+
+   @Override
+   protected LaTeXSty getLaTeXSty(KeyValList options, String styName,
+      boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {  
+      if (texApp.isIgnoredPackage(styName))
+      {
+         return new UnknownSty(options, styName, this, loadParentOptions);
+      }
+
+      return super.getLaTeXSty(options, styName, loadParentOptions, stack);
+   }
 
    // Ignore unknown control sequences
    @Override
