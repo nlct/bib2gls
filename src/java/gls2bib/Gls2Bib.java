@@ -324,7 +324,7 @@ public class Gls2Bib extends BibGlsConverter
          // allow \newcommand{\newdualentry} to overwrite default
          // definition
 
-         message(getMessage("gls2bib.override.newdualentry"));
+         message(getMessage(getParser(), "gls2bib.override.newdualentry"));
          listener.addLaTeXCommand(csName, isShort, numParams, defValue, definition);
          return true;
       }

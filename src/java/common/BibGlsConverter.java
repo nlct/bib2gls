@@ -66,6 +66,16 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return listener.createString(str);
    }
 
+   public TeXParser getParser()
+   {
+      return parser;
+   }
+
+   public BibGlsConverterListener getListener()
+   {
+      return listener;
+   }
+
    protected void addPredefinedCommands(TeXParser parser)
    {
       // don't complain about redefining unknown commands
