@@ -5358,8 +5358,10 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          return 1;
       }
-
-      return 0;
+      else
+      {
+         return super.argCount(arg);
+      }
    }
 
    @Override

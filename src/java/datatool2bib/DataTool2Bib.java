@@ -53,7 +53,17 @@ public class DataTool2Bib extends BibGlsConverter
    {
       DataToolSty datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
 
-      parser.parse(texFile, charset);
+      if (readOpts == null)
+      {
+         parser.parse(texFile, charset);
+      }
+      else
+      {
+         TeXPath texPath = new TeXPath(parser, texFile);
+
+         parser.parse(new TeXReader(String.format("\\DTLread[%s]{%s}",
+           readOpts, texPath.getTeXPath(false))));
+      }
 
       int numDatabases = datatoolSty.getDataBaseCount();
 
@@ -224,7 +234,7 @@ public class DataTool2Bib extends BibGlsConverter
          int colIdx = header.getColumnIndex();
          String label = header.getColumnLabel();
 
-         if (label.equals(labelColumn))
+         if (!autoLabel && label.equals(labelColumn))
          {
             labelColIdx = colIdx;
          }
@@ -246,7 +256,7 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
-      if (labelColIdx < 1)
+      if (!autoLabel && labelColIdx < 1)
       {
          throw new Bib2GlsException(
            getMessage("datatool2bib.missing.label.column",
@@ -258,13 +268,21 @@ public class DataTool2Bib extends BibGlsConverter
          out.println();
          out.print("@entry{");
 
-         DataToolEntry entry = row.getEntry(labelColIdx);
-
+         DataToolEntry entry;
          String rowLabel = "";
 
-         if (entry != null)
+         if (autoLabel)
          {
-            rowLabel = processLabel(entry);
+            rowLabel = "entry" + row.getRowIndex();
+         }
+         else
+         {
+            entry = row.getEntry(labelColIdx);
+
+            if (entry != null)
+            {
+               rowLabel = processLabel(entry);
+            }
          }
 
          if (rowLabel.isEmpty())
@@ -306,7 +324,9 @@ public class DataTool2Bib extends BibGlsConverter
    protected int argCount(String arg)
    {
       if (arg.equals("--key-map") || arg.equals("-m")
-        || arg.equals("--label") || arg.equals("L"))
+        || arg.equals("--label") || arg.equals("-L")
+        || arg.equals("--read") || arg.equals("-r")
+         )
       {
          return 1;
       }
@@ -329,6 +349,29 @@ public class DataTool2Bib extends BibGlsConverter
          }
 
          labelColumn = returnVals[0].toString();
+      }
+      else if (arg.equals("--auto-label") || arg.equals("-a"))
+      {
+         autoLabel = true;
+      }
+      else if (arg.equals("--no-auto-label"))
+      {
+         autoLabel = false;
+      }
+      else if (isArg(deque, arg, "-r", "--read", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         readOpts = returnVals[0].toString();
+      }
+      else if (arg.equals("--no-read"))
+      {
+         readOpts = null;
       }
       else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
       {
@@ -391,4 +434,6 @@ public class DataTool2Bib extends BibGlsConverter
    private boolean split = false;
 
    private String labelColumn="Label";
+   private boolean autoLabel = false;
+   private String readOpts = null;
 }

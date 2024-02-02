@@ -1203,7 +1203,17 @@ public abstract class BibGlsTeXApp implements TeXApp
     * @return number of required arguments or -1 for a single
     * optional argument
     */ 
-   protected abstract int argCount(String arg);
+   protected int argCount(String arg)
+   {
+      if (arg.equals("--debug-mode")
+         || arg.equals("--default-encoding")
+         )
+      {
+         return 1;
+      }
+
+      return 0;
+   }
 
    protected boolean isArg(ArrayDeque<String> deque, String arg,
      String longName, BibGlsArgValue[] returnVals)
@@ -1474,6 +1484,12 @@ public abstract class BibGlsTeXApp implements TeXApp
          {        
             debugLevel = 0;
 
+            if (returnVals[0] == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", arg));
+            }
+
             for (String mode : returnVals[0].listValue())
             {
                mode = mode.trim();
@@ -1551,7 +1567,7 @@ public abstract class BibGlsTeXApp implements TeXApp
 
             verboseLevel = DEBUG;
          }
-         else if (isArg(deque, arg, "default-encoding", returnVals))
+         else if (isArg(deque, arg, "--default-encoding", returnVals))
          {
             if (returnVals[0] == null)
             {

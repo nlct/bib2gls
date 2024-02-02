@@ -53,6 +53,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
       listener = new BibGlsConverterListener(this, preambleOnly);
       parser = new TeXParser(listener);
+      parser.setDebugMode(debugLevel);
    }
 
    @Override
@@ -117,8 +118,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       {
          return 1;
       }
-
-      return 0;
+      else
+      {
+         return super.argCount(arg);
+      }
    }
 
    @Override
