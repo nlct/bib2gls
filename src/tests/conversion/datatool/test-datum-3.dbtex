@@ -1,0 +1,59 @@
+% DBTEX 3.0 utf8
+% Created by datatool 2023/11/23 v3.0 (NLCT) on November 23, 2023
+\DTLdbProvideData{datum}%
+\DTLreconstructdbdata
+{% Header
+\dtldbheaderreconstruct{1}{product}{0}{product}%
+\dtldbheaderreconstruct{2}{quantity}{1}{quantity}%
+\dtldbheaderreconstruct{3}{price}{3}{price}%
+\dtldbheaderreconstruct{4}{rating}{2}{rating}%
+}% End of Header
+{% Content
+% Row 1
+\dtldbrowreconstruct{1}%
+{% Row 1 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtldbdatumreconstruct{Product 1}{}{}{0}%
+  }% End of Column 1 Content
+  \dtldbcolreconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtldbdatumreconstruct{3}{3}{}{1}%
+  }% End of Column 2 Content
+  \dtldbcolreconstruct{3}% Column 3
+  {% Column 3 Content
+   \dtldbdatumreconstruct{\$2.59}{2.59}{\$}{3}%
+  }% End of Column 3 Content
+  \dtldbcolreconstruct{4}% Column 4
+  {% Column 4 Content
+   \dtldbdatumreconstruct{4.5}{4.5}{}{2}%
+  }% End of Column 4 Content
+}%
+% Row 2
+\dtldbrowreconstruct{2}%
+{% Row 2 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtldbdatumreconstruct{Product 2}{}{}{0}%
+  }% End of Column 1 Content
+  \dtldbcolreconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtldbdatumreconstruct{1,234}{1234}{}{1}%
+  }% End of Column 2 Content
+  \dtldbcolreconstruct{3}% Column 3
+  {% Column 3 Content
+   \dtldbdatumreconstruct{\$2,346.59}{2346.59}{\$}{3}%
+  }% End of Column 3 Content
+  \dtldbcolreconstruct{4}% Column 4
+  {% Column 4 Content
+   \dtldbdatumreconstruct{3.5}{3.5}{}{2}%
+  }% End of Column 4 Content
+}%
+}% End of Content
+{2}{4}
+{% Key to index
+\dtldbreconstructkeyindex{product}{1}%
+\dtldbreconstructkeyindex{quantity}{2}%
+\dtldbreconstructkeyindex{price}{3}%
+\dtldbreconstructkeyindex{rating}{4}%
+}% End of key to index

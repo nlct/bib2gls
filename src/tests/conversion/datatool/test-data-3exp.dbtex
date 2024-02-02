@@ -1,0 +1,50 @@
+% DBTEX 3.0 utf8
+\DTLdbProvideData{data3}%
+\DTLreconstructdata
+{% Header
+\dtl@db@header@reconstruct{1}{name}{0}{Name}%
+\dtl@db@header@reconstruct{2}{score}{2}{Score (\%)}%
+}% End of Header
+{% Content
+% Row 1
+\dtl@db@row@reconstruct{1}%
+{% Row 1 Content
+  \dtl@db@col@reconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtl@db@value@reconstruct{Chloë}%
+  }% End of Column 1 Content
+  \dtl@db@col@reconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtl@db@value@reconstruct{1.23}%
+  }% End of Column 2 Content
+}%
+% Row 2
+\dtl@db@row@reconstruct{2}%
+{% Row 2 Content
+  \dtl@db@col@reconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtl@db@value@reconstruct{Fred}%
+  }% End of Column 1 Content
+  \dtl@db@col@reconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtl@db@value@reconstruct{4.23}%
+  }% End of Column 2 Content
+}%
+% Row 3
+\dtl@db@row@reconstruct{3}%
+{% Row 3 Content
+  \dtl@db@col@reconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtl@db@value@reconstruct{Sam}%
+  }% End of Column 1 Content
+  \dtl@db@col@reconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtl@db@value@reconstruct{5.0}%
+  }% End of Column 2 Content
+}%
+}% End of Content
+{3}{2}
+{% Key to index
+\dtl@db@reconstruct@keyindex{name}{1}%
+\dtl@db@reconstruct@keyindex{score}{2}%
+}% End of key to index

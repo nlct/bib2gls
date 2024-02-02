@@ -163,20 +163,43 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
+   protected String processLabel(DataToolEntry entry)
+    throws IOException
+   {
+      TeXObject content = entry.getContents();
+
+      return processLabel(parser.expandToString(content, null));
+   }
+
    protected String processLabel(String label)
    {
-      if (spaceSub == null)
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < label.length(); )
       {
-         return label.replace(" ", "");
+         int cp = label.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (Character.isLetterOrDigit(cp)
+            || cp == '-' || cp == '.' || cp == '/' || cp == '+' || cp == '*'
+             )
+         {
+            builder.appendCodePoint(cp);
+         }
+         else if (Character.isWhitespace(cp))
+         {
+            if (spaceSub != null)
+            {
+               builder.append(spaceSub);
+            }
+         }
       }
-      else
-      {
-         return label.replace(" ", spaceSub);
-      }
+
+      return builder.toString();
    }
 
    protected void writeEntries(DataBase db, PrintWriter out)
-     throws IOException
+     throws IOException,Bib2GlsException
    {
       message(getMessage("datatool2bib.database", db.getName()));
 
@@ -194,7 +217,7 @@ public class DataTool2Bib extends BibGlsConverter
 
       HashMap<Integer,String> idxFieldMap = new HashMap<Integer,String>();
 
-      int labelColIdx = -1;
+      int labelColIdx = 0;
 
       for (DataToolHeader header : headers)
       {
@@ -208,11 +231,14 @@ public class DataTool2Bib extends BibGlsConverter
 
          if (!isCustomIgnoreField(label))
          {
-            String map = keyToFieldMap.get(label);
-
-            if (map != null)
+            if (keyToFieldMap != null)
             {
-               label = map;
+               String map = keyToFieldMap.get(label);
+
+               if (map != null)
+               {
+                  label = map;
+               }
             }
 
             label = processLabel(label);
@@ -220,7 +246,54 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
-// TODO
+      if (labelColIdx < 1)
+      {
+         throw new Bib2GlsException(
+           getMessage("datatool2bib.missing.label.column",
+            db.getName(), labelColumn));
+      }
+
+      for (DataToolEntryRow row : data)
+      {
+         out.println();
+         out.print("@entry{");
+
+         DataToolEntry entry = row.getEntry(labelColIdx);
+
+         String rowLabel = "";
+
+         if (entry != null)
+         {
+            rowLabel = processLabel(entry);
+         }
+
+         if (rowLabel.isEmpty())
+         {
+            out.format("entry" + row.getRowIndex());
+         }
+         else
+         {
+            out.print(rowLabel);
+         }
+
+         for (Integer idx : idxFieldMap.keySet())
+         {
+            entry = row.getEntry(idx);
+
+            if (entry != null)
+            {
+               TeXObject content = entry.getContents();
+
+               out.println(",");
+
+               out.format("  %s = {%s}", idxFieldMap.get(idx),
+                 content.toString(getParser()));
+            }
+         }
+
+         out.println();
+         out.println("}");
+      }
    }
 
    @Override

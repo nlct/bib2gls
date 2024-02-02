@@ -1,0 +1,37 @@
+\providecommand{\qt}[1]{``#1''}
+\DTLaction{new}
+\DTLaction[key={Name}]{add column}
+\DTLaction[key={Score},type=int]{add column}
+\DTLaction[key={Award},value={Award (\$)}]{add column}
+\DTLaction{new row}
+\DTLaction[
+ key={Name},
+ value={Zoë Zebra}
+]
+ {new entry}
+\DTLaction[key={Score},value={23}]{new entry}
+\DTLaction
+ [
+   key={Award}, value={\$1,234}
+ ]
+ {new entry}
+\DTLaction{new row}
+\DTLaction
+ [
+   %key={Name},
+   column=1,
+   expand-value={Dickie \qt{the Duck}}
+ ]
+ {new entry}
+\DTLaction[key={Score},value={34}]{new entry}
+\DTLaction[key={Award},value={\$1,234.56}]{new entry}
+\DTLaction
+ [
+   assign =
+    {
+      Name = {José Arara},
+      Score = 68,
+      Award = {\$2,453.99}
+    }
+ ]
+ { new row }

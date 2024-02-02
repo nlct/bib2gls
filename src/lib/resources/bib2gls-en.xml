@@ -596,6 +596,8 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool2bib.databases.found">{0} {0,choice,1#database|1&lt;databases} found</entry>
 <entry key="datatool2bib.database">Database ''{0}''</entry>
 <entry key="datatool2bib.database.empty">Database ''{0}'' is empty</entry>
+<entry key="datatool2bib.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''</entry>
+
 
 <!--
      The following messages are used by various parts of

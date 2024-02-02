@@ -1,0 +1,13 @@
+% DTLTEX 3.0 utf8
+\DTLdbProvideData{mydata}%
+\DTLdbNewRow
+\DTLdbNewEntry{name}{Joe}%
+\DTLdbNewEntry{score}{23.4}%
+\DTLdbNewRow
+\DTLdbNewEntry{name}{Jane}%
+\DTLdbNewEntry{score}{32.5}%
+\DTLdbNewRow
+\DTLdbNewEntry{name}{Evelyn}%
+\DTLdbNewEntry{score}{45.0}%
+\DTLdbSetHeader{name}{Name}%
+\DTLdbSetHeader{score}{Score (\%)}%

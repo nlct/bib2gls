@@ -1,0 +1,58 @@
+% DBTEX 3.0 utf8
+\DTLdbProvideData{datum}%
+\DTLreconstructdata
+{% Header
+\dtl@db@header@reconstruct{1}{product}{0}{product}%
+\dtl@db@header@reconstruct{2}{quantity}{1}{quantity}%
+\dtl@db@header@reconstruct{3}{price}{3}{price}%
+\dtl@db@header@reconstruct{4}{rating}{2}{rating}%
+}% End of Header
+{% Content
+% Row 1
+\dtl@db@row@reconstruct{1}%
+{% Row 1 Content
+  \dtl@db@col@reconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtl@db@datum@reconstruct{Product 1}{}{}{0}%
+  }% End of Column 1 Content
+  \dtl@db@col@reconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtl@db@datum@reconstruct{3}{3}{}{1}%
+  }% End of Column 2 Content
+  \dtl@db@col@reconstruct{3}% Column 3
+  {% Column 3 Content
+   \dtl@db@datum@reconstruct{\$2.59}{2.59}{\$}{3}%
+  }% End of Column 3 Content
+  \dtl@db@col@reconstruct{4}% Column 4
+  {% Column 4 Content
+   \dtl@db@datum@reconstruct{4.5}{4.5}{}{2}%
+  }% End of Column 4 Content
+}%
+% Row 2
+\dtl@db@row@reconstruct{2}%
+{% Row 2 Content
+  \dtl@db@col@reconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtl@db@datum@reconstruct{Product 2}{}{}{0}%
+  }% End of Column 1 Content
+  \dtl@db@col@reconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtl@db@datum@reconstruct{1,234}{1234}{}{1}%
+  }% End of Column 2 Content
+  \dtl@db@col@reconstruct{3}% Column 3
+  {% Column 3 Content
+   \dtl@db@datum@reconstruct{\$2,346.59}{2346.59}{\$}{3}%
+  }% End of Column 3 Content
+  \dtl@db@col@reconstruct{4}% Column 4
+  {% Column 4 Content
+   \dtl@db@datum@reconstruct{3.5}{3.5}{}{2}%
+  }% End of Column 4 Content
+}%
+}% End of Content
+{2}{4}
+{% Key to index
+\dtl@db@reconstruct@keyindex{product}{1}%
+\dtl@db@reconstruct@keyindex{quantity}{2}%
+\dtl@db@reconstruct@keyindex{price}{3}%
+\dtl@db@reconstruct@keyindex{rating}{4}%
+}% End of key to index

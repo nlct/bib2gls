@@ -1,0 +1,51 @@
+% DBTEX 3.0 utf8
+% Created by datatool 2023/11/23 v3.0 (NLCT) on November 23, 2023
+\DTLdbProvideData{data3}%
+\DTLreconstructdbdata
+{% Header
+\dtldbheaderreconstruct{1}{name}{0}{Name}%
+\dtldbheaderreconstruct{2}{score}{2}{Score (\%)}%
+}% End of Header
+{% Content
+% Row 1
+\dtldbrowreconstruct{1}%
+{% Row 1 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtldbvaluereconstruct{Chloë}%
+  }% End of Column 1 Content
+  \dtldbcolreconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtldbvaluereconstruct{1.23}%
+  }% End of Column 2 Content
+}%
+% Row 2
+\dtldbrowreconstruct{2}%
+{% Row 2 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtldbvaluereconstruct{Fred}%
+  }% End of Column 1 Content
+  \dtldbcolreconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtldbvaluereconstruct{4.23}%
+  }% End of Column 2 Content
+}%
+% Row 3
+\dtldbrowreconstruct{3}%
+{% Row 3 Content
+  \dtldbcolreconstruct{1}% Column 1
+  {% Column 1 Content
+   \dtldbvaluereconstruct{Sam}%
+  }% End of Column 1 Content
+  \dtldbcolreconstruct{2}% Column 2
+  {% Column 2 Content
+   \dtldbvaluereconstruct{5.0}%
+  }% End of Column 2 Content
+}%
+}% End of Content
+{3}{2}
+{% Key to index
+\dtldbreconstructkeyindex{name}{1}%
+\dtldbreconstructkeyindex{score}{2}%
+}% End of key to index

@@ -1,0 +1,41 @@
+\documentclass{article}
+
+% datatool v3.0 currently under development
+% see https://www.dickimaw-books.com/expl/
+\usepackage{datatool}[=v3.0]
+
+\DTLsetup{store-datum}
+
+\begin{document}
+\DTLread[format=dtltex]{test-data-3}
+
+Last loaded: \dtllastloadeddb.
+Row count: \DTLrowcount{mydata}.
+Column count: \DTLcolumncount{mydata}.
+
+\DTLdisplaydb{mydata}
+
+\DTLread[format=dbtex]{test-data-3}
+Last loaded: \dtllastloadeddb.
+
+\DTLdisplaydb{data3}
+
+\DTLread[format=dbtex]{test-datum-3}
+Last loaded: \dtllastloadeddb.
+
+\DTLdisplaydb{datum}
+
+\DTLread[name=literal,csv-content=literal,format=csv]{test-literal}
+Last loaded: \dtllastloadeddb.
+
+\DTLdisplaydb{literal}
+
+\DTLread[name=texdb,csv-content=tex,format=csv]{test-tex}
+Last loaded: \dtllastloadeddb.
+
+\DTLdisplaydb{texdb}
+
+\input{test-action}
+
+\DTLaction{display}
+\end{document}
