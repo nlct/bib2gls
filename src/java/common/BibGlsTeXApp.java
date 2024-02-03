@@ -91,82 +91,17 @@ public abstract class BibGlsTeXApp implements TeXApp
    protected void setDebugLevel(String... modes)
     throws Bib2GlsSyntaxException
    {
-      debugLevel = 0;
       verboseLevel = DEBUG;
 
-      for (String mode : modes)
+      try
       {
-         mode = mode.trim();
-
-         if (mode.equals("all"))
-         {
-            debugLevel = Integer.MAX_VALUE;
-         }
-         else if (mode.equals("io"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_IO;
-         }
-         else if (mode.equals("popped"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_POPPED;
-         }
-         else if (mode.equals("decl"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_DECL;
-         }
-         else if (mode.equals("sty-data"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_STY_DATA;
-         }
-         else if (mode.equals("expansion"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION;
-         }
-         else if (mode.equals("expansion-list"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_LIST;
-         }
-         else if (mode.equals("expansion-once"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE;
-         }
-         else if (mode.equals("expansion-once-list"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_EXPANSION_ONCE_LIST;
-         }
-         else if (mode.equals("process"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING;
-         }
-         else if (mode.equals("process-stack"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK;
-         }
-         else if (mode.equals("process-stack-list"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_STACK_LIST;
-         }
-         else if (mode.equals("cs"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_CS;
-         }
-         else if (mode.equals("process-generic-cs"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_PROCESSING_GENERIC_CS;
-         }
-         else if (mode.equals("catcode"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_CATCODE;
-         }
-         else if (mode.equals("read"))
-         {
-            debugLevel = debugLevel | TeXParser.DEBUG_READ;
-         }
-         else
-         {
-            throw new Bib2GlsSyntaxException(
-              getMessage("error.syntax.unknown_debug_mode", mode));
-         }
+         debugLevel = TeXParser.getDebugLevelFromModeList(modes);
+      }
+      catch (TeXSyntaxException e)
+      {
+         throw new Bib2GlsSyntaxException(
+          getMessage("error.invalid.option_syntax", "--debug-mode",
+           e.getMessage(this)));
       }
    }
 

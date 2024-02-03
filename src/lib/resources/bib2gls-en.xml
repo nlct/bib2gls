@@ -620,7 +620,6 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.syntax.batch.missing_in">Input file required for batch mode</entry>
 <entry key="error.syntax.batch.missing_out">Output directory required for batch mode</entry>
 <entry key="error.syntax.batch.unknown_format">Unknown format ''{0}''</entry>
-<entry key="error.syntax.unknown_debug_mode">Unknown debug mode ''{0}''</entry>
 <entry key="error.exists">{0} already exists</entry>
 <entry key="error.file_exists.nooverwrite">Can''t write to ''{0}'': file already exists (use {1} to force overwrite)</entry>
 <entry key="error.no_matcher">Can''t match group {0}: no match found</entry>
@@ -629,6 +628,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.matcher_failed">Failed to match group {0} (for match {1})</entry>
 
 <entry key="tex.error.bad_param">Parameter digit 1 to 9 expected. Found ''{0}''</entry>
+<entry key="tex.error.illegal_param">Illegal parameter number ''{0}'' in definition of {1}</entry>
 <entry key="tex.error.no_eg">Missing end group</entry>
 <entry key="tex.error.par_before_eg">Paragraph break found before end group</entry>
 <entry key="tex.error.unexpected_eg">Unexpected end group found</entry>
@@ -664,11 +664,16 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="tex.error.numeric register_expected">Numeric register expected</entry>
 <entry key="tex.error.register_not_numeric">Register ''{0}'' not numeric</entry>
 <entry key="tex.error.register_not_token">Register ''{0}'' not a token register</entry>
+<entry key="tex.error.internal_quantity_expected">Internal_quantity expected</entry>
+<entry key="tex.error.internal_quantity_expected_but_found">Internal quantity expected (found ''{0}'')</entry>
 <entry key="tex.error.generic">{0}</entry>
 <entry key="tex.error.file.not.found">File ''{0}'' not found.</entry>
 <entry key="tex.error.unexpandable">Can''t expand ''{0}''</entry>
-
-
+<entry key="tex.error.cant_change_const">Can''t change constant {0}</entry>
+<entry key="tex.error.file.overwrite_forbidden">File ''{0}'' already exists (overwrite forbidden).</entry>
+<entry key="tex.error.file.mapper">An error occurred while parsing {0}:
+   {1}</entry>
+<entry key="tex.error.invalid.debug_mode">Invalid debug mode ''{0}''. Recognised mode names: {1}</entry>
 
 <entry key="latex.error.no_alignment">No alignment specifiers found</entry>
 <entry key="latex.error.undefined_counter">No counter ''{0}'' defined</entry>
@@ -736,6 +741,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool.row.not.found">Row index ''{0}'' doesn''t exist.</entry>
 <entry key="datatool.loaddb.message">Database ''{0}'' loaded from ''{1}'' (column count={2}, row count={3}).</entry>
 <entry key="datatool.index.outofrange">Index ''{0}'' out of range.</entry>
+<entry key="datatool.no.columns">No columns available for database ''{0}''</entry>
 <entry key="datatool.file_info">Identified file format {0} version {1} (encoding {2})</entry>
 <entry key="datatool.file_info_failed">Failed to parse file identifier on first line of file {0} (assuming {1})</entry>
 <entry key="datatool.unknown_file_format_version">Unknown version ''{0}'' of file format ''{1}''</entry>
@@ -755,5 +761,9 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="color.unsupported">Unsupported ''{0}'' model colour {1}</entry>
 <entry key="color.invalid.specs">Invalid specification ''{0}'' for colour model {1}</entry>
 <entry key="color.unknown">Unknown named colour ''{0}''</entry>
+
+<!--  fontawesome messages -->
+
+<entry key="fontawesome.unknown.icon_name">Unknown icon name ''{0}''.</entry>
 
 </properties>
