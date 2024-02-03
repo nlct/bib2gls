@@ -525,7 +525,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
               String suff = settings.getSuffixMarker() + fieldValue;
 
-              if (bib2gls.getVerboseLevel() > 0)
+              if (bib2gls.isVerbose())
               {
                   bib2gls.logMessage(
                     bib2gls.getMessage("message.sort_suffix",
@@ -544,7 +544,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
             {
                suff = settings.getSuffixMarker() + suff;
 
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                    bib2gls.logMessage(
                       bib2gls.getMessage("message.sort_suffix",
@@ -598,7 +598,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
       {
          sortCount.put(key, Integer.valueOf(0));
 
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.logMessage(String.format("%s: %s -> 0",
               entry.getId(), key));
@@ -614,7 +614,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
 
       sortCount.put(key, num);
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logMessage(String.format("%s: %s -> %d",
            entry.getId(), key, num));
@@ -746,7 +746,7 @@ public abstract class SortComparator implements Comparator<Bib2GlsEntry>
             result = -result;
          }
 
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.logAndPrintMessage(String.format("%s %c %s",
               e1.getFieldValue(sortStorageField),

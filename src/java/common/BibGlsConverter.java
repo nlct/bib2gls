@@ -33,6 +33,7 @@ import java.io.*;
 import java.net.URL;
 
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
@@ -54,6 +55,15 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       listener = new BibGlsConverterListener(this, preambleOnly);
       parser = new TeXParser(listener);
       parser.setDebugMode(debugLevel);
+
+      if (transcriptFile != null)
+      {
+         logWriter = new PrintWriter(
+           Files.newBufferedWriter(transcriptFile.toPath(), defaultCharset));
+
+         parser.setLogWriter(logWriter);
+         parser.setLogging(true);
+      }
    }
 
    @Override
@@ -114,7 +124,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
        || arg.equals("--space-sub")
        || arg.equals("-s")
        || arg.equals("--ignore-fields")
-       || arg.equals("-f"))
+       || arg.equals("-f")
+       || arg.equals("--log-file")
+       || arg.equals("-t")
+       )
       {
          return 1;
       }
@@ -204,6 +217,17 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       else if (arg.equals("--no-preamble-only"))
       {
          preambleOnly = false;
+      }
+      else if (isArg(deque, arg, "-t", "--log-file", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         transcriptFile = new File(returnVals[0].toString());
       }
       else
       {
@@ -400,23 +424,25 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       catch (Bib2GlsSyntaxException e)
       {
          System.err.println(e.getMessage());
-         System.exit(1);
+         exitCode = 1;
       }
       catch (Bib2GlsException e)
       {
          System.err.println(e.getMessage());
-         System.exit(3);
+         exitCode = 3;
       }
       catch (IOException e)
       {
          System.err.println(e.getMessage());
-         System.exit(2);
+         exitCode = 2;
       }
       catch (Exception e)
       {
          e.printStackTrace();
-         System.exit(4);
+         exitCode = 4;
       }
+
+      exit();
    }
 
    protected File texFile=null, bibFile=null;
@@ -433,5 +459,4 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;
-
 }

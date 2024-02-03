@@ -51,7 +51,7 @@ public class FieldNullMatch implements Conditional
          result = equals ? false : true;
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            String.format(

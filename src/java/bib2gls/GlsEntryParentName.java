@@ -87,7 +87,7 @@ public class GlsEntryParentName extends GlsUseField
 
       if (entry == null)
       {
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.debug(String.format("\\%s: %s", getName(),
              bib2gls.getMessage("warning.unknown_entry", 
@@ -100,7 +100,7 @@ public class GlsEntryParentName extends GlsUseField
 
          if (parentLabel == null)
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                bib2gls.debug(String.format("\\%s: %s", 
                  getName(),

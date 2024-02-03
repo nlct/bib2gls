@@ -696,7 +696,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
    {
       Bib2Gls bib2gls = entry.getBib2Gls();
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            "Entry: "+entry+". Evaluating condition group: "+toString());
@@ -799,7 +799,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
          }
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            "Entry: "+entry+". Result from condition group: "

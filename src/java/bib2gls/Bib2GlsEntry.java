@@ -515,7 +515,7 @@ public class Bib2GlsEntry extends BibEntry
                      list.set(i, parser.getListener().createGroup(label));
                   }
 
-                  if (bib2gls.getVerboseLevel() > 0)
+                  if (bib2gls.isVerbose())
                   {
                      bib2gls.logMessage(bib2gls.getMessage(
                         "message.crossref.found", getId(),
@@ -550,7 +550,7 @@ public class Bib2GlsEntry extends BibEntry
                         grp.add(parser.getListener().getOther(','));
                      }
 
-                     if (bib2gls.getVerboseLevel() > 0)
+                     if (bib2gls.isVerbose())
                      {
                         bib2gls.logMessage(bib2gls.getMessage(
                            "message.crossref.found", getId(),
@@ -596,7 +596,7 @@ public class Bib2GlsEntry extends BibEntry
                      list.set(i, parser.getListener().createGroup(label));
                   }
 
-                  if (bib2gls.getVerboseLevel() > 0)
+                  if (bib2gls.isVerbose())
                   {
                      bib2gls.logMessage(bib2gls.getMessage(
                         "message.crossref.found", getId(),
@@ -694,7 +694,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   if (mglslike)
                   {
-                     if (bib2gls.getVerboseLevel() > 0)
+                     if (bib2gls.isVerbose())
                      {
                         bib2gls.logMessage(bib2gls.getMessage(
                            "message.compoundcrossref.found", getId(),
@@ -770,7 +770,7 @@ public class Bib2GlsEntry extends BibEntry
 
                      }
 
-                     if (bib2gls.getVerboseLevel() > 0)
+                     if (bib2gls.isVerbose())
                      {
                         bib2gls.logMessage(bib2gls.getMessage(
                            "message.crossref.found", getId(),
@@ -869,7 +869,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (fieldsParsed) return;
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logMessage(bib2gls.getMessage("message.parsing.fields", getId()));
       }
@@ -878,7 +878,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (resource.hasFieldAliases())
       {
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getMessage("message.field.alias.check",
               getOriginalId()));
@@ -901,7 +901,7 @@ public class Bib2GlsEntry extends BibEntry
 
                putField(map, val);
 
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(field+"=>"
                     +map+"={"+list.toString(parser)+"}");
@@ -1318,7 +1318,7 @@ public class Bib2GlsEntry extends BibEntry
 
             if (override || getField(field) == null)
             {
-               if (bib2gls.getDebugLevel() > 0)
+               if (bib2gls.isDebuggingOn())
                {
                   bib2gls.logAndPrintMessage("Entry "+getId()
                     + " evaluating assignment "+assignSpec);
@@ -1328,7 +1328,7 @@ public class Bib2GlsEntry extends BibEntry
 
                if (val != null)
                {
-                  if (bib2gls.getDebugLevel() > 0)
+                  if (bib2gls.isDebuggingOn())
                   {
                      bib2gls.logAndPrintMessage("Value: " + val);
                   }
@@ -1392,7 +1392,7 @@ public class Bib2GlsEntry extends BibEntry
 
                   putField(field, value);
 
-                  if (bib2gls.getDebugLevel() > 0)
+                  if (bib2gls.isDebuggingOn())
                   {
                      TeXParser parser = resource.getBibParser();
 
@@ -1403,7 +1403,7 @@ public class Bib2GlsEntry extends BibEntry
                   interpretFields = processField(field, mfirstucProtect,
                      protectFields, idField, interpretFields);
                }
-               else if (bib2gls.getDebugLevel() > 0)
+               else if (bib2gls.isDebuggingOn())
                {
                   bib2gls.logAndPrintMessage(
                    String.format("Value for field '%s' can't be obtained", field));
@@ -1484,7 +1484,7 @@ public class Bib2GlsEntry extends BibEntry
 
       TeXObjectList list = value.expand(parser);
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.debug(String.format(">> %s={%s}", field, list.toString(parser)));
       }
@@ -1782,7 +1782,7 @@ public class Bib2GlsEntry extends BibEntry
          putField(field, list.toString(parser));
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.debug(String.format("=>> %s={%s}", field, getFieldValue(field)));
       }
@@ -2910,7 +2910,7 @@ public class Bib2GlsEntry extends BibEntry
 
             writer.format("%s={%s}", field, value);
          }
-         else if (bib2gls.getDebugLevel() > 0 && 
+         else if (bib2gls.isDebuggingOn() && 
             !bib2gls.isInternalField(field) &&
             !bib2gls.isKnownSpecialField(field))
          {
@@ -3156,7 +3156,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                bib2gls.logAndPrintMessage(
                  bib2gls.getMessage("message.crossref.tail", getId(), crossRefTail));
@@ -3172,7 +3172,7 @@ public class Bib2GlsEntry extends BibEntry
 
       String tail = getCrossRefTail(tailList);
 
-      if (tail != null && bib2gls.getDebugLevel() > 0)
+      if (tail != null && bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            bib2gls.getMessage("message.crossref.tail", getId(), tail));
@@ -3205,7 +3205,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                tailList.add(getId());
             }
@@ -3458,7 +3458,7 @@ public class Bib2GlsEntry extends BibEntry
 
          for (int i = 0; i < crossRefs.length; i++)
          {
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.crossref.found", getId(),
@@ -3521,7 +3521,7 @@ public class Bib2GlsEntry extends BibEntry
 
             list.add(newRefs[i]);
 
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.crossref.found", getId(),
@@ -4756,7 +4756,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (alias == null)
       {
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getMessage(
                "message.field.not.set", "alias"));
@@ -4771,7 +4771,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             alias = processLabel(alias);
 
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.crossref.found", getId(),
@@ -4782,7 +4782,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else
          {
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.compoundcrossref.found", getId(),
@@ -4806,7 +4806,7 @@ public class Bib2GlsEntry extends BibEntry
    public void initCrossRefs()
     throws IOException
    {
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          bib2gls.logMessage(bib2gls.getMessage(
             "message.checking.crossrefs", getId()));
@@ -4822,7 +4822,7 @@ public class Bib2GlsEntry extends BibEntry
       if (value == null)
       {// no 'see' field, is there a 'seealso' field?
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getMessage(
                "message.field.not.set", "see"));
@@ -4834,7 +4834,7 @@ public class Bib2GlsEntry extends BibEntry
             return;
          }
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getMessage(
                "message.field.not.set", "seealso"));
@@ -4934,7 +4934,7 @@ public class Bib2GlsEntry extends BibEntry
             {
                crossRefs[xrIdx++] = label;
 
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                      "message.crossref.found", getId(), "see", label));
@@ -4947,7 +4947,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             crossRefs[xrIdx++] = label;
 
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.compoundcrossref.found", getId(), "see", label));
@@ -5071,7 +5071,7 @@ public class Bib2GlsEntry extends BibEntry
                }
                else
                {   
-                  if (bib2gls.getVerboseLevel() > 0)
+                  if (bib2gls.isVerbose())
                   {
                      bib2gls.logMessage(bib2gls.getMessage(
                         "message.crossref.found", getId(), "seealso", label));
@@ -5087,7 +5087,7 @@ public class Bib2GlsEntry extends BibEntry
             }
             else
             {
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                      "message.compoundcrossref.found", getId(), "seealso", label));
@@ -5220,7 +5220,7 @@ public class Bib2GlsEntry extends BibEntry
             }
             else
             {
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                      "message.crossref.found", getId(), "seealso", label));
@@ -5231,7 +5231,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else
          {
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                   "message.compoundcrossref.found", getId(), "seealso", label));
@@ -5618,7 +5618,7 @@ public class Bib2GlsEntry extends BibEntry
 
          String label = processLabel(dep);
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getMessage(
                "message.custom.dep.found", field, getId(), field, label));

@@ -300,7 +300,7 @@ public class Field implements FieldValueElement
       String tag = null;
       Field field = null;
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage("Parsing field from "+stack.toString(parser));
       }

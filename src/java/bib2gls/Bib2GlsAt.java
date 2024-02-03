@@ -172,7 +172,7 @@ public class Bib2GlsAt extends At
 
       if (data instanceof BibPreamble)
       {
-         if (bib2gls.getDebugLevel() > 0 
+         if (bib2gls.isDebuggingOn() 
             && !entryType.equals(originalEntryType))
          {
             bib2gls.debug(String.format("@%s => @preamble", originalEntryType));
@@ -188,7 +188,7 @@ public class Bib2GlsAt extends At
          ((Bib2GlsEntry)data).setOriginalEntryType(originalEntryType);
          String id = ((Bib2GlsEntry)data).getId();
 
-         if (bib2gls.getDebugLevel() > 0 
+         if (bib2gls.isDebuggingOn() 
             && !entryType.equals(originalEntryType))
          {
             bib2gls.debug(String.format("@%s{%s} => @%s{%s}", originalEntryType,

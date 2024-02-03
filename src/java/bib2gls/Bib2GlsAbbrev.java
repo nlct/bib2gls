@@ -193,7 +193,7 @@ public class Bib2GlsAbbrev extends Bib2GlsEntry
 
             writer.format("%s={%s}", field, getFieldValue(field));
          }
-         else if (bib2gls.getDebugLevel() > 0 && 
+         else if (bib2gls.isDebuggingOn() && 
             !bib2gls.isInternalField(field) &&
             !bib2gls.isKnownSpecialField(field))
          {

@@ -497,7 +497,7 @@ public class Bib2GlsEntryLetterNumberComparator
          if (value == 0 || value == Integer.MIN_VALUE
               || value == Integer.MAX_VALUE)
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                return value == 0 ? "" : (value < 0 ? "\u2199" : "\u2197");
             }

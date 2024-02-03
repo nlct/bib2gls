@@ -42,7 +42,7 @@ public abstract class EntryFieldCommand extends Command
 
       if (entry == null)
       {
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.debug(String.format("\\%s -> %s", getName(),
               bib2gls.getMessage("warning.unknown_entry_in_current_resource", 
@@ -59,7 +59,7 @@ public abstract class EntryFieldCommand extends Command
 
                if (entry != null)
                {
-                  if (bib2gls.getDebugLevel() > 0)
+                  if (bib2gls.isDebuggingOn())
                   {
                      bib2gls.debug(String.format("\\%s -> %s", getName(),
                        bib2gls.getMessage("message.found_entry_in_resource", 

@@ -61,8 +61,10 @@ public class DataTool2Bib extends BibGlsConverter
       {
          TeXPath texPath = new TeXPath(parser, texFile);
 
-         parser.parse(new TeXReader(String.format("\\DTLread[%s]{%s}",
-           readOpts, texPath.getTeXPath(false))));
+         TeXReader reader = new TeXReader(String.format("\\DTLread[%s]{%s}",
+           readOpts, texPath.getTeXPath(false)));
+
+         parser.parse(reader);
       }
 
       int numDatabases = datatoolSty.getDataBaseCount();

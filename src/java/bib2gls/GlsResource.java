@@ -223,7 +223,7 @@ public class GlsResource
 
             if (entryTypeAliases == null)
             {
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                      "message.clearing.entry.aliases"));
@@ -231,7 +231,7 @@ public class GlsResource
             }
             else
             {
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                      "message.setting.entry.aliases"));
@@ -262,7 +262,7 @@ public class GlsResource
                        bib2gls.getMessage("error.invalid.entry.type",val,opt));
                   }
 
-                  if (bib2gls.getVerboseLevel() > 0)
+                  if (bib2gls.isVerbose())
                   {
                      bib2gls.logMessage(String.format("@%s=>@%s.", key, val));
                   }
@@ -3258,7 +3258,7 @@ public class GlsResource
          prefixFieldCsExceptions.add(" ");
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logMessageNoLn("append-prefix-field-exceptions:");
 
@@ -3637,7 +3637,7 @@ public class GlsResource
          dualSortSettings.setSortField(sortSettings.getSortField());
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          bib2gls.logMessage();
          bib2gls.verboseMessage("message.selection.mode", 
@@ -5818,7 +5818,7 @@ public class GlsResource
            "error.invalid.option_syntax", opt, object.toString(parser)));
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage("Parsing field assignment setting: "
           +object.format());
@@ -5927,7 +5927,7 @@ public class GlsResource
                   FieldAssignment assignSpec
                      = new FieldAssignment(field, fieldValueList, condition, override);
 
-                  if (bib2gls.getDebugLevel() > 0)
+                  if (bib2gls.isDebuggingOn())
                   {
                      bib2gls.logAndPrintMessage("Field assignment: "+assignSpec);
                   }
@@ -5996,7 +5996,7 @@ public class GlsResource
          FieldAssignment assignSpec
            = new FieldAssignment(field, fieldValueList, condition, override);
 
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.logAndPrintMessage("Field assignment: "+assignSpec);
          }
@@ -6027,7 +6027,7 @@ public class GlsResource
            "error.invalid.option_syntax", opt, object.toString(parser)));
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage("Parsing field evaluation setting: "
           +object.format());
@@ -6141,7 +6141,7 @@ public class GlsResource
            "error.invalid.option_syntax", opt, object.toString(parser)));
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage("Parsing field evaluation setting: "
           +object.format());
@@ -7353,7 +7353,7 @@ public class GlsResource
                   dual.addDependency(primaryId);
                }
 
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                     "message.dual.dep", dualId, primaryId));
@@ -7939,7 +7939,7 @@ public class GlsResource
 
             if (comp != null)
             {
-               if (bib2gls.getVerboseLevel() > 0)
+               if (bib2gls.isVerbose())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                     "message.compoundcrossref.by", xr, entry.getId()));
@@ -7953,7 +7953,7 @@ public class GlsResource
          }
          else
          {
-            if (bib2gls.getVerboseLevel() > 0)
+            if (bib2gls.isVerbose())
             {
                bib2gls.logMessage(bib2gls.getMessage(
                  "message.crossref.by", xrEntry.getId(), entry.getId()));
@@ -8437,7 +8437,7 @@ public class GlsResource
             if (recordedOrDependent || selectedBefore || isMatch
                || (dual != null && (dualHasRecords || isDualMatch)))
             {
-               if (bib2gls.getDebugLevel() > 0)
+               if (bib2gls.isDebuggingOn())
                {
                   if (selectedBefore)
                   {
@@ -9140,7 +9140,7 @@ public class GlsResource
          entries.setSize(limit);
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          bib2gls.logMessage(bib2gls.getChoiceMessage("message.selected", 0,
             "entry", 3, entries.size()));
@@ -9209,7 +9209,7 @@ public class GlsResource
             dualEntries.setSize(limit);
          }
 
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             bib2gls.logMessage(bib2gls.getChoiceMessage(
                "message.dual.selected", 0, "entry", 3, dualEntries.size()));
@@ -17386,7 +17386,7 @@ public class GlsResource
 
          if (prefixFieldCsExceptions.contains(csName))
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.cs.nospace",
                   field, csName));
@@ -17408,7 +17408,7 @@ public class GlsResource
       }
       else
       {
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp",
                prefixControlSequence.toString(bibParser), field,
@@ -17422,7 +17422,7 @@ public class GlsResource
       {
          if (num.intValue() == codePoint)
          {
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.nospace", 
                  field, String.format("0x%X", codePoint)));
@@ -17435,7 +17435,7 @@ public class GlsResource
       if (appendPrefixField == PREFIX_FIELD_APPEND_SPACE
             || prefixFieldNbspPattern == null)
       {
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space", 
               prefixControlSequence.toString(bibParser), field));
@@ -17456,7 +17456,7 @@ public class GlsResource
 
             if (m.matches())
             {
-               if (bib2gls.getDebugLevel() > 0)
+               if (bib2gls.isDebuggingOn())
                {
                   bib2gls.logMessage(bib2gls.getMessage(
                     "message.append.prefix.nbsp.match",
@@ -17466,7 +17466,7 @@ public class GlsResource
                return new Nbsp();
             }
 
-            if (bib2gls.getDebugLevel() > 0)
+            if (bib2gls.isDebuggingOn())
             {
                bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.space",
                   prefixControlSequence.toString(bibParser), field));
@@ -17476,7 +17476,7 @@ public class GlsResource
          }
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logMessage(bib2gls.getMessage("message.append.prefix.no.excp", field,
             obj.toString(bibParser)));
@@ -17706,7 +17706,7 @@ public class GlsResource
       public void sort(Vector<Bib2GlsEntry> entries, SortSettings baseSettings)
        throws Bib2GlsException,IOException
       {
-         if (bib2gls.getVerboseLevel() > 0)
+         if (bib2gls.isVerbose())
          {
             if (fields.length == 1)
             {

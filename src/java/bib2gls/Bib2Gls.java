@@ -85,7 +85,7 @@ public class Bib2Gls extends BibGlsTeXApp
          pendingWriter = null;
       }
 
-      if (debugLevel > 0 && verboseLevel > SILENT)
+      if (!isSilent())
       {
          version();
       }
@@ -106,7 +106,7 @@ public class Bib2Gls extends BibGlsTeXApp
          debug(e);
       }
 
-      if (verboseLevel >= NORMAL)
+      if (!isSilent())
       {
          version();
       }
@@ -456,7 +456,7 @@ public class Bib2Gls extends BibGlsTeXApp
            ||name.equals("ins") || name.equals("def")
            ||name.equals("ldf"))
          {
-            if (debugLevel > 0)
+            if (isDebuggingOn())
             {
                logAndPrintMessage(getMessageWithFallback(
                "error.forbidden.ext",
@@ -1002,7 +1002,7 @@ public class Bib2Gls extends BibGlsTeXApp
           texLogFile);
       }
 
-      if (debugLevel > 0 && packages.size() > 0)
+      if (isDebuggingOn() && packages.size() > 0)
       {
          if (packages.size() == 1)
          {
@@ -1689,7 +1689,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       interpreter.addAll(list.expand(interpreter));
 
-      if (getDebugLevel() > 0)
+      if (isDebuggingOn())
       {
          logAndPrintMessage(String.format(
            "%n%s%n%s%n%n",
@@ -1726,7 +1726,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
          interpreter.addAll(objList);
 
-         if (getDebugLevel() > 0)
+         if (isDebuggingOn())
          {
             logAndPrintMessage(String.format(
               "%n%s%n%s%n%n",
@@ -1742,7 +1742,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
          String result = writer.toString();
 
-         if (getDebugLevel() > 0)
+         if (isDebuggingOn())
          {
             logAndPrintMessage(String.format("texparserlib:--> %s", result));
          }
@@ -1770,7 +1770,7 @@ public class Bib2Gls extends BibGlsTeXApp
       catch (IOException e)
       {// too complicated
 
-         if (getDebugLevel() > 0)
+         if (isDebuggingOn())
          {
             debug("texparserlib: ");
             debug(e);
@@ -1797,7 +1797,7 @@ public class Bib2Gls extends BibGlsTeXApp
       catch (IOException e)
       {
 
-         if (getDebugLevel() > 0)
+         if (isDebuggingOn())
          {
             debug("texparserlib: ");
             debug(e);
@@ -1889,7 +1889,7 @@ public class Bib2Gls extends BibGlsTeXApp
          strVal = strVal.replaceAll("^,|,$", "");
       }
 
-      if (verboseLevel > NORMAL && (!original.equals(strVal) || debugLevel > 0))
+      if (isVerbose() && (!original.equals(strVal) || isDebuggingOn()))
       {
          logMessage(String.format("%s: %s -> %s",
           isList? "labelify-list" : "labelify", original, strVal));
@@ -2329,7 +2329,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   fieldMap.put(field, map);
                }
 
-               if (debugLevel > 0)
+               if (isDebuggingOn())
                {
                   logAndPrintMessage("Adding field: "+field+" ("+map+")");
                }
@@ -2373,7 +2373,7 @@ public class Bib2Gls extends BibGlsTeXApp
                if (recordLocation.isEmpty())
                {// make empty locations an ignored record
 
-                  if (debugLevel > 0 && !recordFormat.equals("glsignore"))
+                  if (isDebuggingOn() && !recordFormat.equals("glsignore"))
                   {
                      logAndPrintMessage();
                      logAndPrintMessage(getMessage(
@@ -2559,7 +2559,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   {// discard new record
                    // (keep the record with the range formation)
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                         logAndPrintMessage();
                         logAndPrintMessage(getMessage(
@@ -2573,7 +2573,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   {// discard existing record
                    // (keep the record with the range formation)
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                         logAndPrintMessage();
                         logAndPrintMessage(getMessage(
@@ -2588,7 +2588,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   else if (isIgnoredFormat(newFmt))
                   {// discard the new record
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                         logAndPrintMessage();
                         logAndPrintMessage(getMessage(
@@ -2601,7 +2601,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   else if (isIgnoredFormat(existingFmt))
                   {// override the existing record
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                         logAndPrintMessage();
                         logAndPrintMessage(getMessage(
@@ -2616,7 +2616,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   else if (newFmt.equals("glsnumberformat"))
                   {// discard the new record
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                         logAndPrintMessage();
                         logAndPrintMessage(getMessage(
@@ -2629,7 +2629,7 @@ public class Bib2Gls extends BibGlsTeXApp
                   else if (existingFmt.equals("glsnumberformat"))
                   {// override the existing record
 
-                     if (debugLevel > 0)
+                     if (isDebuggingOn())
                      {
                          logAndPrintMessage();
                          logAndPrintMessage(getMessage(
@@ -2650,7 +2650,7 @@ public class Bib2Gls extends BibGlsTeXApp
                      {
                         // discard new record
 
-                        if (debugLevel > 0)
+                        if (isDebuggingOn())
                         {
                            logAndPrintMessage();
                            logAndPrintMessage(getMessage(
@@ -2664,7 +2664,7 @@ public class Bib2Gls extends BibGlsTeXApp
                      {
                         // discard existing record
 
-                        if (debugLevel > 0)
+                        if (isDebuggingOn())
                         {
                            logAndPrintMessage();
                            logAndPrintMessage(getMessage(
@@ -2682,7 +2682,7 @@ public class Bib2Gls extends BibGlsTeXApp
                      {
                         // replace both records with mapping
 
-                        if (debugLevel > 0)
+                        if (isDebuggingOn())
                         {
                            logAndPrintMessage();
                            logAndPrintMessage(getMessage(
@@ -2768,7 +2768,7 @@ public class Bib2Gls extends BibGlsTeXApp
                && glossariesExtraVersion.compareTo(GLOSSARIES_EXTRA_1_46) >= 0
              );
 
-      if (verboseLevel > NORMAL)
+      if (isVerbose())
       {
          Locale l = getDefaultLocale();
 
@@ -2979,7 +2979,7 @@ public class Bib2Gls extends BibGlsTeXApp
             logWriter = null;
          }
 
-         message(getMessage("message.log.file", glgLogFile));
+         message(getMessage("message.log.file", transcriptFile));
       }
    }
 
@@ -4475,7 +4475,7 @@ public class Bib2Gls extends BibGlsTeXApp
          {
             warning(((TeXSyntaxException)e).getMessage(this));
 
-            if (debugLevel > 0)
+            if (isDebuggingOn())
             {
                e.printStackTrace();
 
@@ -4505,7 +4505,7 @@ public class Bib2Gls extends BibGlsTeXApp
          error(msg);
       }
 
-      if (debugLevel > 0)
+      if (isDebuggingOn())
       {
          e.printStackTrace();
 
@@ -4521,7 +4521,7 @@ public class Bib2Gls extends BibGlsTeXApp
    @Override
    public void debug(Throwable e)
    {
-      if (debugLevel > 0)
+      if (isDebuggingOn())
       {
          String message = e.getMessage();
 
@@ -4547,7 +4547,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
    public void debug(String msgPrefix, Throwable e)
    {
-      if (debugLevel > 0)
+      if (isDebuggingOn())
       {
          String message = e.getMessage();
 
@@ -4643,7 +4643,7 @@ public class Bib2Gls extends BibGlsTeXApp
             }
          }
       }
-      else if (debugLevel > 0)
+      else if (isDebuggingOn())
       {
          logAndPrintMessage(getMessageWithFallback("error.app_failed",
            "{0} failed with exit code {1}",
@@ -5302,23 +5302,6 @@ public class Bib2Gls extends BibGlsTeXApp
       }
 
       return !trimExceptFields.contains(field);
-   }
-
-   protected void setDebugLevel(int level)
-   {
-      if (level < 0)
-      {
-         throw new IllegalArgumentException(getMessage(
-           "error.invalid.opt.minint.value", "--debug",
-             level, 0));
-      }
-
-      debugLevel = level;
-
-      if (level > 0)
-      {
-         verboseLevel = DEBUG;
-      }
    }
 
    @Override
@@ -6012,38 +5995,38 @@ public class Bib2Gls extends BibGlsTeXApp
          System.exit(0);
       }
 
-      glgLogFile = null;
+      transcriptFile = null;
 
       if (logName == null)
       {
          String base = auxFile.getName();
 
-         glgLogFile = new File(dir,
+         transcriptFile = new File(dir,
             base.substring(0,base.lastIndexOf("."))+".glg");
       }
       else
       {
-         glgLogFile = resolveFile(logName);
+         transcriptFile = resolveFile(logName);
       }
 
-      glgLogFile = getWritableFile(glgLogFile);
+      transcriptFile = getWritableFile(transcriptFile);
 
       try
       {
-         logWriter = new PrintWriter(Files.newBufferedWriter(glgLogFile.toPath(),
+         logWriter = new PrintWriter(Files.newBufferedWriter(transcriptFile.toPath(),
            defaultCharset));
       }
       catch (IOException e)
       {
          logWriter = null;
          System.err.println(getMessage("error.cant.open.log", 
-            glgLogFile.toString()));
+            transcriptFile.toString()));
          error(e);
       }
 
       logMessage(getMessage("about.version", NAME, VERSION, DATE));
 
-      if (getDebugLevel() > 0)
+      if (isDebuggingOn())
       {
          logMessage("Java "+System.getProperty("java.version"));
          logMessage(String.format("texparserlib.jar %s (%s)",
@@ -6062,7 +6045,7 @@ public class Bib2Gls extends BibGlsTeXApp
       pendingWriter = null;
       pending = null;
 
-      if (getDebugLevel() > 0)
+      if (isDebuggingOn())
       {
          logAndPrintMessage(String.format(
             "openin_any=%s%nopenout_any=%s%nTEXMFOUTPUT=%s%ncwd=%s", 
@@ -6072,63 +6055,33 @@ public class Bib2Gls extends BibGlsTeXApp
       }
    }
 
-   public static void exit(Bib2Gls bib2gls, int exitCode)
+   protected void run(String[] args)
    {
-      if (bib2gls != null)
-      {
-         // Make sure transcript file is closed
-
-         if (bib2gls.logWriter != null)
-         {
-            bib2gls.logWriter.close();
-            bib2gls.message(bib2gls.getMessageWithFallback(
-              "message.log.file", 
-              "Transcript written to {0}.",
-               bib2gls.glgLogFile));
-
-            bib2gls.logWriter = null;
-         }
-      }
-
-      System.exit(exitCode);
-   }
-
-   public static void main(String[] args)
-   {
-      Bib2Gls bib2gls = null;
-
       try
       {
-         bib2gls = new Bib2Gls();
-         bib2gls.initialise(args);
-         bib2gls.process();
-
-         if (bib2gls.exitCode != 0)
-         {
-            exit(bib2gls, bib2gls.exitCode);
-         }
+         initialise(args);
+         process();
       }
       catch (Bib2GlsSyntaxException e)
       {
          System.err.println(e.getMessage());
-         System.err.println(bib2gls.getMessage("syntax.use.help"));
-         System.exit(1);
+         System.err.println(getMessage("syntax.use.help"));
+         exitCode = 1;
       }
       catch (Exception e)
       {
-         if (bib2gls == null)
-         {
-            System.err.println("Fatal error: "+e.getMessage());
-
-            e.printStackTrace();
-         }
-         else
-         {
-            bib2gls.error(e);
-         }
-
-         exit(bib2gls, 3);
+         error(e);
+         exitCode = 3;
       }
+
+      exit();
+   }
+
+   public static void main(String[] args)
+   {
+      Bib2Gls bib2gls = new Bib2Gls();
+
+      bib2gls.run(args);
    }
 
    public static final String NAME = "bib2gls";
@@ -6145,12 +6098,9 @@ public class Bib2Gls extends BibGlsTeXApp
    private Path basePath;
 
    private File auxFile;
-   private File glgLogFile;
    private File texLogFile;
-   private PrintWriter logWriter=null;
    private StringWriter pending = null;
    private PrintWriter pendingWriter = null;
-   private int exitCode = 0;
 
    public static final Pattern PATTERN_PACKAGE = Pattern.compile(
        "Package: ([^\\s]+)(?:\\s+(\\d{4})/(\\d{2})/(\\d{2}))?.*");

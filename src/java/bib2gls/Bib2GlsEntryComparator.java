@@ -74,7 +74,7 @@ public class Bib2GlsEntryComparator extends SortComparator
       collator.setStrength(settings.getCollatorStrength());
       collator.setDecomposition(settings.getCollatorDecomposition());
 
-      if (collator instanceof RuleBasedCollator && bib2gls.getDebugLevel() > 0)
+      if (collator instanceof RuleBasedCollator && bib2gls.isDebuggingOn())
       {
          bib2gls.logMessage(bib2gls.getMessage("message.collator.rules",
            ruleString(((RuleBasedCollator)collator).getRules())));
@@ -469,7 +469,7 @@ public class Bib2GlsEntryComparator extends SortComparator
          }
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          StringBuilder keyList = new StringBuilder();
 

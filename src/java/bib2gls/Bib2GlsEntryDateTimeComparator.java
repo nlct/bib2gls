@@ -174,7 +174,7 @@ public class Bib2GlsEntryDateTimeComparator extends SortComparator
          }
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          String id = entry.getId();
 

@@ -231,7 +231,7 @@ public class Bib2GlsProgenitor extends Bib2GlsEntry
 
          parserListener.addBibData(spawnedEntry);
 
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             for (Iterator<String> it = spawnedEntry.getKeySet().iterator();
                   it.hasNext(); )

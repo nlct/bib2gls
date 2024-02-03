@@ -77,7 +77,7 @@ public class FieldInField implements Conditional
          result = !result;
       }
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          if (fieldValue2 == null)
          {

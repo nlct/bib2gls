@@ -55,7 +55,7 @@ public class FieldPatternMatch implements Conditional
 
       entry.getResource().setLastMatch(m);
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            String.format("Entry: %s%nCondition: %s%nValue: \"%s\"%nResult: %s",

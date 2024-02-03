@@ -206,7 +206,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
 
             writer.format("%s={%s}", field, value);
          }
-         else if (bib2gls.getDebugLevel() > 0 && 
+         else if (bib2gls.isDebuggingOn() && 
             !bib2gls.isInternalField(field) &&
             !bib2gls.isKnownSpecialField(field))
          {

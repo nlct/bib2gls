@@ -56,7 +56,7 @@ public class FieldLengthMatch extends FieldNumberMatch
 
       result = compare(num1, num2);
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            String.format(

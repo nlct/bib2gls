@@ -196,7 +196,7 @@ public class Bib2GlsEntryNumericComparator extends SortComparator
          setGroupTitle(entry, -1, number, value, type);
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          bib2gls.verbose(String.format("%s -> '%s'", id, value));
       }

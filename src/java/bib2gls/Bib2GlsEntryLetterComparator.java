@@ -154,7 +154,7 @@ public class Bib2GlsEntryLetterComparator extends SortComparator
          }
       }
 
-      if (bib2gls.getVerboseLevel() > 0)
+      if (bib2gls.isVerbose())
       {
          StringBuilder builder = new StringBuilder();
 

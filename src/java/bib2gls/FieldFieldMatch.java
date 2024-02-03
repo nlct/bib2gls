@@ -57,7 +57,7 @@ public class FieldFieldMatch implements Conditional
 
       boolean result = compare(fieldValue1, fieldValue2);
 
-      if (bib2gls.getDebugLevel() > 0)
+      if (bib2gls.isDebuggingOn())
       {
          bib2gls.logAndPrintMessage(
            String.format(

@@ -186,7 +186,7 @@ public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry
 
          parserListener.addBibData(spawnedEntry);
 
-         if (bib2gls.getDebugLevel() > 0)
+         if (bib2gls.isDebuggingOn())
          {
             for (Iterator<String> it = spawnedEntry.getKeySet().iterator();
                   it.hasNext(); )
