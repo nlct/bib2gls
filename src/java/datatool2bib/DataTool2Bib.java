@@ -303,11 +303,58 @@ public class DataTool2Bib extends BibGlsConverter
             if (entry != null)
             {
                TeXObject content = entry.getContents();
+               String field = idxFieldMap.get(idx);
 
                out.println(",");
 
-               out.format("  %s = {%s}", idxFieldMap.get(idx),
-                 content.toString(getParser()));
+               String strVal = content.toString(getParser());
+
+               out.format("  %s = {%s}", field, strVal);
+
+               if (content instanceof DataNumericElement)
+               {
+                  DataNumericElement dataNum = (DataNumericElement)content;
+
+                  DatumType datumType = dataNum.getDatumType();
+
+                  if (dataValueSuffix != null)
+                  {
+                     String numVal;
+
+                     if (datumType == DatumType.INTEGER)
+                     {
+                        numVal = "" + dataNum.intValue();
+                     }
+                     else
+                     {
+                        numVal = "" + dataNum.doubleValue();
+                     }
+
+                     if (!numVal.equals(strVal))
+                     {
+                        out.println(",");
+
+                        out.format("  %s%s = {%s}", field,
+                          dataValueSuffix, numVal);
+                     }
+                  }
+
+
+                  if (datumType == DatumType.CURRENCY
+                       && dataCurrencySuffix != null)
+                  {
+                     TeXObject sym = dataNum.getCurrencySymbol();
+
+                     if (sym != null)
+                     {
+                        out.println(",");
+
+                        out.format("  %s%s = {%s}", field,
+                          dataCurrencySuffix,
+                          sym.toString(parser));
+                     }
+                  }
+               }
             }
          }
 
@@ -331,6 +378,11 @@ public class DataTool2Bib extends BibGlsConverter
          )
       {
          return 1;
+      }
+      else if (arg.equals("--save-value")
+        || arg.equals("--save-currency"))
+      {
+         return -1;
       }
 
       return super.argCount(arg);
@@ -374,6 +426,46 @@ public class DataTool2Bib extends BibGlsConverter
       else if (arg.equals("--no-read"))
       {
          readOpts = null;
+      }
+      else if (arg.equals("--save-datum"))
+      {
+         dataValueSuffix = "-value";
+         dataCurrencySuffix = "-currency";
+      }
+      else if (arg.equals("--no-save-datum"))
+      {
+         dataValueSuffix = null;
+         dataCurrencySuffix = null;
+      }
+      else if (isArg(deque, arg, "--save-value", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            dataValueSuffix = "-value";
+         }
+         else
+         {
+            dataValueSuffix = returnVals[0].toString();
+         }
+      }
+      else if (arg.equals("--no-save-value"))
+      {
+         dataValueSuffix = null;
+      }
+      else if (isArg(deque, arg, "--save-currency", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            dataCurrencySuffix = "-currency";
+         }
+         else
+         {
+            dataCurrencySuffix = returnVals[0].toString();
+         }
+      }
+      else if (arg.equals("--no-save-currency"))
+      {
+         dataCurrencySuffix = null;
       }
       else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
       {
@@ -438,4 +530,7 @@ public class DataTool2Bib extends BibGlsConverter
    private String labelColumn="Label";
    private boolean autoLabel = false;
    private String readOpts = null;
+
+   private String dataValueSuffix = null;
+   private String dataCurrencySuffix = null;
 }
