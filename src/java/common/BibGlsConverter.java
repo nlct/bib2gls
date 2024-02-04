@@ -111,6 +111,36 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return false;
    }
 
+   public String processLabel(String label)
+   {
+      StringBuilder builder = new StringBuilder();
+
+      for (int i = 0; i < label.length(); )
+      {
+         int cp = label.codePointAt(i);
+         i += Character.charCount(cp);
+
+         if (! (Character.isISOControl(cp)
+                || cp == ',' || cp == '=' || cp == '{' || cp == '}'
+                || cp == '$' || cp == '\\' || cp == '^' || cp == '_'
+                || cp == '%' || cp == '#' || cp == '&' || cp == '~'
+               )
+            )
+         {
+            builder.appendCodePoint(cp);
+         }
+         else if (Character.isWhitespace(cp))
+         {
+            if (spaceSub != null)
+            {
+               builder.append(spaceSub);
+            }
+         }
+      }
+
+      return builder.toString();
+   }
+
    protected boolean isIgnoredPackage(String styName)
    {
       return false;

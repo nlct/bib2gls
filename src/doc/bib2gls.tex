@@ -3245,6 +3245,9 @@ Available options are listed below.
 
 \section{Common Options}
 
+These command line switches are common to \bibgls\ and the
+supplementary command line conversion tools
+
 \argsection{help}
 
 Display the help message and quit.
@@ -3293,223 +3296,6 @@ the required locale in the appropriate \idx{resourceset} using
 the \csopt{locale} resource option, to specify the default
 \gls{resource-locale}, or set the locale for individual options,
 such as \csopt{sort}.
-
-\argsection{group}
-
-The \styfmt{glossaries-extra} \styopt{record} package option
-automatically creates a new internal field called \field{group}. If the
-\longarg{group} switch is used with the default \csopt[auto]{group}
-option then, when sorting, \bibgls\ will try
-to determine the \idx{group} for each entry and assign it to the
-\field{group} field.  (Some \csopt{sort} options ignore this
-setting.) This value will be picked up by \ics{printunsrtglossary}
-if group headings are required (for example with the
-\glostyle{indexgroup} style) or if group separators are required
-(for example, the \glostyle{index} style with the default 
-\styopt[false]{nogroupskip}). If you don't require grouping within
-the glossary, there's no need to use this switch. Note that this
-switch doesn't automatically select an appropriate glossary style.
-
-If you want \idxpl{sub-group}, you will need to use the \csopt{group-level}
-resource option and ensure you have \sty{glossaries-extra} v1.49+.
-\Idxpl{smallgroup} can be merged with the \csopt{merge-small-groups}
-resource option.
-
-\begin{important}
-The \field{group} field should typically not be set in the \ext{bib}
-file and will trigger a warning if found. The explicit use of the
-\field{group} key will override \bibgls's normal group formation
-behaviour, which can cause unexpected results. The custom use of the
-\field{group} field requires some care. As a general rule, if you
-find yourself wanting to use the \field{group} field in the
-\ext{bib} file, then the chances are that what you actually have is
-a \gls{hierarchicalglossary} (list of topics) and what you really
-need is the \field{parent} field.  Compare the example files
-\exfile{sample-textsymbols.tex} and
-\exfile{sample-textsymbols2.tex}. See also
-\sectionref{sec:logicaldivisions}.
-\end{important}
-There are eight types of groups:
-\begin{description}
-\item[\idx{lettergroup}] The first non-ignored character of the
-sort value is alphabetic. This type of group occurs when using the
-alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
-with the letter sort methods listed in
-\tableref{tab:sortoptionsletter} or with the letter-number sort
-methods listed in \tableref{tab:sortoptionsletternumber}. The group
-label is obtained from \gls!{bibglslettergroup}.
-
-\item[\idx{nonlettergroup} (or \idx{symbolgroup})]
-The first non-ignored character of all the sort values within this group
-are non-alphabetical. This type of group occurs when using the
-alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
-with the letter sort methods listed in
-\tableref{tab:sortoptionsletter} or with the letter-number sort
-methods listed in \tableref{tab:sortoptionsletternumber}.
-The alphabetic sort methods ignore many punctuation
-characters, so an entry that has a non-alphabetic initial
-character in the sort value may actually be placed in a
-\idx{lettergroup}.
-The group label is obtained from \gls!{bibglsothergroup}.
-
-\item[\idx{emptygroup}] The sort value is empty when sorting with an
-alphabetical, letter or letter-number method, typically a
-result of the original value consisting solely of commands that \bibgls\
-can't interpret. The group label is obtained from \gls!{bibglsemptygroup}.
-
-\item[\idx{numbergroup}] The entries were sorted by one of the
-numeric comparisons listed in \tableref{tab:sortoptionsnumerical}.
-The group label is obtained from \gls!{bibglsnumbergroup}.
-
-\item[\idx{datetimegroup}] The entries were sorted by one of the date-time
-comparisons listed in \tableref{tab:sortoptionsdatetime} (where both
-date and time are present). 
-The group label is obtained from \gls!{bibglsdatetimegroup}.
-
-\item[\idx{dategroup}] The entries were sorted by one of the date
-comparisons (where the time is omitted). 
-The group label is obtained from \gls!{bibglsdategroup}.
-
-\item[\idx{timegroup}] The entries were sorted by one of the time
-comparisons (where the date is omitted). 
-The group label is obtained from \gls!{bibglstimegroup}.
-
-\item[\idx{customgroup}] The group label is explicitly set either by
-aliasing a field (with \csopt{field-aliases}) or by using the
-\csopt[\meta{label}]{group} resource option. You will need to use
-\gls{glsxtrsetgrouptitle} in the document to provide an associated title if the
-\meta{label} isn't the same as the title.  Remember that with older
-\LaTeX\ kernels, the label can't contain any active characters, so
-you can't use non-ASCII characters in \meta{label} with
-\sty{inputenc} (but you can use non-ASCII alphanumerics with
-\sty{fontspec}). To ensure better support for UTF-8 with \pdfLaTeX, make sure you
-have a recent \TeX\ distribution and up-to-date versions of
-\sty{glossaries} and \sty{glossaries-extra}.
-
-\end{description}
-
-The \idx{lettergroup} titles will typically have the first character
-converted to \idx{uppercase} for the alphabet sort methods
-(\tableref{tab:sortoptionsrule}). A \qt{letter} may not necessarily
-be a single character (depending on the sort rule), but may be
-composed of multiple characters, such as a \idx{digraph} (two
-characters) or \idx{trigraph} (three characters).
-
-For example, if the sort rule recognises the digraph \qt{dz} as a
-letter, then it will be converted to \qt{Dz} for the group title. 
-There are some exceptions to this. For example, the Dutch digraph 
-\qt{ij} should be \qt{IJ} rather than \qt{Ij}. This is indicated 
-by the following line in the \langxml:
-\begin{verbatim}
-<entry key="grouptitle.case.ij">IJ</entry>
-\end{verbatim}
-If there isn't a \idx{grouptitle.case.lc} key (where 
-\meta{lc} is the \idx!{lowercase} version), then only the first character
-will be converted to \idx{uppercase} otherwise the value supplied by the
-resource file is used. This resource key is only checked for
-the alphabetical comparisons listed in
-\tableref{tab:sortoptionsrule}. If the initial part of the sort
-value isn't recognised as a letter according to the sort rule, then
-the entry will be in a \idx{nonlettergroup} (even if the character is
-alphabetical).
-
-The letter (\tableref{tab:sortoptionsletter}) and letter-number
-(\tableref{tab:sortoptionsletternumber}) methods only select the
-first character of the sort value for the group. If the character is
-alphabetical\footnote{according to Java's
-\code{Character.isAlphabetic(int)} method} then it will be a 
-\idx{lettergroup} otherwise it's a \idx{nonlettergroup}.  The case-insensitive
-ordering (such as \csopt[letter-nocase]{sort}) will convert the
-letter group character to \idx{uppercase}. The case-sensitive ordering
-(such as \csopt[letter-case]{sort}) won't change the case.
-
-Glossary styles with navigational links to groups (such as
-\glostyle{indexhypergroup}) require an extra run for the ordinary
-\cs{cs.makeglossaries} and \cs{makenoidxglossaries} methods. For
-example, for the document \filefmt{myDoc.tex}:
-\begin{verbatim}
-pdflatex myDoc
-makeglossaries myDoc
-pdflatex myDoc
-pdflatex myDoc
-\end{verbatim}
-On the first \appfmt{pdflatex} call, there's no glossary. On the second
-\appfmt{pdflatex}, there's a glossary but the glossary must be
-processed to find the group information, which is written to the
-\iext{aux} file as
-\nosecdef{@gls@hypergroup}
-The third \appfmt{pdflatex} reads this information and is then able
-to create the navigation links.
-
-With \bibgls, if the \optfmt{type} is provided (through the
-\field{type} field or via options such as \csopt{type} and
-\csopt{dual-type}) then this information can be determined when
-\bibgls\ is ready to write the \iext{glstex} file, which means that
-the extra \LaTeX\ run isn't necessary. If \bibgls\ doesn't know
-the glossary type then it will fallback on the original method
-which requires an extra \LaTeX\ run.
-
-For example:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
-\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
-\strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\comment{data in entries.bib}
-  \csopt[main]{type}\comment{put these entries in the 'main' glossary}
-}
-\strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src},\comment{data in abbrvs.bib}
-  \csopt[abbreviations]{type}\comment{put entries in the 'abbreviations' glossary}
-}
-\end{codeenv}
-Here the \csopt{type} is set and \bibgls\ can detect that
-\isty{hyperref} has been loaded, so if the \longargfmt{group} switch
-is used, then the group hyperlinks can be set (using
-\gls!{bibglshypergroup}). This means that the build process is
-just:
-\begin{verbatim}
-pdflatex myDoc
-bibtex --group myDoc
-pdflatex myDoc
-\end{verbatim}
-Note that this requires \isty{glossaries} v4.53+ and
-\isty{glossaries-extra} v1.53. If your version of \sty{glossaries}
-or \sty{glossaries-extra} is too old, an extra \LaTeX\ run is
-required.
-
-If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
-isn't used or the \field{type} isn't set or your version of
-\sty{glossaries} is too old, then the information can't be saved in
-the \ext{glstex} file.
-
-For example:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
-\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
-\strut
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}\comment{data in entries.bib}
-\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src}}\comment{data in abbrvs.bib}
-\end{codeenv}
-This requires the build process:
-\begin{verbatim}
-pdflatex myDoc
-bibtex --group myDoc
-pdflatex myDoc
-pdflatex myDoc
-\end{verbatim}
-because the group hyperlink information can't be determined by
-\bibgls, so it's best to always set the \optfmt{type} if you want
-hyper-group styles, and make sure you have an up-to-date version of 
-\styfmt{glossaries} (and \styfmt{glossaries-extra}).
-
-\argsection{no-group}
-
-Don't automatically set the \field{group} field with
-\csopt[auto]{group} (default). The glossary won't have groups even if a
-group style, such as \glostyle{indexgroup}, is used (unless the
-\field{group} field is set to a custom value).
 
 \argsection{debug}
 
@@ -4273,6 +4059,223 @@ This option will suppress the warning if an unknown \glspl{entrytype} are
 found in the \ext{bib} file.
 
 \section{Field Options}
+
+\argsection{group}
+
+The \styfmt{glossaries-extra} \styopt{record} package option
+automatically creates a new internal field called \field{group}. If the
+\longarg{group} switch is used with the default \csopt[auto]{group}
+option then, when sorting, \bibgls\ will try
+to determine the \idx{group} for each entry and assign it to the
+\field{group} field.  (Some \csopt{sort} options ignore this
+setting.) This value will be picked up by \ics{printunsrtglossary}
+if group headings are required (for example with the
+\glostyle{indexgroup} style) or if group separators are required
+(for example, the \glostyle{index} style with the default 
+\styopt[false]{nogroupskip}). If you don't require grouping within
+the glossary, there's no need to use this switch. Note that this
+switch doesn't automatically select an appropriate glossary style.
+
+If you want \idxpl{sub-group}, you will need to use the \csopt{group-level}
+resource option and ensure you have \sty{glossaries-extra} v1.49+.
+\Idxpl{smallgroup} can be merged with the \csopt{merge-small-groups}
+resource option.
+
+\begin{important}
+The \field{group} field should typically not be set in the \ext{bib}
+file and will trigger a warning if found. The explicit use of the
+\field{group} key will override \bibgls's normal group formation
+behaviour, which can cause unexpected results. The custom use of the
+\field{group} field requires some care. As a general rule, if you
+find yourself wanting to use the \field{group} field in the
+\ext{bib} file, then the chances are that what you actually have is
+a \gls{hierarchicalglossary} (list of topics) and what you really
+need is the \field{parent} field.  Compare the example files
+\exfile{sample-textsymbols.tex} and
+\exfile{sample-textsymbols2.tex}. See also
+\sectionref{sec:logicaldivisions}.
+\end{important}
+There are eight types of groups:
+\begin{description}
+\item[\idx{lettergroup}] The first non-ignored character of the
+sort value is alphabetic. This type of group occurs when using the
+alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
+with the letter sort methods listed in
+\tableref{tab:sortoptionsletter} or with the letter-number sort
+methods listed in \tableref{tab:sortoptionsletternumber}. The group
+label is obtained from \gls!{bibglslettergroup}.
+
+\item[\idx{nonlettergroup} (or \idx{symbolgroup})]
+The first non-ignored character of all the sort values within this group
+are non-alphabetical. This type of group occurs when using the
+alphabetic sort methods listed in \tableref{tab:sortoptionsrule} or
+with the letter sort methods listed in
+\tableref{tab:sortoptionsletter} or with the letter-number sort
+methods listed in \tableref{tab:sortoptionsletternumber}.
+The alphabetic sort methods ignore many punctuation
+characters, so an entry that has a non-alphabetic initial
+character in the sort value may actually be placed in a
+\idx{lettergroup}.
+The group label is obtained from \gls!{bibglsothergroup}.
+
+\item[\idx{emptygroup}] The sort value is empty when sorting with an
+alphabetical, letter or letter-number method, typically a
+result of the original value consisting solely of commands that \bibgls\
+can't interpret. The group label is obtained from \gls!{bibglsemptygroup}.
+
+\item[\idx{numbergroup}] The entries were sorted by one of the
+numeric comparisons listed in \tableref{tab:sortoptionsnumerical}.
+The group label is obtained from \gls!{bibglsnumbergroup}.
+
+\item[\idx{datetimegroup}] The entries were sorted by one of the date-time
+comparisons listed in \tableref{tab:sortoptionsdatetime} (where both
+date and time are present). 
+The group label is obtained from \gls!{bibglsdatetimegroup}.
+
+\item[\idx{dategroup}] The entries were sorted by one of the date
+comparisons (where the time is omitted). 
+The group label is obtained from \gls!{bibglsdategroup}.
+
+\item[\idx{timegroup}] The entries were sorted by one of the time
+comparisons (where the date is omitted). 
+The group label is obtained from \gls!{bibglstimegroup}.
+
+\item[\idx{customgroup}] The group label is explicitly set either by
+aliasing a field (with \csopt{field-aliases}) or by using the
+\csopt[\meta{label}]{group} resource option. You will need to use
+\gls{glsxtrsetgrouptitle} in the document to provide an associated title if the
+\meta{label} isn't the same as the title.  Remember that with older
+\LaTeX\ kernels, the label can't contain any active characters, so
+you can't use non-ASCII characters in \meta{label} with
+\sty{inputenc} (but you can use non-ASCII alphanumerics with
+\sty{fontspec}). To ensure better support for UTF-8 with \pdfLaTeX, make sure you
+have a recent \TeX\ distribution and up-to-date versions of
+\sty{glossaries} and \sty{glossaries-extra}.
+
+\end{description}
+
+The \idx{lettergroup} titles will typically have the first character
+converted to \idx{uppercase} for the alphabet sort methods
+(\tableref{tab:sortoptionsrule}). A \qt{letter} may not necessarily
+be a single character (depending on the sort rule), but may be
+composed of multiple characters, such as a \idx{digraph} (two
+characters) or \idx{trigraph} (three characters).
+
+For example, if the sort rule recognises the digraph \qt{dz} as a
+letter, then it will be converted to \qt{Dz} for the group title. 
+There are some exceptions to this. For example, the Dutch digraph 
+\qt{ij} should be \qt{IJ} rather than \qt{Ij}. This is indicated 
+by the following line in the \langxml:
+\begin{verbatim}
+<entry key="grouptitle.case.ij">IJ</entry>
+\end{verbatim}
+If there isn't a \idx{grouptitle.case.lc} key (where 
+\meta{lc} is the \idx!{lowercase} version), then only the first character
+will be converted to \idx{uppercase} otherwise the value supplied by the
+resource file is used. This resource key is only checked for
+the alphabetical comparisons listed in
+\tableref{tab:sortoptionsrule}. If the initial part of the sort
+value isn't recognised as a letter according to the sort rule, then
+the entry will be in a \idx{nonlettergroup} (even if the character is
+alphabetical).
+
+The letter (\tableref{tab:sortoptionsletter}) and letter-number
+(\tableref{tab:sortoptionsletternumber}) methods only select the
+first character of the sort value for the group. If the character is
+alphabetical\footnote{according to Java's
+\code{Character.isAlphabetic(int)} method} then it will be a 
+\idx{lettergroup} otherwise it's a \idx{nonlettergroup}.  The case-insensitive
+ordering (such as \csopt[letter-nocase]{sort}) will convert the
+letter group character to \idx{uppercase}. The case-sensitive ordering
+(such as \csopt[letter-case]{sort}) won't change the case.
+
+Glossary styles with navigational links to groups (such as
+\glostyle{indexhypergroup}) require an extra run for the ordinary
+\cs{cs.makeglossaries} and \cs{makenoidxglossaries} methods. For
+example, for the document \filefmt{myDoc.tex}:
+\begin{verbatim}
+pdflatex myDoc
+makeglossaries myDoc
+pdflatex myDoc
+pdflatex myDoc
+\end{verbatim}
+On the first \appfmt{pdflatex} call, there's no glossary. On the second
+\appfmt{pdflatex}, there's a glossary but the glossary must be
+processed to find the group information, which is written to the
+\iext{aux} file as
+\nosecdef{@gls@hypergroup}
+The third \appfmt{pdflatex} reads this information and is then able
+to create the navigation links.
+
+With \bibgls, if the \optfmt{type} is provided (through the
+\field{type} field or via options such as \csopt{type} and
+\csopt{dual-type}) then this information can be determined when
+\bibgls\ is ready to write the \iext{glstex} file, which means that
+the extra \LaTeX\ run isn't necessary. If \bibgls\ doesn't know
+the glossary type then it will fallback on the original method
+which requires an extra \LaTeX\ run.
+
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src},\comment{data in entries.bib}
+  \csopt[main]{type}\comment{put these entries in the 'main' glossary}
+}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src},\comment{data in abbrvs.bib}
+  \csopt[abbreviations]{type}\comment{put entries in the 'abbreviations' glossary}
+}
+\end{codeenv}
+Here the \csopt{type} is set and \bibgls\ can detect that
+\isty{hyperref} has been loaded, so if the \longargfmt{group} switch
+is used, then the group hyperlinks can be set (using
+\gls!{bibglshypergroup}). This means that the build process is
+just:
+\begin{verbatim}
+pdflatex myDoc
+bibtex --group myDoc
+pdflatex myDoc
+\end{verbatim}
+Note that this requires \isty{glossaries} v4.53+ and
+\isty{glossaries-extra} v1.53. If your version of \sty{glossaries}
+or \sty{glossaries-extra} is too old, an extra \LaTeX\ run is
+required.
+
+If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
+isn't used or the \field{type} isn't set or your version of
+\sty{glossaries} is too old, then the information can't be saved in
+the \ext{glstex} file.
+
+For example:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\oarg{colorlinks}\marg{hyperref}
+\cmd{usepackage}\oarg{\styopt{record},\styopt{abbreviations},\styopt[indexhypergroup]{style}}\marg{glossaries-extra}
+\strut
+\gls{GlsXtrLoadResources}\oarg{\csopt[entries]{src}}\comment{data in entries.bib}
+\gls{GlsXtrLoadResources}\oarg{\csopt[abbrvs]{src}}\comment{data in abbrvs.bib}
+\end{codeenv}
+This requires the build process:
+\begin{verbatim}
+pdflatex myDoc
+bibtex --group myDoc
+pdflatex myDoc
+pdflatex myDoc
+\end{verbatim}
+because the group hyperlink information can't be determined by
+\bibgls, so it's best to always set the \optfmt{type} if you want
+hyper-group styles, and make sure you have an up-to-date version of 
+\styfmt{glossaries} (and \styfmt{glossaries-extra}).
+
+\argsection{no-group}
+
+Don't automatically set the \field{group} field with
+\csopt[auto]{group} (default). The glossary won't have groups even if a
+group style, such as \glostyle{indexgroup}, is used (unless the
+\field{group} field is set to a custom value).
 
 \argsection{no-expand-fields}
 
@@ -22750,34 +22753,33 @@ but will expand to empty if the associated resource option hasn't
 been set.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
-\label{sec:gls2bib}
-\setsecdepth{1}
+\label{sec:tex}
+\setsecdepth{2}
 
-If you have already been using the \styfmt{glossaries} or
-\styfmt{glossaries-extra} package with a large file containing all your
-definitions using commands like \gls{newglossaryentry}, then you can
-use the supplementary tool \idx{convertgls2bib} to convert the definitions
-to the \ext{bib} format required by \bibgls. The syntax is:
-\begin{alltt}
-convertgls2bib \oargm{options} \meta{tex file} \meta{bib file}
-\end{alltt}
-where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
-the \ext{bib} file. This application is less secure than \bibgls\ as
-it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
-\texmfcnf{openoutany}. Take care not to accidentally overwrite
-existing \ext{bib} files as there's no check to determine if
-\meta{bib file} already exists with the default \convertglsbiblongarg{overwrite}. 
+There are some supplementary command line tools provided with
+\bibgls\ that can convert certain types of data from existing
+documents to \iext{bib} files:
+\begin{itemize}
+  \item \idx{convertgls2bib} converts
+data from commands like \gls{newglossaryentry} to \ext{bib} entry
+data (see \sectionref{sec:gls2bib}).
 
-If the \ext{bib} extension is missing from \meta{bib file}, it will
-be added. The extension is required for \meta{tex file}.
+  \item \idx{datatool2bib} converts \sty{datatool} databases to
+\ext{bib} entry data (see \sectionref{sec:gls2bib}).
+\end{itemize}
 
-\section{Command Line Arguments}
+These command line tools share the same common switches listed in
+\sectionref{sec:switches}. Additionally, they share the switches
+listed in \sectionref{sec:shared2bibswitches}, but they may also
+have their specific switches which are described in the revelant
+section.
 
-The \meta{options} recognised by \idx{convertgls2bib} are described below.
+\section{Shared Conversion Tool Switches}
+\label{sec:shared2bibswitches}
 
 \convertglsbibarg{texenc}
 
-The character \igls{encoding} of the \ext{tex} file. If omitted, the
+The character \igls{encoding} of the source \ext{tex} file. If omitted, the
 operating system's default \gls{encoding} is assumed (or the
 \idx{JVM}['s]).
 
@@ -22801,6 +22803,39 @@ operating system. For example:
 \begin{verbatim}
 convertgls2bib --space-sub '' entries.tex entries.bib
 \end{verbatim}
+
+\begin{information}
+Note that all forbidden punctuation characters
+(such as commas, equal signs and braces) will be automatically stripped.
+\end{information}
+
+\section{\glsfmttext{idx.convertgls2bib}: Conversion from \styfmt{glossaries} or
+\styfmt{glossaries-extra}}
+\label{sec:gls2bib}
+
+If you have already been using the \styfmt{glossaries} or
+\styfmt{glossaries-extra} package with a large file containing all your
+definitions using commands like \gls{newglossaryentry}, then you can
+use the supplementary tool \idx{convertgls2bib} to convert the definitions
+to the \ext{bib} format required by \bibgls. The syntax is:
+\begin{alltt}
+convertgls2bib \oargm{options} \meta{tex file} \meta{bib file}
+\end{alltt}
+where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
+the \ext{bib} file. This application is less secure than \bibgls\ as
+it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
+\texmfcnf{openoutany}. Take care not to accidentally overwrite
+existing \ext{bib} files as there's no check to determine if
+\meta{bib file} already exists with the default \convertglsbiblongarg{overwrite}. 
+
+If the \ext{bib} extension is missing from \meta{bib file}, it will
+be added. The extension is required for \meta{tex file}.
+
+\section{Command Line Arguments}
+
+The \meta{options} specific to \idx{convertgls2bib} are described below.
+This is in addition to those described in \sectionref{sec:switches}
+and \sectionref{sec:shared2bibswitches}.
 
 \convertglsbibarg{ignore-sort}
 

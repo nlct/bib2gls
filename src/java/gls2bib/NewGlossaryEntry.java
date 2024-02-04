@@ -65,12 +65,7 @@ public class NewGlossaryEntry extends ControlSequence
     KeyValList valuesArg)
    throws IOException
    {
-      String spaceSub = gls2bib.getSpaceSub();
-
-      if (spaceSub != null)
-      {
-         label = label.replaceAll(" ", spaceSub);
-      }
+      label = gls2bib.processLabel(label);
 
       if (provide && gls2bib.hasEntry(label))
       {
@@ -183,8 +178,7 @@ public class NewGlossaryEntry extends ControlSequence
             }
          }
 
-         if (spaceSub != null 
-             && (field.equals("see") || field.equals("seealso")
+         if ((field.equals("see") || field.equals("seealso")
                || field.equals("alias"))
              && object instanceof TeXObjectList
              && !((TeXObjectList)object).isEmpty())
@@ -205,27 +199,17 @@ public class NewGlossaryEntry extends ControlSequence
                newVal.add(parser.getListener().getOther(']'));
             }
 
-            // If the value is a comma-separated list, there
-            // shouldn't be any spaces around the commas as
-            // glossaries.sty internally uses \@for which doesn't
-            // trim leading or trailing spaces.
+            String[] xrLabels = parser.expandToString(list, null).trim().split(" *, *");
 
-            for (TeXObject elem : list)
+            for (int i = 0; i < xrLabels.length; i++)
             {
-               if (elem instanceof WhiteSpace)
+               if (i > 0)
                {
-                  for (int i = 0, n = spaceSub.length(); i < n; )
-                  {
-                     int codepoint = spaceSub.codePointAt(i);
-                     i += Character.charCount(codepoint);
+                  newVal.add(parser.getListener().getOther(','));
+               }
 
-                     newVal.add(parser.getListener().getOther(codepoint));
-                  }
-               }
-               else
-               {
-                  newVal.add(elem);
-               }
+               newVal.addAll(parser.getListener().createString(
+                 gls2bib.processLabel(xrLabels[i])));
             }
 
             object = newVal;
@@ -458,48 +442,17 @@ public class NewGlossaryEntry extends ControlSequence
       return null;
    }
 
-   private void processEntry(TeXParser parser, TeXObject labelArg,
-    KeyValList valuesArg)
-   throws IOException
-   {
-      processEntry(parser, labelArg.toString(parser), valuesArg);
-   }
-
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject labelArg = parser.popNextArg();
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, 
-        KeyValList.getList(parser, parser.popNextArg()));
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject labelArg = list.popArg(parser);
+      String labelStr = popLabelString(parser, stack);
+      KeyValList keyValList = TeXParserUtils.popKeyValList(parser, stack);
 
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
-            list);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, 
-        KeyValList.getList(parser, list.popArg(parser)));
+      processEntry(parser, labelStr, keyValList);
    }
 
    public boolean isProvide()

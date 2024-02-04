@@ -141,11 +141,6 @@ public class Gls2Bib extends BibGlsConverter
       return splitOnCategory;
    }
 
-   public String getSpaceSub()
-   {
-      return spaceSub;
-   }
-
    @Override
    protected void addPredefinedCommands(TeXParser parser)
    {

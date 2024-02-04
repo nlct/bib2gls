@@ -64,92 +64,25 @@ public class OldAcronym extends NewAbbreviation
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject labelArg = parser.popNextArg('[', ']');
-
-      if (labelArg != null && labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      TeXObject shortArg = parser.popNextArg();
-
-      if (shortArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)shortArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            shortArg = expanded;
-         }
-      }
-
-      if (labelArg == null)
-      {
-         labelArg = shortArg;
-      }
-
-      TeXObject longArg = parser.popNextArg();
-
-      if (longArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)longArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            longArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, shortArg, longArg, parser.popNextArg());
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject labelArg = list.popArg(parser, '[', ']');
+      String labelStr = TeXParserUtils.popOptLabelString(parser, stack);
 
-      if (labelArg != null && labelArg instanceof Expandable)
+      TeXObject shortArg = TeXParserUtils.popArgExpandFully(parser, stack);
+
+      if (labelStr == null)
       {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
-            list);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
+         labelStr = shortArg.toString(parser);
       }
 
-      TeXObject shortArg = list.popArg(parser);
+      TeXObject longArg = TeXParserUtils.popArgExpandFully(parser, stack);
 
-      if (shortArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)shortArg).expandfully(parser,
-            list);
+      KeyValList options = TeXParserUtils.popKeyValList(parser, stack);      
 
-         if (expanded != null)
-         {
-            shortArg = expanded;
-         }
-      }
-
-      TeXObject longArg = list.popArg(parser);
-
-      if (longArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)longArg).expandfully(parser,
-            list);
-
-         if (expanded != null)
-         {
-            longArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, shortArg, longArg, list.popArg(parser));
+      processEntry(parser, labelStr, shortArg, longArg, options);
    }
 
 }

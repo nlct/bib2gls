@@ -175,39 +175,12 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
-   protected String processLabel(DataToolEntry entry)
+   public String processLabel(DataToolEntry entry)
     throws IOException
    {
       TeXObject content = entry.getContents();
 
       return processLabel(parser.expandToString(content, null));
-   }
-
-   protected String processLabel(String label)
-   {
-      StringBuilder builder = new StringBuilder();
-
-      for (int i = 0; i < label.length(); )
-      {
-         int cp = label.codePointAt(i);
-         i += Character.charCount(cp);
-
-         if (Character.isLetterOrDigit(cp)
-            || cp == '-' || cp == '.' || cp == '/' || cp == '+' || cp == '*'
-             )
-         {
-            builder.appendCodePoint(cp);
-         }
-         else if (Character.isWhitespace(cp))
-         {
-            if (spaceSub != null)
-            {
-               builder.append(spaceSub);
-            }
-         }
-      }
-
-      return builder.toString();
    }
 
    protected void writeEntries(DataBase db, PrintWriter out)

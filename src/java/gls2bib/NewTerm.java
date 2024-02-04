@@ -62,74 +62,53 @@ public class NewTerm extends NewGlossaryEntry
       return "index";
    }
 
-   private void processEntry(TeXParser parser, TeXObject labelArg,
-     TeXObject options)
+   @Override
+   protected void processEntry(TeXParser parser, String labelStr,
+     KeyValList fields)
    throws IOException
    {
-      KeyValList fields;
-      String spaceSub = gls2bib.getSpaceSub();
-      String labelStr = labelArg.toString(parser);
+      TeXObject name = null;
 
-      if (options == null)
+      if (fields == null)
       {
          fields = new KeyValList();
-
-         if (spaceSub != null && labelStr.contains(" "))
-         {
-            fields.put("name", labelArg);
-         }
       }
       else
       {
-         fields = KeyValList.getList(parser, options);
+         name = fields.get("name");
+      }
 
-         if (spaceSub != null && labelStr.contains(" ")
-              && fields.get("name") == null)
+      if (name == null)
+      {
+         name = parser.getListener().createString(labelStr);
+
+         labelStr = gls2bib.processLabel(labelStr);
+
+         if (!name.toString(parser).equals(labelStr))
          {
-            fields.put("name", labelArg);
+            fields.put("name", name);
          }
       }
 
-      processEntry(parser, labelStr, fields);
+      super.processEntry(parser, labelStr, fields);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject labelArg = parser.popNextArg();
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, options);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
+      String labelStr = popLabelString(parser, stack);
 
-      TeXObject labelArg = list.popArg(parser);
-
-      if (labelArg instanceof Expandable)
+      if (options == null)
       {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
-            list);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
+         options = new KeyValList();
       }
 
-      processEntry(parser, labelArg, options);
+      processEntry(parser, labelStr, options);
    }
 
 }

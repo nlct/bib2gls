@@ -46,7 +46,7 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
       return new LongNewGlossaryEntry(getName(), gls2bib, isProvide());
    }
 
-   private void processEntry(TeXParser parser, TeXObject labelArg,
+   private void processEntry(TeXParser parser, String labelStr,
      KeyValList fields, TeXObject descriptionArg, boolean trimDesc)
      throws IOException
    {
@@ -54,86 +54,31 @@ public class LongNewGlossaryEntry extends NewGlossaryEntry
       {
          TeXObjectList list = (TeXObjectList)descriptionArg;
 
-         for (int i = list.size()-1; i >= 0; i--)
-         {
-            if (list.get(i) instanceof WhiteSpace)
-            {
-               list.remove(i);
-            }
-            else if (!(list.get(i) instanceof Ignoreable))
-            {
-               break;
-            }
-         }
+         list.trimTrailing();
       }
 
       fields.put("description", descriptionArg);
-      processEntry(parser, labelArg.toString(parser), fields);
+
+      processEntry(parser, labelStr, fields);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject obj = parser.peekStack();
-
-      boolean isStar = false;
-
-      if (obj != null && (obj instanceof CharObject)
-        && ((CharObject)obj).getCharCode() == '*')
-      {
-         isStar = true;
-         parser.popStack();
-      }
-
-      TeXObject labelArg = parser.popNextArg();
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      TeXObject keyListArg = parser.popNextArg();
-
-      TeXObject descriptionArg = parser.popNextArg();
-
-      processEntry(parser, labelArg, 
-        KeyValList.getList(parser, keyListArg),
-        descriptionArg, isStar);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject obj = list.peekStack();
+      boolean isStar = (popModifier(parser, stack, '*') != -1);
 
-      boolean isStar = false;
+      String labelStr = popLabelString(parser, stack);
 
-      if (obj != null && (obj instanceof CharObject)
-        && ((CharObject)obj).getCharCode() == '*')
-      {
-         isStar = true;
-         list.popStack(parser);
-      }
+      KeyValList keyValList = TeXParserUtils.popKeyValList(parser, stack);
 
-      TeXObject labelArg = list.popArg(parser);
+      TeXObject descArg = TeXParserUtils.popArg(parser, stack,
+        TeXObjectList.POP_IGNORE_LEADING_SPACE);
 
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
-            list);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, labelArg, 
-        KeyValList.getList(parser, list.popArg(parser)),
-        list.popArg(parser), isStar);
+      processEntry(parser, labelStr, keyValList, descArg, isStar);
    }
 
 }

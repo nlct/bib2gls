@@ -62,72 +62,36 @@ public class NewAbbreviation extends NewGlossaryEntry
       return "abbreviation";
    }
 
-   protected void processEntry(TeXParser parser, TeXObject labelArg,
-     TeXObject shortArg, TeXObject longArg, TeXObject options)
+   protected void processEntry(TeXParser parser, String labelStr,
+     TeXObject shortArg, TeXObject longArg, KeyValList fields)
    throws IOException
    {
-      KeyValList fields;
-
-      if (options == null)
+      if (fields == null)
       {
          fields = new KeyValList();
-      }
-      else
-      {
-         fields = KeyValList.getList(parser, options);
       }
 
       fields.put("long", longArg);
       fields.put("short", shortArg);
 
-      processEntry(parser, labelArg.toString(parser), fields);
+      processEntry(parser, labelStr, fields);
    }
 
    public void process(TeXParser parser) throws IOException
    {
-      TeXObject options = parser.popNextArg('[', ']');
-
-      TeXObject labelArg = parser.popNextArg();
-
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser);
-
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, 
-        labelArg, // label
-        parser.popNextArg(), // short
-        parser.popNextArg(), // long
-        options);
+      process(parser, parser);
    }
 
-   public void process(TeXParser parser, TeXObjectList list) throws IOException
+   public void process(TeXParser parser, TeXObjectList stack) throws IOException
    {
-      TeXObject options = list.popArg(parser, '[', ']');
+      KeyValList options = TeXParserUtils.popOptKeyValList(parser, stack);
 
-      TeXObject labelArg = list.popArg(parser);
+      String labelStr = popLabelString(parser, stack);
 
-      if (labelArg instanceof Expandable)
-      {
-         TeXObjectList expanded = ((Expandable)labelArg).expandfully(parser,
-            list);
+      TeXObject shortArg = popArg(parser, stack);
+      TeXObject longArg = popArg(parser, stack);
 
-         if (expanded != null)
-         {
-            labelArg = expanded;
-         }
-      }
-
-      processEntry(parser, 
-        labelArg, // label
-        list.popArg(parser), // short
-        list.popArg(parser), // long
-        options);
+      processEntry(parser, labelStr, shortArg, longArg, options);
    }
 
 }
