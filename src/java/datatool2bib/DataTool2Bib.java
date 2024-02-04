@@ -51,7 +51,7 @@ public class DataTool2Bib extends BibGlsConverter
    @Override
    public void process() throws IOException,Bib2GlsException
    {
-      DataToolSty datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
+      datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
 
       if (readOpts == null)
       {
@@ -215,6 +215,18 @@ public class DataTool2Bib extends BibGlsConverter
    {
       message(getMessage("datatool2bib.database", db.getName()));
 
+      String labelPrefix;
+
+      if (autoLabelPrefix == null)
+      {
+         labelPrefix = processLabel(db.getName());
+         autoLabelIdx = 0;
+      }
+      else
+      {
+         labelPrefix = autoLabelPrefix;
+      }
+
       DataToolHeaderRow headers = db.getHeaders();
       DataToolRows data = db.getData();
 
@@ -275,7 +287,7 @@ public class DataTool2Bib extends BibGlsConverter
 
          if (autoLabel)
          {
-            rowLabel = "entry" + row.getRowIndex();
+            rowLabel = labelPrefix + (++autoLabelIdx);
          }
          else
          {
@@ -311,47 +323,50 @@ public class DataTool2Bib extends BibGlsConverter
 
                out.format("  %s = {%s}", field, strVal);
 
-               if (content instanceof DataNumericElement)
+               if (dataValueSuffix != null || dataCurrencySuffix != null)
                {
-                  DataNumericElement dataNum = (DataNumericElement)content;
+                  DataElement element = datatoolSty.getElement(content);
+                  DatumType datumType = element.getDatumType();
 
-                  DatumType datumType = dataNum.getDatumType();
-
-                  if (dataValueSuffix != null)
+                  if (datumType.isNumeric())
                   {
-                     String numVal;
+                     DataNumericElement dataNum = (DataNumericElement)content;
 
-                     if (datumType == DatumType.INTEGER)
+                     if (dataValueSuffix != null)
                      {
-                        numVal = "" + dataNum.intValue();
+                        String numVal;
+
+                        if (datumType == DatumType.INTEGER)
+                        {
+                           numVal = "" + dataNum.intValue();
+                        }
+                        else
+                        {
+                           numVal = "" + dataNum.doubleValue();
+                        }
+
+                        if (!numVal.equals(strVal))
+                        {
+                           out.println(",");
+
+                           out.format("  %s%s = {%s}", field,
+                             dataValueSuffix, numVal);
+                        }
                      }
-                     else
+
+                     if (datumType == DatumType.CURRENCY
+                          && dataCurrencySuffix != null)
                      {
-                        numVal = "" + dataNum.doubleValue();
-                     }
+                        TeXObject sym = dataNum.getCurrencySymbol();
 
-                     if (!numVal.equals(strVal))
-                     {
-                        out.println(",");
+                        if (sym != null)
+                        {
+                           out.println(",");
 
-                        out.format("  %s%s = {%s}", field,
-                          dataValueSuffix, numVal);
-                     }
-                  }
-
-
-                  if (datumType == DatumType.CURRENCY
-                       && dataCurrencySuffix != null)
-                  {
-                     TeXObject sym = dataNum.getCurrencySymbol();
-
-                     if (sym != null)
-                     {
-                        out.println(",");
-
-                        out.format("  %s%s = {%s}", field,
-                          dataCurrencySuffix,
-                          sym.toString(parser));
+                           out.format("  %s%s = {%s}", field,
+                             dataCurrencySuffix,
+                             sym.toString(parser));
+                        }
                      }
                   }
                }
@@ -375,6 +390,7 @@ public class DataTool2Bib extends BibGlsConverter
       if (arg.equals("--key-map") || arg.equals("-m")
         || arg.equals("--label") || arg.equals("-L")
         || arg.equals("--read") || arg.equals("-r")
+        || arg.equals("--auto-label-prefix")
          )
       {
          return 1;
@@ -411,6 +427,24 @@ public class DataTool2Bib extends BibGlsConverter
       else if (arg.equals("--no-auto-label"))
       {
          autoLabel = false;
+         autoLabelPrefix = null;
+      }
+      else if (isArg(deque, arg, "--auto-label-prefix", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         autoLabel = true;
+         autoLabelPrefix = returnVals[0].toString().trim();
+
+         if (autoLabelPrefix.isEmpty())
+         {
+            autoLabelPrefix = null;
+         }
       }
       else if (isArg(deque, arg, "-r", "--read", returnVals))
       {
@@ -529,8 +563,12 @@ public class DataTool2Bib extends BibGlsConverter
 
    private String labelColumn="Label";
    private boolean autoLabel = false;
+   private String autoLabelPrefix = null;
    private String readOpts = null;
+   private int autoLabelIdx = 0;
 
    private String dataValueSuffix = null;
    private String dataCurrencySuffix = null;
+
+   private DataToolSty datatoolSty;
 }
