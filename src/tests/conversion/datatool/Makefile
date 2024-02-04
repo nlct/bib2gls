@@ -25,3 +25,6 @@ test-literal.bib	: test-literal.csv $(DEPS)
 
 test-multi.bib	: test-datatool-v3.tex $(DEPS)
 		$(DATATOOL2BIB) --save-datum --auto-label test-datatool-v3.tex test-multi.bib
+
+test-split.bib	: test-datatool-v3.tex $(DEPS)
+		$(DATATOOL2BIB) --split --save-datum --auto-label test-datatool-v3.tex test-split.bib

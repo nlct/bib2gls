@@ -529,6 +529,14 @@ public class DataTool2Bib extends BibGlsConverter
             keyToFieldMap.put(map[0], map[1]);
          }
       }
+      else if (arg.equals("--split"))
+      {
+         split = true;
+      }
+      else if (arg.equals("--no-split"))
+      {
+         split = false;
+      }
       else
       {
          return super.parseArg(deque, arg, returnVals);
