@@ -354,14 +354,11 @@ public class DataTool2Bib extends BibGlsConverter
       if ( arg.equals("--label") || arg.equals("-L")
         || arg.equals("--read") || arg.equals("-r")
         || arg.equals("--auto-label-prefix")
+        || arg.equals("--save-value")
+        || arg.equals("--save-currency")
          )
       {
          return 1;
-      }
-      else if (arg.equals("--save-value")
-        || arg.equals("--save-currency"))
-      {
-         return -1;
       }
 
       return super.argCount(arg);
@@ -438,12 +435,12 @@ public class DataTool2Bib extends BibGlsConverter
       {
          if (returnVals[0] == null)
          {
-            dataValueSuffix = "-value";
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
          }
-         else
-         {
-            dataValueSuffix = returnVals[0].toString();
-         }
+
+         dataValueSuffix = returnVals[0].toString();
       }
       else if (arg.equals("--no-save-value"))
       {
@@ -453,12 +450,12 @@ public class DataTool2Bib extends BibGlsConverter
       {
          if (returnVals[0] == null)
          {
-            dataCurrencySuffix = "-currency";
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
          }
-         else
-         {
-            dataCurrencySuffix = returnVals[0].toString();
-         }
+
+         dataCurrencySuffix = returnVals[0].toString();
       }
       else if (arg.equals("--no-save-currency"))
       {
