@@ -86,17 +86,68 @@ public class NewGlossaryEntry extends ControlSequence
       while (it.hasNext())
       {
          String field = it.next();
-
-         if ((gls2bib.ignoreSort() && field.equals("sort"))
-            || gls2bib.isCustomIgnoreField(field))
-         {
-            gls2bib.debug(gls2bib.getMessage("message.ignore.field", field, label));
-            continue;
-         }
+         String bibfield = gls2bib.getFieldName(field);
 
          TeXObject object = valuesArg.getValue(field);
 
-         if (field.equals("see") && (object instanceof TeXObjectList))
+         if (field.equals("type"))
+         {
+            // Ignore type=\glsdefaulttype
+
+            ControlSequence cs = null;
+
+            if (object instanceof TeXObjectList)
+            {
+               TeXObjectList list = (TeXObjectList)object;
+               list.trim();
+
+               // Ignore if type is \glsdefaulttype
+
+               if (list.size() == 1)
+               {
+                  TeXObject elem = list.firstElement();
+
+                  if (elem instanceof ControlSequence)
+                  {
+                     cs = (ControlSequence)elem;
+                  }
+               }
+            }
+            else if (object instanceof ControlSequence)
+            {
+               cs = (ControlSequence)object;
+            }
+
+            if (cs != null && cs.getName().equals("glsdefaulttype"))
+            {
+               bibfield = null;
+            }
+            else if (gls2bib.isSplitTypeOn())
+            {
+               glosType = parser.expandToString(object, parser);
+
+               if (!glosType.isEmpty())
+               {
+                  data.setGlossaryType(glosType);
+               }
+            }
+         }
+         else if (field.equals("category"))
+         {
+            if (gls2bib.isSplitCategoryOn())
+            {
+               category = parser.expandToString(object, parser);
+
+               if (!category.isEmpty())
+               {
+                  data.setCategory(category);
+               }
+            }
+         }
+         else if (bibfield == null)
+         {// skip remaining tests
+         }
+         else if (field.equals("see") && (object instanceof TeXObjectList))
          {
             // convert see=[\seealsoname] or see=[\alsoname] to seealso=
 
@@ -165,17 +216,15 @@ public class NewGlossaryEntry extends ControlSequence
             }
          }
 
+         if (bibfield == null)
+         {
+            gls2bib.debug(gls2bib.getMessage("message.ignore.field", field, label));
+            continue;
+         }
+
          if (gls2bib.fieldExpansionOn(field))
          {
-            if (object instanceof Expandable)
-            {
-               TeXObjectList expanded = ((Expandable)object).expandfully(parser);
-
-               if (expanded != null)
-               {
-                  object = expanded;
-               }
-            }
+            object = TeXParserUtils.expandFully(object, parser, parser);
          }
 
          if ((field.equals("see") || field.equals("seealso")
@@ -213,123 +262,6 @@ public class NewGlossaryEntry extends ControlSequence
             }
 
             object = newVal;
-         }
-         else if (field.equals("type"))
-         {
-            // Ignore type=\glsdefaulttype
-
-            if (object instanceof TeXObjectList)
-            {
-               TeXObjectList list = (TeXObjectList)object;
-
-               if (list.peekStack() == null)
-               {
-                  // This shouldn't happen as it suggests type={}
-                  // which is invalid. Ignore this field.
-
-                  gls2bib.debug(gls2bib.getMessage("message.ignore.field",
-                       field, label));
-
-                  continue;
-               }
-
-               // using popArg here to skip any leading ignoreables
-               // (such as comments or ignored spaces)
-
-               TeXObject val = list.popArg(parser);
-
-               if (val instanceof ControlSequence
-                   && ((ControlSequence)val).getName().equals("glsdefaulttype"))
-               {
-                  if (list.peekStack() == null)
-                  {
-                     // ignore this field
-
-                     gls2bib.debug(gls2bib.getMessage("message.ignore.field",
-                       field, label));
-
-                     continue;
-                  }
-
-                  // if we get here, then something follows
-                  // \glsdefaulttype which is a bit odd, but retain
-                  // the field.
-               }
-
-               // value isn't \glsdefaulttype so push it back
-
-               list.push(val);
-            }
-            else if (object instanceof ControlSequence
-              && ((ControlSequence)object).getName().equals("glsdefaulttype"))
-            {
-               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
-                  field, label));
-
-               continue;
-            }
-
-            if (gls2bib.isSplitTypeOn())
-            {
-               TeXObject obj = object;
-
-               if (obj instanceof Expandable)
-               {
-                  TeXObjectList expanded = ((Expandable)obj).expandfully(parser);
-
-                  if (expanded != null)
-                  {
-                     obj = expanded;
-                  }
-               }
-
-               glosType = obj.toString(parser);
-
-               if (!glosType.isEmpty())
-               {
-                  data.setGlossaryType(glosType);
-               }
-            }
-
-            if (gls2bib.ignoreType())
-            {
-               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
-                  field, label));
-
-               continue;
-            }
-         }
-         else if (field.equals("category"))
-         {
-            if (gls2bib.isSplitCategoryOn())
-            {
-               TeXObject obj = object;
-
-               if (obj instanceof Expandable)
-               {
-                  TeXObjectList expanded = ((Expandable)obj).expandfully(parser);
-
-                  if (expanded != null)
-                  {
-                     obj = expanded;
-                  }
-               }
-
-               category = obj.toString(parser);
-
-               if (!category.isEmpty())
-               {
-                  data.setCategory(category);
-               }
-            }
-
-            if (gls2bib.ignoreCategory())
-            {
-               gls2bib.debug(gls2bib.getMessage("message.ignore.field",
-                  field, label));
-
-               continue;
-            }
          }
          else if (checkDesc && field.equals("description"))
          {
@@ -390,7 +322,7 @@ public class NewGlossaryEntry extends ControlSequence
 
             if (val.isEmpty() || val.equals("true"))
             {
-               data.putField(field, "true");
+               data.putField(bibfield, "true");
             }
             else
             {
@@ -400,11 +332,11 @@ public class NewGlossaryEntry extends ControlSequence
          }
          else if ((object instanceof Group) && !(object instanceof MathGroup))
          {
-            data.putField(field, object.toString(parser));
+            data.putField(bibfield, object.toString(parser));
          }
          else
          {
-            data.putField(field, 
+            data.putField(bibfield, 
                String.format("{%s}", object.toString(parser)));
          }
       }

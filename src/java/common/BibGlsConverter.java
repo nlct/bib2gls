@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Locale;
 import java.util.ArrayDeque;
 import java.util.Vector;
+import java.util.HashMap;
 import java.text.MessageFormat;
 import java.text.BreakIterator;
 import java.io.*;
@@ -151,12 +152,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    {
       if (arg.equals("--texenc")
        || arg.equals("--bibenc")
-       || arg.equals("--space-sub")
-       || arg.equals("-s")
-       || arg.equals("--ignore-fields")
-       || arg.equals("-f")
-       || arg.equals("--log-file")
-       || arg.equals("-t")
+       || arg.equals("--space-sub") || arg.equals("-s")
+       || arg.equals("--ignore-fields") || arg.equals("-f")
+       || arg.equals("--log-file") || arg.equals("-t")
+       || arg.equals("--key-map") || arg.equals("-m")
        )
       {
          return 1;
@@ -238,6 +237,34 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          else
          {
             addCustomIgnoreField(returnVals[0].listValue());
+         }
+      }
+      else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
+      {     
+         if (returnVals[0] == null)
+         {  
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         if (keyToFieldMap == null)
+         {
+            keyToFieldMap = new HashMap<String,String>();
+         }
+
+         for (String s : returnVals[0].listValue())
+         {
+            String[] map = s.split(" *= *");
+
+            if (map.length != 2)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("datatool2bib.syntax.invalid_map",
+                  s, arg));
+            }
+
+            keyToFieldMap.put(map[0], map[1]);
          }
       }
       else if (arg.equals("--preamble-only") || arg.equals("-p"))
@@ -343,15 +370,36 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          return false;
       }
 
-      for (String f : customIgnoreFields)
+      return customIgnoreFields.contains(field);
+   }
+
+   /**
+    * Gets the bib field name from the input source label.
+    * This will first apply any mapping and then convert to
+    * lowercase. Returns null if this field should be omitted.
+    */ 
+   public String getFieldName(String originalLabel)
+   {
+      String field = originalLabel;
+
+      if (isCustomIgnoreField(originalLabel))
       {
-         if (f.equals(field))
+         field = null;
+      }
+      else
+      {
+         if (keyToFieldMap != null)
          {
-            return true;
+            String val = keyToFieldMap.get(originalLabel);
+
+            if (val != null)
+            {
+               field = val;
+            }
          }
       }
-
-      return false;
+   
+      return field == null ? null : processLabel(field.toLowerCase());
    }
 
    protected void localeHelp()
@@ -486,6 +534,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    protected String spaceSub = null;
 
    protected Vector<String> customIgnoreFields = null;
+   protected HashMap<String,String> keyToFieldMap = null;
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;

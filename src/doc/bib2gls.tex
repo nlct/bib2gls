@@ -1135,7 +1135,13 @@ Library}}
 
 \newcommand*{\entryref}[1]{\glslink[format=glsignore]{entry.#1}{\entryfmt{#1}}}
 
+\newcommand{\commonarg}[2][\subsection]{\argsection[#1]{common.#2}}
+
+\newcommand{\converterarg}[2][\subsection]{\argsection[#1]{converter.#2}}
+
 \newcommand{\convertglsbibarg}[2][\subsection]{\argsection[#1]{gls2bib.#2}}
+
+\newcommand{\datatoolbibarg}[2][\subsection]{\argsection[#1]{datatool2bib.#2}}
 
 \newcommand{\argsection}[2][\subsection]{%
  \def\switcharg{}%
@@ -1170,6 +1176,18 @@ Library}}
 \newcommand*{\longarg}[1]{%
   \texorpdfstring
   {\gls{switch.#1}}%
+  {\string-\string-#1}%
+}
+
+\newcommand*{\commonlongarg}[1]{%
+  \texorpdfstring
+  {\gls{switch.common.#1}}%
+  {\string-\string-#1}%
+}
+
+\newcommand*{\converterlongarg}[1]{%
+  \texorpdfstring
+  {\gls{switch.converter.#1}}%
   {\string-\string-#1}%
 }
 
@@ -3248,38 +3266,38 @@ Available options are listed below.
 These command line switches are common to \bibgls\ and the
 supplementary command line conversion tools
 
-\argsection{help}
+\commonargsection{help}
 
 Display the help message and quit.
 
-\argsection{version}
+\commonargsection{version}
 
 Display the version information and quit. As from v2.5, this now
 includes the version number of the \file{texparserlib.jar} library.
 
-\argsection{verbose}
+\commonargsection{verbose}
 
 Switches on the verbose mode. This writes extra information to the
 terminal and transcript file.
 
-\argsection{no-verbose}
+\commonargsection{no-verbose}
 
 Switches off the verbose mode. This is the default behaviour.
 Some messages are written to the terminal. To completely suppress
 all messages (except errors), switch on the silent mode.
 For additional information messages, switch on the verbose mode.
 
-\argsection{quiet}
+\commonargsection{quiet}
 
 Suppresses all messages except for errors that would normally be
 written to the terminal. Warnings and informational messages are
 written to the transcript file, which can be inspected afterwards.
 
-\argsection{silent}
+\commonargsection{silent}
 
 Synonym of \longarg{quiet}.
 
-\argsection{locale}
+\commonargsection{locale}
 
 Specify the preferred \langxml, where \meta{lang} is a valid \idx{IETF} language tag.
 This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
@@ -3297,7 +3315,7 @@ the \csopt{locale} resource option, to specify the default
 \gls{resource-locale}, or set the locale for individual options,
 such as \csopt{sort}.
 
-\argsection{debug}
+\commonargsection{debug}
 
 Sometimes when things go wrong it can be hard to diagnose the problem
 from the normal messages. If you report an issue, you may be asked
@@ -3308,7 +3326,7 @@ The \longargfmt{debug} option can be used to switch on debugging mode.
 If \meta{n} is present, it must be a non-negative integer indicating
 the debugging mode. If omitted, 1 is assumed. This option also
 switches on the verbose mode. A value of 0 is equivalent to
-\longargfmt{no-debug}.
+\commonlongargfmt{no-debug}.
 
 The value of \meta{n} determines how much extra information is
 provided. If \meta{n} is greater than 0 then all \bibgls\ debugging
@@ -3327,12 +3345,14 @@ setting. An error message will start with \qt{Error:~} and a warning
 message will start with \qt{Warning:~}. Unknown commands will throw
 an exception with a stack trace in debug mode.
 
-\argsection{debug-mode}
+\commonargsection{debug-mode}
 
 This option is an alternative to \longargfmt{debug} where the value
-of \meta{n} needs to be calculated. The \meta{setting} is
-required and should be a comma-separated list of any of the
-following keywords.
+of \meta{n} needs to be calculated. Debugging mode requires a
+transcript file, which is automatically created with \bibgls, but is
+optional for the converter tools (see \sectionref{sec:tex2bib}). The
+\meta{setting} is required and should be a comma-separated list of
+any of the following keywords.
 
 \begin{itemize}
 \item\optfmt{all}: enable all debugging information
@@ -3375,6 +3395,8 @@ list detail (may result in a large transcript file).
 \item\optfmt{read}: \texparserlib\ file codepoint read
 (likely to result in a very large transcript file).
 
+\item\optfmt{settings}: \texparserlib\ settings information.
+
 \item\optfmt{sty-data}: data associated with packages used to store
 information that may not exactly correspond to the way the
 information is stored in \LaTeX. In the case of \bibgls, this will
@@ -3387,7 +3409,7 @@ For example:
 bib2gls \longargfmt{debug-mode} catcode,sty-data \meta{filename}
 \end{alltt}
 
-\argsection{no-debug}
+\commonargsection{no-debug}
 
 Switches off the debugging mode. Equivalent to \longarg{debug}~0.
 
@@ -22753,7 +22775,7 @@ but will expand to empty if the associated resource option hasn't
 been set.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
-\label{sec:tex}
+\label{sec:tex2bib}
 \setsecdepth{2}
 
 There are some supplementary command line tools provided with
@@ -22774,21 +22796,29 @@ listed in \sectionref{sec:shared2bibswitches}, but they may also
 have their specific switches which are described in the revelant
 section.
 
+\begin{information}
+The \ext{bib} format has case-insensitive field names. However, the
+source files input by the converter tool typically have
+case-sensitive labels that correspond to the destination \ext{bib}
+field. The converter tools will convert the fields to
+\idx{lowercase} after any mappings have been applied.
+\end{information}
+
 \section{Shared Conversion Tool Switches}
 \label{sec:shared2bibswitches}
 
-\convertglsbibarg{texenc}
+\converterarg{texenc}
 
 The character \igls{encoding} of the source \ext{tex} file. If omitted, the
 operating system's default \gls{encoding} is assumed (or the
 \idx{JVM}['s]).
 
-\convertglsbibarg{bibenc}
+\converterarg{bibenc}
 
 The character \igls{encoding} of the \ext{bib} file. If omitted, the same
 \gls{encoding} as the \ext{tex} file is assumed.
 
-\convertglsbibarg{space-sub}
+\converterarg{space-sub}
 
 The \ext{bib} format doesn't allow spaces in labels. If your original
 definitions in your \ext{tex} file have spaces, use this option to
@@ -22809,6 +22839,37 @@ Note that all forbidden punctuation characters
 (such as commas, equal signs and braces) will be automatically stripped.
 \end{information}
 
+\converterarg{preamble-only}
+
+Stop parsing if the start of the \env{document} environment is found.
+
+\converterarg{no-preamble-only}
+
+Parse the entire file (default). Be prepared for a lot of
+unknown command warnings if you make conversion tool parse an
+entire document.
+
+\converterarg{overwrite}
+
+Allow existing \ext{bib} files to be overwritten. (Default unless
+otherwise specified.)
+
+\converterarg{no-overwrite}
+
+Don't allow existing \ext{bib} files to be overwritten.
+
+\converterarg{ignore-fields}
+
+Omit all the fields listed in \meta{list} from the \ext{bib} file.
+This option is not cumulative. 
+
+\converterarg{log-file}
+
+The log file is optional for the converter applications. It's
+provided for use with the \texparserlib\ debugging modes 
+(\commonlongarg{debug-mode}) which writes
+logging information to this file (which can be sizable).
+
 \section{\glsfmttext{idx.convertgls2bib}: Conversion from \styfmt{glossaries} or
 \styfmt{glossaries-extra}}
 \label{sec:gls2bib}
@@ -22826,7 +22887,7 @@ the \ext{bib} file. This application is less secure than \bibgls\ as
 it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
 \texmfcnf{openoutany}. Take care not to accidentally overwrite
 existing \ext{bib} files as there's no check to determine if
-\meta{bib file} already exists with the default \convertglsbiblongarg{overwrite}. 
+\meta{bib file} already exists with the default \converterlongarg{overwrite}. 
 
 If the \ext{bib} extension is missing from \meta{bib file}, it will
 be added. The extension is required for \meta{tex file}.
@@ -22835,13 +22896,18 @@ be added. The extension is required for \meta{tex file}.
 
 The \meta{options} specific to \idx{convertgls2bib} are described below.
 This is in addition to those described in \sectionref{sec:switches}
-and \sectionref{sec:shared2bibswitches}.
+and \sectionref{sec:shared2bibswitches}. Note that
+\convertglsbiblongarg{split-on-type} overrides the default
+\converterlongarg{overwrite} setting.
 
 \convertglsbibarg{ignore-sort}
 
 Omit the \field{sort} field.  This is the default since \bibgls\ can
 work out a more intuitive sort value than either \idx!{makeindex} or
 \idx!{xindy}.
+This option is automatically set if the \field{sort} field is
+included in \converterbiblongarg{ignore-fields} (but it won't be
+switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-sort}
 
@@ -22852,6 +22918,9 @@ Don't ignore the \field{sort} field.
 Omit the \field{type} field in the \ext{bib} file.  You may find it
 more flexible not to be locked into a specific glossary type if you
 have a large database of entries.
+This option is automatically set if the \field{type} field is
+included in \converterbiblongarg{ignore-fields} (but it won't be
+switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-type}
 
@@ -22896,6 +22965,9 @@ Don't split the entries into separate files according to their type
 \convertglsbibarg{ignore-category}
 
 Omit the \field{category} field in the \ext{bib} file.
+This option is automatically set if the \field{category} field is
+included in \converterbiblongarg{ignore-fields} (but it won't be
+switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-category}
 
@@ -22944,47 +23016,6 @@ This option automatically implements \convertglsbiblongarg{ignore-category} and
 Don't split the entries into separate files according to their
 category (default).
 
-\convertglsbibarg{ignore-fields}
-
-Omit all the fields listed in \meta{list} from the \ext{bib} file.
-If \field{sort}, \field{type} or \field{category} are included
-in the list, this will automatically implement the corresponding
-\convertglsbiblongarg{ignore-sort},
-\convertglsbiblongarg{ignore-type} or
-\convertglsbiblongarg{ignore-category} option.
-
-This option is not cumulative. If the list is empty it will unset
-any previous list but won't unset any 
-\convertglsbiblongarg{ignore-sort},
-\convertglsbiblongarg{ignore-type} or
-\convertglsbiblongarg{ignore-category} option.
-
-For example:
-\begin{alltt}
-convertgls2bib \longargfmt{ignore-fields} 'user1,sort' entries.bib
-\end{alltt}
-is equivalent to:
-\begin{alltt}
-convertgls2bib \longargfmt{ignore-fields} user1 \longargfmt{ignore-sort entries.bib}
-\end{alltt}
-and
-\begin{alltt}
-convertgls2bib \longargfmt{ignore-fields} 'user1,sort' \longargfmt{ignore-fields} '' entries.bib
-\end{alltt}
-is equivalent to:
-\begin{alltt}
-convertgls2bib \longargfmt{ignore-sort} entries.bib
-\end{alltt}
-
-\convertglsbibarg{preamble-only}
-
-Stop parsing if the start of the \env{document} environment is found.
-
-\convertglsbibarg{no-preamble-only}
-
-Parse the entire file (default). Be prepared for a lot of
-unknown command warnings if you make \idx{convertgls2bib} parse an
-entire document.
 
 \convertglsbibarg{absorb-see}
 
@@ -23008,42 +23039,6 @@ be converted to \atentry{entry}, such as those defined with
 \convertglsbibarg{no-index-conversion}
 
 Don't convert \atentry{entry} to \atentry{index} (default).
-
-\convertglsbibarg{locale}
-
-Identifies the \langxml\ to use for \idx{convertgls2bib}['s]
-messages.
-
-\convertglsbibarg{overwrite}
-
-Allow existing \ext{bib} files to be overwritten. (Default unless
-\convertglsbiblongarg{split-on-type}.)
-
-\convertglsbibarg{no-overwrite}
-
-Don't allow existing \ext{bib} files to be overwritten. (Default if
-\convertglsbiblongarg{split-on-type}.)
-
-\convertglsbibarg{silent}
-
-Suppress all messages except for errors.
-
-\convertglsbibarg{verbose}
-
-Display messages and warnings (default).
-
-\convertglsbibarg{debug}
-
-Display debugging messages (stack traces and other information in
-addition to \convertglsbiblongarg{verbose}).
-
-\convertglsbibarg{help}
-
-Display help message and quit.
-
-\convertglsbibarg{version}
-
-Display version information and quit.
 
 \section{Recognised Commands}
 
@@ -23381,6 +23376,55 @@ contain:
 }
 \end{codeenv}
 
+\section{\glsfmttext{idx.datatool2bib}: Conversion from
+\styfmt{datatool}}
+\label{sec:datatool2bib}
+
+A \sty{datatool} database can be converted to a \ext{bib} file
+with the supplementary tool \idx{datatool2bib}. The syntax is:
+\begin{alltt}
+datatool2bib \oargm{options} \meta{tex file} \meta{bib file}
+\end{alltt}
+where \meta{tex file} is the \ext{tex} file and \meta{bib file} is
+the \ext{bib} file. This application is less secure than \bibgls\ as
+it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and 
+\texmfcnf{openoutany}. Take care not to accidentally overwrite
+existing \ext{bib} files as there's no check to determine if
+\meta{bib file} already exists with the default \converterlongarg{overwrite}. 
+
+\section{Command Line Arguments}
+
+The \meta{options} specific to \idx{datatool2bib} are described below.
+This is in addition to those described in \sectionref{sec:switches}
+and \sectionref{sec:shared2bibswitches}.
+
+\datatoolbibarg{label}
+
+\datatoolbibarg{auto-label}
+
+\datatoolbibarg{no-auto-label}
+
+\datatoolbibarg{auto-label-prefix}
+
+\datatoolbibarg{read}
+
+\datatoolbibarg{save-datum}
+
+\datatoolbibarg{no-save-datum}
+
+\datatoolbibarg{save-value}
+
+\datatoolbibarg{no-save-value}
+
+\datatoolbibarg{save-currency}
+
+\datatoolbibarg{no-save-currency}
+
+\datatoolbibarg{split}
+
+\datatoolbibarg{no-split}
+
+% TODO
 \chapter{Examples}
 \label{sec:examples}
 \setsecdepth*{0}

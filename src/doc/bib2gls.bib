@@ -5037,6 +5037,12 @@ and \L/\l\ treated as L/l},
   parent={applications}
 }
 
+@application{datatool2bib,
+  name={\appfmt{data\-tool2bib}},
+  category={application},
+  parent={applications}
+}
+
 @index{packages,
    name={packages},
    text={package}
@@ -10178,16 +10184,26 @@ primary formats, if enabled.},
   name={switches},
   text={switch},
   plural={switches},
-  see={commandlineoptions,commandlineoptionsgls2bib}
+  see={commandlineoptions,commandlineoptionsconverter,commandlineoptionsgls2bib,commandlineoptionsdatatool2bib}
 }
 
 @index{--switch,
   name={\longargfmt{\meta{switch}}},
-  see={commandlineoptions,commandlineoptionsgls2bib}
+  see={commandlineoptions,commandlineoptionsconverter,commandlineoptionsgls2bib,commandlineoptionsdatatool2bib}
 }
 
 @index{commandlineoptions,
   name={command line options (\appfmt{bib2gls})},
+  text={command line option}
+}
+
+@index{commandlineoptionscommon,
+  name={command line options (common)},
+  text={command line option}
+}
+
+@index{commandlineoptionsconverter,
+  name={command line options (conversion tools)},
   text={command line option}
 }
 
@@ -10196,80 +10212,85 @@ primary formats, if enabled.},
   text={command line option}
 }
 
-@switch{switch.help,
+@index{commandlineoptionsdatatool2bib,
+  name={command line options (\appfmt{datatool2bib})},
+  text={command line option}
+}
+
+@switch{switch.common.help,
   name={\longargfmt{help}},
   symbol={\shortargfmt{h}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.version,
+@switch{switch.common.version,
   name={\longargfmt{version}},
   symbol={\shortargfmt{v}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.debug,
+@switch{switch.common.debug,
   name={\longargfmt{debug}},
   user1={\oargm{n}},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.debug-mode,
+@switch{switch.common.debug-mode,
   name={\longargfmt{debug\dhyphen mode}},
   user1={\meta{setting}},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.no-debug,
+@switch{switch.common.no-debug,
   name={\longargfmt{no\dhyphen debug}},
   symbol={\longargfmt{nodebug}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.verbose,
+@switch{switch.common.verbose,
   name={\longargfmt{verbose}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.no-verbose,
+@switch{switch.common.no-verbose,
   name={\longargfmt{no\dhyphen verbose}},
   symbol={\longargfmt{noverbose}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.silent,
+@switch{switch.common.silent,
   name={\longargfmt{silent}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.quiet,
+@switch{switch.common.quiet,
   name={\longargfmt{quiet}},
   symbol={\shortargfmt{q}},
   user1={},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
-@switch{switch.locale,
+@switch{switch.common.locale,
   name={\longargfmt{locale}},
   symbol={\shortargfmt{l}},
   user1={\meta{lang}},
   category={switch},
-  parent={commandlineoptions}
+  parent={commandlineoptionscommon}
 }
 
 @switch{switch.log-file,
@@ -10278,6 +10299,14 @@ primary formats, if enabled.},
   user1={\meta{filename}},
   category={switch},
   parent={commandlineoptions}
+}
+
+@switch{switch.converter.log-file,
+  name={\longargfmt{log\dhyphen file}},
+  symbol={\shortargfmt{t}},
+  user1={\meta{filename}},
+  category={switch},
+  parent={commandlineoptionsconverter}
 }
 
 @switch{switch.dir,
@@ -10695,55 +10724,55 @@ primary formats, if enabled.},
   parent={commandlineoptions}
 }
 
-@switch{switch.gls2bib.help,
-  name={\longargfmt{help}},
-  symbol={\shortargfmt{h}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.version,
-  name={\longargfmt{version}},
-  symbol={\shortargfmt{v}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.debug,
-  name={\longargfmt{debug}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.silent,
-  name={\longargfmt{silent}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.verbose,
-  name={\longargfmt{verbose}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.texenc,
+@switch{switch.converter.texenc,
   name={\longargfmt{texenc}},
   user1={\meta{encoding}},
   category={switch},
-  parent={commandlineoptionsgls2bib}
+  parent={commandlineoptionsconverter}
 }
 
-@switch{switch.gls2bib.bibenc,
+@switch{switch.converter.bibenc,
   name={\longargfmt{bibenc}},
   user1={\meta{encoding}},
   category={switch},
-  parent={commandlineoptionsgls2bib}
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.overwrite,
+  name={\longargfmt{overwrite}},
+  user1={},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.no-overwrite,
+  name={\longargfmt{no\dhyphen overwrite}},
+  user1={},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.preamble-only,
+  name={\longargfmt{preamble\dhyphen only}},
+  symbol={\shortargfmt{p}},
+  user1={},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.no-preamble-only,
+  name={\longargfmt{no\dhyphen preamble\dhyphen only}},
+  user1={},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.space-sub,
+  name={\longargfmt{space\dhyphen sub}},
+  symbol={\shortargfmt{s}},
+  user1={\meta{replacement}},
+  category={switch},
+  parent={commandlineoptionsconverter}
 }
 
 @switch{switch.gls2bib.ignore-sort,
@@ -10803,12 +10832,12 @@ primary formats, if enabled.},
   parent={commandlineoptionsgls2bib}
 }
 
-@switch{switch.gls2bib.ignore-fields,
+@switch{switch.converter.ignore-fields,
   name={\longargfmt{ignore\dhyphen fields}},
   symbol={\shortargfmt{f}},
   user1={\meta{list}},
   category={switch},
-  parent={commandlineoptionsgls2bib}
+  parent={commandlineoptionsconverter}
 }
 
 @switch{switch.gls2bib.split-on-category,
@@ -10822,50 +10851,6 @@ primary formats, if enabled.},
 @switch{switch.gls2bib.no-split-on-category,
   name={\longargfmt{no\dhyphen split\dhyphen on\dhyphen category}},
   user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.overwrite,
-  name={\longargfmt{overwrite}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.no-overwrite,
-  name={\longargfmt{no\dhyphen overwrite}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.preamble-only,
-  name={\longargfmt{preamble\dhyphen only}},
-  symbol={\shortargfmt{p}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.no-preamble-only,
-  name={\longargfmt{no\dhyphen preamble\dhyphen only}},
-  user1={},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.space-sub,
-  name={\longargfmt{space\dhyphen sub}},
-  symbol={\shortargfmt{s}},
-  user1={\meta{replacement}},
-  category={switch},
-  parent={commandlineoptionsgls2bib}
-}
-
-@switch{switch.gls2bib.locale,
-  name={\longargfmt{locale}},
-  user1={\meta{language tag}},
   category={switch},
   parent={commandlineoptionsgls2bib}
 }
@@ -10893,6 +10878,93 @@ primary formats, if enabled.},
   name={\longargfmt{no\dhyphen absorb\dhyphen see}},
   category={switch},
   parent={commandlineoptionsgls2bib}
+}
+
+@switch{switch.datatool2bib.label,
+  name={\longargfmt{label}},
+  symbol={\shortargfmt{L}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.auto-label,
+  name={\longargfmt{auto\dhyphen label}},
+  symbol={\shortargfmt{a}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-auto-label,
+  name={\longargfmt{no\dhyphen auto\dhyphen label}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.auto-label-prefix,
+  name={\longargfmt{auto\dhyphen label\dhyphen prefix}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.read,
+  name={\longargfmt{read}},
+  symbol={\shortargfmt{r}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-read,
+  name={\longargfmt{no\dhyphen read}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.save-datum,
+  name={\longargfmt{save\dhyphen datum}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-save-datum,
+  name={\longargfmt{no\dhyphen save\dhyphen datum}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.save-value,
+  name={\longargfmt{save\dhyphen value}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-save-value,
+  name={\longargfmt{no\dhyphen save\dhyphen value}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.save-currency,
+  name={\longargfmt{save\dhyphen currency}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-save-currency,
+  name={\longargfmt{no\dhyphen save\dhyphen currency}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.split,
+  name={\longargfmt{split}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-split,
+  name={\longargfmt{no\dhyphen split}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
 }
 
 @index{lettergroup,
@@ -11292,6 +11364,10 @@ primary formats, if enabled.},
   name={\filefmt{convert\-gls2bib.sh}}
 }
 
+@file{file.datatool2bib.sh,
+  name={\filefmt{datatool2bib.sh}}
+}
+
 @file{file.texparserlib.jar,
   name={\filefmt{texparserlib.jar}}
 }
@@ -11302,6 +11378,10 @@ primary formats, if enabled.},
 
 @file{file.convertgls2bib.jar,
   name={\filefmt{convert\-gls2bib.jar}}
+}
+
+@file{file.datatool2bib.jar,
+  name={\filefmt{datatool2bib.jar}}
 }
 
 @file{file.bib2gls.bat,

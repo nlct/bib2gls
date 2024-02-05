@@ -226,20 +226,11 @@ public class DataTool2Bib extends BibGlsConverter
             labelColIdx = colIdx;
          }
 
-         if (!isCustomIgnoreField(label))
+         String field = getFieldName(label);
+
+         if (field != null)
          {
-            if (keyToFieldMap != null)
-            {
-               String map = keyToFieldMap.get(label);
-
-               if (map != null)
-               {
-                  label = map;
-               }
-            }
-
-            label = processLabel(label);
-            idxFieldMap.put(Integer.valueOf(colIdx), label);
+            idxFieldMap.put(Integer.valueOf(colIdx), field);
          }
       }
 
@@ -360,8 +351,7 @@ public class DataTool2Bib extends BibGlsConverter
    @Override
    protected int argCount(String arg)
    {
-      if (arg.equals("--key-map") || arg.equals("-m")
-        || arg.equals("--label") || arg.equals("-L")
+      if ( arg.equals("--label") || arg.equals("-L")
         || arg.equals("--read") || arg.equals("-r")
         || arg.equals("--auto-label-prefix")
          )
@@ -474,34 +464,6 @@ public class DataTool2Bib extends BibGlsConverter
       {
          dataCurrencySuffix = null;
       }
-      else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
-      {
-         if (returnVals[0] == null)
-         {
-            throw new Bib2GlsSyntaxException(
-               getMessage("common.missing.arg.value",
-               arg));
-         }
-
-         if (keyToFieldMap == null)
-         {
-            keyToFieldMap = new HashMap<String,String>();
-         }
-
-         for (String s : returnVals[0].listValue())
-         {
-            String[] map = s.split(" *= *");
-
-            if (map.length != 2)
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("datatool2bib.syntax.invalid_map",
-                  s, arg));
-            }
-
-            keyToFieldMap.put(map[0], map[1]);
-         }
-      }
       else if (arg.equals("--split"))
       {
          split = true;
@@ -537,8 +499,6 @@ public class DataTool2Bib extends BibGlsConverter
    }
 
    public static final String NAME = "datatool2bib";
-
-   private HashMap<String,String> keyToFieldMap;
 
    private boolean split = false;
 

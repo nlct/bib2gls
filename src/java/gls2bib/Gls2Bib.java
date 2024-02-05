@@ -106,6 +106,27 @@ public class Gls2Bib extends BibGlsConverter
       keyToFieldMap.put("shortpl", "shortplural");
    }
 
+   @Override
+   public String getFieldName(String originalLabel)
+   {
+      if (ignoreSortField && originalLabel.equals("sort"))
+      {
+         return null;
+      }
+
+      if (ignoreTypeField && originalLabel.equals("type"))
+      {
+         return null;
+      }
+
+      if (ignoreCategoryField && originalLabel.equals("category"))
+      {
+         return null;
+      }
+
+      return super.getFieldName(originalLabel);
+   }
+
    public boolean isAbsorbSeeOn()
    {
       return absorbSee;
