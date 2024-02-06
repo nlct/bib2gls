@@ -1,0 +1,15 @@
+% DTLTEX 2.0 utf8
+% Created by datatool 2024/01/27 v3.0 (NLCT) on February 5, 2024
+\DTLnewdb{mydata}%
+\DTLnewrow{mydata}%
+\DTLnewdbentry{mydata}{name}{Joe}%
+\DTLnewdbentry{mydata}{score}{23.4}%
+\DTLnewrow{mydata}%
+\DTLnewdbentry{mydata}{name}{Jane}%
+\DTLnewdbentry{mydata}{score}{32.5}%
+\DTLnewrow{mydata}%
+\DTLnewdbentry{mydata}{name}{Evelyn}%
+\DTLnewdbentry{mydata}{score}{45.0}%
+\DTLsetheader{mydata}{name}{Name}%
+\DTLsetheader{mydata}{score}{Score (\%)}%
+\def\dtllastloadeddb{mydata}%
