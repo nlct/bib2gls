@@ -180,7 +180,9 @@ public class DataTool2Bib extends BibGlsConverter
    {
       TeXObject content = entry.getContents();
 
-      return processLabel(parser.expandToString(content, null));
+      String label = parser.expandToString(content, null);
+
+      return processLabel(label);
    }
 
    protected void writeEntries(DataBase db, PrintWriter out)
@@ -215,6 +217,7 @@ public class DataTool2Bib extends BibGlsConverter
       HashMap<Integer,String> idxFieldMap = new HashMap<Integer,String>();
 
       int labelColIdx = 0;
+      int descFieldIdx = 0;
 
       for (DataToolHeader header : headers)
       {
@@ -231,6 +234,11 @@ public class DataTool2Bib extends BibGlsConverter
          if (field != null)
          {
             idxFieldMap.put(Integer.valueOf(colIdx), field);
+
+            if (isIndexConversionOn() && field.equals("description"))
+            {
+               descFieldIdx = colIdx;
+            }
          }
       }
 
@@ -244,7 +252,16 @@ public class DataTool2Bib extends BibGlsConverter
       for (DataToolEntryRow row : data)
       {
          out.println();
-         out.print("@entry{");
+
+         if (isIndexConversionOn()
+              && (descFieldIdx == 0 || row.getEntry(descFieldIdx) == null))
+         {
+            out.print("@index{");
+         }
+         else
+         {
+            out.print("@entry{");
+         }
 
          DataToolEntry entry;
          String rowLabel = "";
@@ -261,16 +278,14 @@ public class DataTool2Bib extends BibGlsConverter
             {
                rowLabel = processLabel(entry);
             }
+
+            if (rowLabel.isEmpty())
+            {
+               rowLabel = labelPrefix + (++autoLabelIdx);
+            }
          }
 
-         if (rowLabel.isEmpty())
-         {
-            out.format("entry" + row.getRowIndex());
-         }
-         else
-         {
-            out.print(rowLabel);
-         }
+         out.print(rowLabel);
 
          for (Integer idx : idxFieldMap.keySet())
          {

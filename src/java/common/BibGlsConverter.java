@@ -121,21 +121,25 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          int cp = label.codePointAt(i);
          i += Character.charCount(cp);
 
-         if (! (Character.isISOControl(cp)
-                || cp == ',' || cp == '=' || cp == '{' || cp == '}'
-                || cp == '$' || cp == '\\' || cp == '^' || cp == '_'
-                || cp == '%' || cp == '#' || cp == '&' || cp == '~'
-               )
-            )
-         {
-            builder.appendCodePoint(cp);
-         }
-         else if (Character.isWhitespace(cp))
+         if (Character.isWhitespace(cp))
          {
             if (spaceSub != null)
             {
                builder.append(spaceSub);
             }
+         }
+         else if (Character.isISOControl(cp)
+                || cp == ',' || cp == '=' || cp == '{' || cp == '}'
+                || cp == '$' || cp == '\\' || cp == '^' || cp == '_'
+                || cp == '%' || cp == '#' || cp == '&' || cp == '~'
+                || cp == '"' || cp == '`' || cp == '\''
+                || cp == '(' || cp == ')' || cp == '[' || cp == ']'
+            )
+         {// skip
+         }
+         else
+         {
+            builder.appendCodePoint(cp);
          }
       }
 
@@ -145,6 +149,11 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    protected boolean isIgnoredPackage(String styName)
    {
       return false;
+   }
+
+   public boolean isIndexConversionOn()
+   {
+      return noDescEntryToIndex;
    }
 
    @Override
@@ -274,6 +283,14 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       else if (arg.equals("--no-preamble-only"))
       {
          preambleOnly = false;
+      }
+      else if (arg.equals("--index-conversion") || arg.equals("-i"))
+      {
+         noDescEntryToIndex = true;
+      }
+      else if (arg.equals("--no-index-conversion"))
+      {
+         noDescEntryToIndex = false;
       }
       else if (isArg(deque, arg, "-t", "--log-file", returnVals))
       {
@@ -427,6 +444,8 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    {
       printSyntaxItem(getMessage("common.syntax.space-sub",
         "--space-sub", "-s"));
+      printSyntaxItem(getMessage("common.syntax.index-conversion",
+        "--[no-]index-conversion", "-i"));
    }
 
    protected void otherHelp()
@@ -530,6 +549,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected boolean overwriteFiles=true;
    protected boolean preambleOnly=false;
+   protected boolean noDescEntryToIndex=false;
 
    protected String spaceSub = null;
 

@@ -132,11 +132,6 @@ public class Gls2Bib extends BibGlsConverter
       return absorbSee;
    }
 
-   public boolean isIndexConversionOn()
-   {
-      return noDescEntryToIndex;
-   }
-
    public boolean ignoreSort()
    {
       return ignoreSortField;
@@ -511,6 +506,8 @@ public class Gls2Bib extends BibGlsConverter
    @Override
    protected void filterHelp()
    {
+      super.filterHelp();
+
       printSyntaxItem(getMessage("gls2bib.syntax.ignore-category",
         "--[no-]ignore-category"));
       printSyntaxItem(getMessage("gls2bib.syntax.ignore-type",
@@ -519,28 +516,24 @@ public class Gls2Bib extends BibGlsConverter
         "--[no-]ignore-sort"));
       printSyntaxItem(getMessage("gls2bib.syntax.ignore-fields",
         "--ignore-fields", "-f"));
-      printSyntaxItem(getMessage("common.syntax.preamble-only",
-        "--[no-]preamble-only", "-p"));
    }
 
    @Override
    protected void ioHelp()
    {
+      super.ioHelp();
+
       printSyntaxItem(getMessage("gls2bib.syntax.split-on-type",
         "--[no-]split-on-type", "-t"));
       printSyntaxItem(getMessage("gls2bib.syntax.split-on-category",
         "--[no-]split-on-category", "-c"));
-      printSyntaxItem(getMessage("common.syntax.overwrite",
-        "--[no-]overwrite"));
    }
 
    @Override
    protected void adjustHelp()
    {
-      printSyntaxItem(getMessage("common.syntax.space-sub",
-        "--space-sub", "-s"));
-      printSyntaxItem(getMessage("gls2bib.syntax.index-conversion",
-        "--[no-]index-conversion", "-i"));
+      super.adjustHelp();
+
       printSyntaxItem(getMessage("gls2bib.syntax.absorb-see",
         "--[no-]absorb-see"));
    }
@@ -599,14 +592,6 @@ public class Gls2Bib extends BibGlsConverter
       else if (arg.equals("--no-split-on-category"))
       {
          splitOnCategory = false;
-      }
-      else if (arg.equals("--index-conversion") || arg.equals("-i"))
-      {
-         noDescEntryToIndex = true;
-      }
-      else if (arg.equals("--no-index-conversion"))
-      {
-         noDescEntryToIndex = false;
       }
       else if (arg.equals("--absorb-see"))
       {
@@ -688,7 +673,6 @@ public class Gls2Bib extends BibGlsConverter
    private boolean splitOnType=false;
    private boolean ignoreCategoryField=false;
    private boolean splitOnCategory=false;
-   private boolean noDescEntryToIndex=false;
    private boolean absorbSee=true;
 
    private boolean expandFields = false;

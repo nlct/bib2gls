@@ -6,7 +6,7 @@ all	: test-action.bib test-datum-3.bib test-data-3.bib \
 	  test-multi.bib
 
 test-action.bib	: test-action.tex $(DEPS)
-		$(DATATOOL2BIB) --label Name test-action.tex test-action.bib
+		$(DATATOOL2BIB) -i --label Name test-action.tex test-action.bib
 
 test-datum-3.bib	: test-datum-3.dbtex $(DEPS)
 		$(DATATOOL2BIB) --label product test-datum-3.dbtex test-datum-3.bib

@@ -574,7 +574,7 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.split-on-type">{1}, {0}	Split entries into separate files according to type field.</entry>
 <entry key="gls2bib.syntax.split-on-category">{1}, {0}	Split entries into separate files according to category field.</entry>
 
-<entry key="gls2bib.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
+<entry key="common.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
 <entry key="gls2bib.syntax.absorb-see">{0}	Absorb \glssee and \glsxtrindexseealso into the data.</entry> 
 
 <entry key="datatool2bib.syntax.invalid_map">Invalid mapping ''{0}'' for ''{1}''. Syntax requires element pairs &lt;key=&gt;=&lt;field=&gt;</entry>
