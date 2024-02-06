@@ -23409,10 +23409,33 @@ and \sectionref{sec:shared2bibswitches}.
 \datatoolbibarg{read}
 
 \datatoolbibarg{save-datum}
+Equivalent to:
+\begin{alltt}
+\datatoolbiblongarg{save-value} "-value" \datatoolbiblongarg{save-currency} "-currency"
+\end{alltt}
 
 \datatoolbibarg{no-save-datum}
+Equivalent to:
+\begin{alltt}
+\datatoolbiblongarg{no-save-value} \datatoolbiblongarg{no-save-currency}
+\end{alltt}
 
 \datatoolbibarg{save-value}
+
+If a field contains a formatted numeric value or currency (according
+to the current \sty{datatool} settings), the numeric value will be
+saved in the field \meta{field}\meta{prefix} if it's different from
+the value in \meta{field}. For example, if the CSV file
+\filefmt{products.csv} contains:
+\begin{alltt}
+ID,Product,Quantity,Price
+1,Sample,3,"\$1,234.50"
+\end{alltt}
+then with:
+\begin{alltt}
+\app{datatool2bib} \databiblongarg{read} "format=csv,content=literal" products.csv products.bib
+\end{alltt}
+
 
 \datatoolbibarg{no-save-value}
 
