@@ -22846,7 +22846,7 @@ Stop parsing if the start of the \env{document} environment is found.
 \converterarg{no-preamble-only}
 
 Parse the entire file (default). Be prepared for a lot of
-unknown command warnings if you make conversion tool parse an
+unknown command warnings if you make the conversion tool parse an
 entire document.
 
 \converterarg{overwrite}
@@ -22862,6 +22862,19 @@ Don't allow existing \ext{bib} files to be overwritten.
 
 Omit all the fields listed in \meta{list} from the \ext{bib} file.
 This option is not cumulative. 
+
+\converterarg{index-conversion}
+
+Use \atentry{index} instead of \atentry{entry} if the
+\field{description} is empty or, for \idx{convertgls2bib}, if the
+\field{description} is simply \ics{nopostdesc} or
+\ics{glsxtrnopostpunc}. (Only applies to terms that would otherwise
+be converted to \atentry{entry}, such as those defined with
+\gls{newglossaryentry} in the case of \idx{convertgls2bib}.)
+
+\converterarg{no-index-conversion}
+
+Don't convert \atentry{entry} to \atentry{index} (default).
 
 \converterarg{log-file}
 
@@ -23027,18 +23040,6 @@ the corresponding entry (default).
 
 Don't absorb any cross-referencing information identified with \ics{glssee} 
 or \ics{glsxtrindexseealso} commands.
-
-\convertglsbibarg{index-conversion}
-
-Use \atentry{index} instead of \atentry{entry} if the
-\field{description} is empty or simply \ics{nopostdesc} or
-\ics{glsxtrnopostpunc}. (Only applies to terms that would otherwise
-be converted to \atentry{entry}, such as those defined with
-\gls{newglossaryentry}.)
-
-\convertglsbibarg{no-index-conversion}
-
-Don't convert \atentry{entry} to \atentry{index} (default).
 
 \section{Recognised Commands}
 
@@ -23400,13 +23401,53 @@ and \sectionref{sec:shared2bibswitches}.
 
 \datatoolbibarg{label}
 
+Obtain the \ext{bib} entry label from the column identified by the
+\meta{column-key}. Note that the column key is the original
+case-sensitive column label not the mapped field.
+The label will be obtained by copying the value from the given
+column and processing according to \converterlongarg{space-sub}
+(and stripping forbidden characters).
+
+\begin{information}
+The chosen column should have unique values (and will still be
+unique after processing).
+\end{information}
+
+The default setting is \code{\datatoolbiblongarg{label} Label}
+since this is the column used for labels with \styfmt{datagidx}.
+If you are converting a general \sty{datatool} database, either
+choose a different column or switch on the auto label.
+
 \datatoolbibarg{auto-label}
+
+If there is no appropriate column for a label, this option may be
+used to automatically generate the label in the form
+\meta{prefix}\meta{n}. If
+\datatoolbiblongarg{auto-label-prefix} is set, that will provide the
+\meta{prefix}, otherwise the prefix will match the database label.
 
 \datatoolbibarg{no-auto-label}
 
+Switches off automatic labelling. The labels will be created from
+the column identified by \datatoolbiblongarg{label}.
+
 \datatoolbibarg{auto-label-prefix}
 
+Sets the prefix for use with \datatoolbiblongarg{auto-label}.
+This option automatically implements
+\datatoolbiblongarg{auto-label}.
+
 \datatoolbibarg{read}
+
+Instead of parsing the provided \ext{tex} file in the usual manner, 
+the \datatoolbiblongarg{read} option will act as though the input
+is:
+\begin{alltt}
+\cs{DTLread}\oargm{options}\marg{filename}
+\end{alltt}
+where \meta{filename} is the input filename supplied to
+\idx{datatool2bib}. This can be use where the source file is a
+CSV file rather than a \LaTeX\ file.
 
 \datatoolbibarg{save-datum}
 Equivalent to:
