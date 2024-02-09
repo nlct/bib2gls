@@ -1666,7 +1666,7 @@ public abstract class BibGlsTeXApp implements TeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "3.9.20140206";
-   public static final String DATE = "2024-02-06";
+   public static final String VERSION = "3.9.20140209";
+   public static final String DATE = "2024-02-09";
 
 }

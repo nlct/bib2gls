@@ -43,6 +43,9 @@ import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
+import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
+import com.dickimawbooks.texparserlib.latex.AtGobble;
+import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 
 import com.dickimawbooks.bibgls.common.*;
@@ -57,6 +60,7 @@ public class DataTool2Bib extends BibGlsConverter
       parser.putControlSequence(new DTLgidxSetDefaultDB());
       parser.putControlSequence(new NewGidx(this));
       parser.putControlSequence(new NewTerm(this));
+      parser.putControlSequence(new NewAcro(this));
 
       parser.putControlSequence(new GenericCommand(true,
        "datagidxwordifygreek", null, TeXParserUtils.createStack(listener,
@@ -139,6 +143,30 @@ public class DataTool2Bib extends BibGlsConverter
        new TeXCsRef("def"), new TeXCsRef("Omega"),
           listener.createGroup("Omega")
       )));
+
+      parser.putControlSequence(
+        new TextualContentCommand("DTLgidxCounter", "page"));
+      parser.putControlSequence(
+        new AtGobble("DTLgidxAddLocationType"));
+      parser.putControlSequence(
+        new AtGobble("DTLgidxSetCompositor"));
+      parser.putControlSequence(
+        new AtGobble("DTLgidxGobble"));
+      parser.putControlSequence(
+        new AtFirstOfOne("DTLgidxNoFormat"));
+
+      parser.putControlSequence(new AtGobble("glsadd"));
+      parser.putControlSequence(new AtGobble("glsaddall"));
+
+      parser.putControlSequence(new AtGobble("glsreset"));
+      parser.putControlSequence(new AtGobble("glsunset"));
+      parser.putControlSequence(new AtGobble("glsresetall"));
+      parser.putControlSequence(new AtGobble("glsunsetall"));
+
+      parser.putControlSequence(new LaTeXGenericCommand(true,
+       "newtermaddfield", "omomom", new TeXObjectList(),
+       TeXParserUtils.createStack(parser,
+        new TeXObjectList(), new TeXObjectList(), new TeXObjectList())));
    }
 
    @Override
@@ -543,6 +571,9 @@ public class DataTool2Bib extends BibGlsConverter
       String orgDescriptionField = "description";
       String orgShortField = "short";
       String orgLongField = "long";
+      String orgNameField = "name";
+      String orgTextField = "text";
+      String orgPluralField = "plural";
 
       if (keyToFieldMap != null)
       {
@@ -561,6 +592,18 @@ public class DataTool2Bib extends BibGlsConverter
             else if (map.equals("long"))
             {
                orgLongField = field;
+            }
+            else if (map.equals("name"))
+            {
+               orgNameField = field;
+            }
+            else if (map.equals("text"))
+            {
+               orgTextField = field;
+            }
+            else if (map.equals("plural"))
+            {
+               orgPluralField = field;
             }
          }
       }
@@ -591,6 +634,17 @@ public class DataTool2Bib extends BibGlsConverter
            && fields.get(orgLongField) != null)
          {
             entrytype = "abbreviation";
+
+            if (stripAcronymText)
+            {
+               fields.remove(orgTextField);
+               fields.remove(orgPluralField);
+            }
+
+            if (stripAcronymName)
+            {
+               fields.remove(orgNameField);
+            }
          }
          else if (isIndexConversionOn()
                     && fields.get(orgDescriptionField) == null)
@@ -600,6 +654,15 @@ public class DataTool2Bib extends BibGlsConverter
 
          out.format("@%s{%s", entrytype, label);
          int fieldCount = 0;
+
+         TeXObject nameVal = fields.get(orgNameField);
+         TeXObject textVal = fields.get(orgTextField);
+
+         if (textVal != null && nameVal != null 
+              && textVal.equals(nameVal))
+         {
+            fields.remove(orgTextField);
+         }
 
          for (String field : fields.keySet())
          {
@@ -611,39 +674,84 @@ public class DataTool2Bib extends BibGlsConverter
             {
                String valStr = value.toString(parser);
 
-               if (!(field.equals("name") && valStr.equals(label)))
+               if (field.equals("name"))
                {
-                  fieldCount++;
-
-                  if (field.equals("parent"))
+                  if (entrytype.equals("index") && valStr.equals(label))
                   {
-                     String parentLabel = valStr;
-                     String mapLabel = labelMap.get(parentLabel);
+                     continue;
+                  }
+
+                  if (entrytype.equals("abbreviation")
+                       && valStr.equals(fields.get(orgShortField).toString(parser)))
+                  {
+                     continue;
+                  }
+               }
+
+               fieldCount++;
+
+               if (field.equals("parent"))
+               {
+                  String parentLabel = valStr;
+                  String mapLabel = labelMap.get(parentLabel);
+
+                  if (mapLabel == null)
+                  {
+                     valStr = processLabel(parentLabel);
+
+                     if (valStr.isEmpty())
+                     {
+                        valStr = labelPrefix + (++autoLabelIdx);
+                     }
+                  }
+                  else
+                  {
+                     valStr = mapLabel;
+                  }
+
+                  if (!valStr.equals(parentLabel))
+                  {
+                     labelMap.put(parentLabel, valStr);
+                  }
+               }
+               else if (field.equals("see") || field.equals("seealso"))
+               {
+                  String[] split = valStr.split(" *, *");
+                  StringBuilder builder = new StringBuilder();
+
+                  for (String xr : split)
+                  {
+                     String mapLabel = labelMap.get(xr);
+
+                     if (builder.length() > 0)
+                     {
+                        builder.append(',');
+                     }
 
                      if (mapLabel == null)
                      {
-                        valStr = processLabel(parentLabel);
+                        String xrLabel = processLabel(xr);
 
-                        if (valStr.isEmpty())
+                        if (xrLabel.isEmpty())
                         {
-                           valStr = labelPrefix + (++autoLabelIdx);
+                           xrLabel = labelPrefix + (++autoLabelIdx);
+                           labelMap.put(xrLabel, xr);
                         }
+
+                        builder.append(xrLabel);
                      }
                      else
                      {
-                        valStr = mapLabel;
-                     }
-
-                     if (!valStr.equals(parentLabel))
-                     {
-                        labelMap.put(parentLabel, valStr);
+                        builder.append(mapLabel);
                      }
                   }
 
-                  out.println(",");
-
-                  out.format("  %s = {%s}", field, valStr);
+                  valStr = builder.toString();
                }
+
+               out.println(",");
+
+               out.format("  %s = {%s}", field, valStr);
             }
          }
 
@@ -682,21 +790,90 @@ public class DataTool2Bib extends BibGlsConverter
    }
 
    public void addTerm(String dbname, GidxData data)
+    throws IOException
    {
       if (gidxdata == null)
       {
          gidxdata = new HashMap<String,Vector<GidxData>>();
       }
 
-      Vector<GidxData> list = gidxdata.get(dbname);
+      Vector<GidxData> datalist = gidxdata.get(dbname);
 
-      if (list == null)
+      if (datalist == null)
       {
-         list = new Vector<GidxData>();
-         gidxdata.put(dbname, list);
+         datalist = new Vector<GidxData>();
+         gidxdata.put(dbname, datalist);
       }
 
-      list.add(data);
+      KeyValList fields = data.getFields();
+
+      for (String field : fields.keySet())
+      {
+         TeXObject value = fields.get(field);
+
+         if (parser.isStack(value))
+         {
+            TeXObjectList stack = (TeXObjectList)value;
+
+            TeXObjectList list = listener.createStack();
+
+            processTermValue(stack, list);
+
+            fields.put(field, list);
+         }
+      }
+
+      datalist.add(data);
+   }
+
+   protected void processTermValue(TeXObjectList stack, TeXObjectList list)
+    throws IOException
+   {
+      while (!stack.isEmpty())
+      {
+         TeXObject obj = stack.pop();
+
+         if (stripGlsAdd && TeXParserUtils.isControlSequence(obj, "glsadd"))
+         {
+            stack.popArg(parser);
+         }
+         else if (TeXParserUtils.isControlSequence(obj, "acronymfont"))
+         {
+            if (stripAcronymFont)
+            {
+               obj = stack.popArg(parser);
+               stack.push(obj, true);
+            }
+            else
+            {
+               list.add(new TeXCsRef("glsabbrvfont"));
+            }
+         }
+         else if (stripCaseChange
+            && TeXParserUtils.isControlSequence(obj,
+             "capitalisewords", "xcapitalisewords", "ecapitalisewords",
+             "capitalisefmtwords", "xcapitalisefmtwords", "ecapitalisefmtwords",
+             "makefirstuc", "xmakefirstuc", "emakefirstuc", "glsmakefirstuc",
+             "uppercase", "lowercase",
+             "MakeTextUppercase", "MakeTextLowercase",
+             "MakeUppercase", "MakeLowercase", "mfirstucMakeUppercase"
+           ))
+         {
+            obj = stack.popArg(parser);
+            stack.push(obj, true);
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            TeXObjectList subList = ((TeXObjectList)obj).createList();
+            list.add(subList);
+
+            processTermValue((TeXObjectList)obj, subList);
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
    }
 
    @Override
@@ -826,6 +1003,46 @@ public class DataTool2Bib extends BibGlsConverter
       {
          split = false;
       }
+      else if (arg.equals("--strip-gls-add"))
+      {
+         stripGlsAdd = true;
+      }
+      else if (arg.equals("--no-strip-gls-add"))
+      {
+         stripGlsAdd = false;
+      }
+      else if (arg.equals("--strip-acronym-font"))
+      {
+         stripAcronymFont = true;
+      }
+      else if (arg.equals("--no-strip-acronym-font"))
+      {
+         stripAcronymFont = false;
+      }
+      else if (arg.equals("--strip-acronym-text"))
+      {
+         stripAcronymText = true;
+      }
+      else if (arg.equals("--no-strip-acronym-text"))
+      {
+         stripAcronymText = false;
+      }
+      else if (arg.equals("--strip-acronym-name"))
+      {
+         stripAcronymName = true;
+      }
+      else if (arg.equals("--no-strip-acronym-name"))
+      {
+         stripAcronymName = false;
+      }
+      else if (arg.equals("--strip-case-change"))
+      {
+         stripCaseChange = true;
+      }
+      else if (arg.equals("--no-strip-case-change"))
+      {
+         stripCaseChange = false;
+      }
       else
       {
          return super.parseArg(deque, arg, returnVals);
@@ -861,6 +1078,12 @@ public class DataTool2Bib extends BibGlsConverter
    private String autoLabelPrefix = null;
    private String readOpts = null;
    private int autoLabelIdx = 0;
+
+   private boolean stripGlsAdd = true;
+   private boolean stripAcronymFont = true;
+   private boolean stripAcronymText = true;
+   private boolean stripAcronymName = true;
+   private boolean stripCaseChange = false;
 
    private String dataValueSuffix = null;
    private String dataCurrencySuffix = null;
