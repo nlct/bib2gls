@@ -593,8 +593,10 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="gls2bib.no.entries">No entries found</entry>
 
 <entry key="datatool2bib.no.databases">No databases found</entry>
-<entry key="datatool2bib.databases.found">{0} {0,choice,1#database|1&lt;databases} found</entry>
-<entry key="datatool2bib.database">Database ''{0}''</entry>
+<entry key="datatool2bib.databases.found">{0} {0,choice,0#databases|1#database|1&lt;databases} (datatool) found</entry>
+<entry key="datatool2bib.gidxdata.found">{0} {0,choice,0#databases|1#database|1&lt;databases} (datagidx) found</entry>
+<entry key="datatool2bib.database">Database (datatool) ''{0}''</entry>
+<entry key="datatool2bib.datagidx">Database (datagidx) ''{0}''</entry>
 <entry key="datatool2bib.database.empty">Database ''{0}'' is empty</entry>
 <entry key="datatool2bib.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''</entry>
 

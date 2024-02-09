@@ -121,7 +121,9 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          int cp = label.codePointAt(i);
          i += Character.charCount(cp);
 
-         if (Character.isWhitespace(cp))
+         if (Character.isWhitespace(cp)
+          || Character.isSpaceChar(cp) // include nbsp
+            )
          {
             if (spaceSub != null)
             {

@@ -42,12 +42,105 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 
 import com.dickimawbooks.bibgls.common.*;
 
 public class DataTool2Bib extends BibGlsConverter
 {
+   @Override
+   protected void addPredefinedCommands(TeXParser parser)
+   {
+      super.addPredefinedCommands(parser);
+
+      parser.putControlSequence(new DTLgidxSetDefaultDB());
+      parser.putControlSequence(new NewGidx(this));
+      parser.putControlSequence(new NewTerm(this));
+
+      parser.putControlSequence(new GenericCommand(true,
+       "datagidxwordifygreek", null, TeXParserUtils.createStack(listener,
+       new TeXCsRef("def"), new TeXCsRef("alpha"),
+          listener.createGroup("alpha"),
+       new TeXCsRef("def"), new TeXCsRef("beta"),
+          listener.createGroup("beta"),
+       new TeXCsRef("def"), new TeXCsRef("gamma"),
+          listener.createGroup("gamma"),
+       new TeXCsRef("def"), new TeXCsRef("delta"),
+          listener.createGroup("delta"),
+       new TeXCsRef("def"), new TeXCsRef("epsilon"),
+          listener.createGroup("epsilon"),
+       new TeXCsRef("def"), new TeXCsRef("varepsilon"),
+          listener.createGroup("epsilon"),
+       new TeXCsRef("def"), new TeXCsRef("zeta"),
+          listener.createGroup("zeta"),
+       new TeXCsRef("def"), new TeXCsRef("eta"),
+          listener.createGroup("eta"),
+       new TeXCsRef("def"), new TeXCsRef("theta"),
+          listener.createGroup("theta"),
+       new TeXCsRef("def"), new TeXCsRef("vartheta"),
+          listener.createGroup("theta"),
+       new TeXCsRef("def"), new TeXCsRef("iota"),
+          listener.createGroup("iota"),
+       new TeXCsRef("def"), new TeXCsRef("kappa"),
+          listener.createGroup("kappa"),
+       new TeXCsRef("def"), new TeXCsRef("lambda"),
+          listener.createGroup("lambda"),
+       new TeXCsRef("def"), new TeXCsRef("mu"),
+          listener.createGroup("mu"),
+       new TeXCsRef("def"), new TeXCsRef("nu"),
+          listener.createGroup("nu"),
+       new TeXCsRef("def"), new TeXCsRef("xi"),
+          listener.createGroup("xi"),
+       new TeXCsRef("def"), new TeXCsRef("pi"),
+          listener.createGroup("pi"),
+       new TeXCsRef("def"), new TeXCsRef("varpi"),
+          listener.createGroup("pi"),
+       new TeXCsRef("def"), new TeXCsRef("rho"),
+          listener.createGroup("rho"),
+       new TeXCsRef("def"), new TeXCsRef("sigma"),
+          listener.createGroup("sigma"),
+       new TeXCsRef("def"), new TeXCsRef("varsigma"),
+          listener.createGroup("sigma"),
+       new TeXCsRef("def"), new TeXCsRef("tau"),
+          listener.createGroup("tau"),
+       new TeXCsRef("def"), new TeXCsRef("upsilon"),
+          listener.createGroup("upsilon"),
+       new TeXCsRef("def"), new TeXCsRef("phi"),
+          listener.createGroup("phi"),
+       new TeXCsRef("def"), new TeXCsRef("avarphi"),
+          listener.createGroup("phi"),
+       new TeXCsRef("def"), new TeXCsRef("chi"),
+          listener.createGroup("chi"),
+       new TeXCsRef("def"), new TeXCsRef("psi"),
+          listener.createGroup("psi"),
+       new TeXCsRef("def"), new TeXCsRef("omega"),
+          listener.createGroup("omega"),
+       new TeXCsRef("def"), new TeXCsRef("Gamma"),
+          listener.createGroup("Gamma"),
+       new TeXCsRef("def"), new TeXCsRef("Delta"),
+          listener.createGroup("Delta"),
+       new TeXCsRef("def"), new TeXCsRef("Theta"),
+          listener.createGroup("Theta"),
+       new TeXCsRef("def"), new TeXCsRef("Lambda"),
+          listener.createGroup("Lambda"),
+       new TeXCsRef("def"), new TeXCsRef("Xi"),
+          listener.createGroup("Xi"),
+       new TeXCsRef("def"), new TeXCsRef("Pi"),
+          listener.createGroup("Pi"),
+       new TeXCsRef("def"), new TeXCsRef("Sigma"),
+          listener.createGroup("Sigma"),
+       new TeXCsRef("def"), new TeXCsRef("Upsilon"),
+          listener.createGroup("Upsilon"),
+       new TeXCsRef("def"), new TeXCsRef("Phi"),
+          listener.createGroup("Phi"),
+       new TeXCsRef("def"), new TeXCsRef("Psi"),
+          listener.createGroup("Psi"),
+       new TeXCsRef("def"), new TeXCsRef("Omega"),
+          listener.createGroup("Omega")
+      )));
+   }
+
    @Override
    public void process() throws IOException,Bib2GlsException
    {
@@ -68,18 +161,22 @@ public class DataTool2Bib extends BibGlsConverter
       }
 
       int numDatabases = datatoolSty.getDataBaseCount();
+      int numGidxDataBases = (gidxdata == null ? 0 : gidxdata.size());
 
-      if (numDatabases == 0)
+      int total = numDatabases + numGidxDataBases;
+
+      if (total == 0)
       {
          throw new Bib2GlsException(
             getMessage("datatool2bib.no.databases"));
       }
-      else if (numDatabases == 1)
+      else if (total == 1)
       {
          split = false;
       }
 
       message(getMessage("datatool2bib.databases.found", numDatabases));
+      message(getMessage("datatool2bib.gidxdata.found", numGidxDataBases));
 
       Enumeration<String> nameEnum = datatoolSty.getDataBaseNames();
 
@@ -97,7 +194,7 @@ public class DataTool2Bib extends BibGlsConverter
             base = base.substring(0, idx);
          }
 
-         while (nameEnum.hasMoreElements())
+         while (nameEnum != null && nameEnum.hasMoreElements())
          {
             String dbName = nameEnum.nextElement();
 
@@ -134,6 +231,47 @@ public class DataTool2Bib extends BibGlsConverter
                }
             }
          }
+
+         if (gidxdata != null)
+         {
+            for (String dbName : gidxdata.keySet())
+            {
+               File file = new File(parentFile, base+"-"+dbName+".bib");
+
+               if (!overwriteFiles && file.exists())
+               {
+                  throw new IOException(getMessage("error.file_exists.nooverwrite",
+                     file, "--overwrite"));
+               }
+
+               message(getMessage("message.writing", file));
+
+               try
+               {
+                  if (bibCharsetName == null)
+                  {
+                     out = new PrintWriter(file);
+                  }
+                  else
+                  {
+                     out = new PrintWriter(file, bibCharsetName);
+
+                     out.println("% Encoding: "+bibCharsetName);
+                  }
+
+                  writeGidxPreamble(out);
+
+                  writeEntries(dbName, gidxdata.get(dbName), out);
+               }
+               finally
+               {
+                  if (out != null)
+                  {
+                     out.close();
+                  }
+               }
+            }
+         }
       }
       else
       {
@@ -158,11 +296,21 @@ public class DataTool2Bib extends BibGlsConverter
                out.println("% Encoding: "+bibCharsetName);
             }
 
-            while (nameEnum.hasMoreElements())
+            while (nameEnum != null && nameEnum.hasMoreElements())
             {
                String dbName = nameEnum.nextElement();
 
                writeEntries(datatoolSty.getDataBase(dbName), out);
+            }
+
+            if (gidxdata != null)
+            {
+               writeGidxPreamble(out);
+
+               for (String dbName : gidxdata.keySet())
+               {
+                  writeEntries(dbName, gidxdata.get(dbName), out);
+               }
             }
          }
          finally
@@ -357,6 +505,200 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
+   protected void writeGidxPreamble(PrintWriter out)
+    throws IOException
+   {
+      out.println("@preamble{");
+      out.println("\\providecommand{\\DTLgidxName}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxOffice}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxPlace}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxSubject}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxRank}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxParticle}[2]{#2, #1}");
+      out.println("\\providecommand{\\DTLgidxParen}[1]{ (#1)}");
+      out.println("\\providecommand{\\DTLgidxSaint}[1]{Saint}");
+      out.println("\\providecommand{\\DTLgidxMac}[1]{Mac}");
+      out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\csuse{two@digits}{#1}}");
+      out.println("}");
+   }
+
+   protected void writeEntries(String dbName,
+      Vector<GidxData> datalist, PrintWriter out)
+     throws IOException,Bib2GlsException
+   {
+      message(getMessage("datatool2bib.datagidx", dbName));
+
+      String labelPrefix;
+
+      if (autoLabelPrefix == null)
+      {
+         labelPrefix = processLabel(dbName);
+         autoLabelIdx = 0;
+      }
+      else
+      {
+         labelPrefix = autoLabelPrefix;
+      }
+
+      String orgDescriptionField = "description";
+      String orgShortField = "short";
+      String orgLongField = "long";
+
+      if (keyToFieldMap != null)
+      {
+         for (String field : keyToFieldMap.keySet())
+         {
+            String map = keyToFieldMap.get(field);
+
+            if (map.equals("description"))
+            {
+               orgDescriptionField = field;
+            }
+            else if (map.equals("short"))
+            {
+               orgShortField = field;
+            }
+            else if (map.equals("long"))
+            {
+               orgLongField = field;
+            }
+         }
+      }
+
+      HashMap<String,String> labelMap = new HashMap<String,String>();
+
+      for (GidxData data : datalist)
+      {
+         String label = processLabel(data.getLabel());
+
+         if (label.isEmpty())
+         {
+            label = labelPrefix + (++autoLabelIdx);
+         }
+
+         if (!label.equals(data.getLabel()))
+         {
+            labelMap.put(data.getLabel(), label);
+         }
+
+         KeyValList fields = data.getFields();
+
+         out.println();
+
+         String entrytype = "entry";
+
+         if (fields.get(orgShortField) != null
+           && fields.get(orgLongField) != null)
+         {
+            entrytype = "abbreviation";
+         }
+         else if (isIndexConversionOn()
+                    && fields.get(orgDescriptionField) == null)
+         {
+            entrytype = "index";
+         }
+
+         out.format("@%s{%s", entrytype, label);
+         int fieldCount = 0;
+
+         for (String field : fields.keySet())
+         {
+            TeXObject value = fields.get(field);
+
+            field = getFieldName(field);
+
+            if (field != null && !field.equals("label") && value != null)
+            {
+               String valStr = value.toString(parser);
+
+               if (!(field.equals("name") && valStr.equals(label)))
+               {
+                  fieldCount++;
+
+                  if (field.equals("parent"))
+                  {
+                     String parentLabel = valStr;
+                     String mapLabel = labelMap.get(parentLabel);
+
+                     if (mapLabel == null)
+                     {
+                        valStr = processLabel(parentLabel);
+
+                        if (valStr.isEmpty())
+                        {
+                           valStr = labelPrefix + (++autoLabelIdx);
+                        }
+                     }
+                     else
+                     {
+                        valStr = mapLabel;
+                     }
+
+                     if (!valStr.equals(parentLabel))
+                     {
+                        labelMap.put(parentLabel, valStr);
+                     }
+                  }
+
+                  out.println(",");
+
+                  out.format("  %s = {%s}", field, valStr);
+               }
+            }
+         }
+
+         if (fieldCount > 0)
+         {
+            out.println();
+         }
+
+         out.println("}");
+      }
+   }
+
+   public void addGidxDatabase(String dbname)
+   {
+      if (gidxdata == null)
+      {
+         gidxdata = new HashMap<String,Vector<GidxData>>();
+      }
+
+      Vector<GidxData> list = gidxdata.get(dbname);
+
+      if (list == null)
+      {
+         list = new Vector<GidxData>();
+         gidxdata.put(dbname, list);
+      }
+
+      ControlSequence cs = parser.getControlSequence(DATAGIDX_DEFAULT_DATABASE);
+
+      if (cs == null || cs.isEmpty())
+      {
+         parser.putControlSequence(true,
+           new TextualContentCommand(DATAGIDX_DEFAULT_DATABASE,
+           dbname));
+      }
+   }
+
+   public void addTerm(String dbname, GidxData data)
+   {
+      if (gidxdata == null)
+      {
+         gidxdata = new HashMap<String,Vector<GidxData>>();
+      }
+
+      Vector<GidxData> list = gidxdata.get(dbname);
+
+      if (list == null)
+      {
+         list = new Vector<GidxData>();
+         gidxdata.put(dbname, list);
+      }
+
+      list.add(data);
+   }
+
    @Override
    protected void syntaxInfo()
    {
@@ -524,4 +866,9 @@ public class DataTool2Bib extends BibGlsConverter
    private String dataCurrencySuffix = null;
 
    private DataToolSty datatoolSty;
+
+   private HashMap<String,Vector<GidxData>> gidxdata;
+
+   public static final String DATAGIDX_DEFAULT_DATABASE
+    = "l__datagidx_default_database_tl";
 }
