@@ -63,6 +63,7 @@ import com.dickimawbooks.texparserlib.latex.textcase.MakeTextUppercase;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MakeFirstUc;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.CapitaliseWords;
+import com.dickimawbooks.texparserlib.latex.datatool.DTLpadleadingzeros;
 import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 import com.dickimawbooks.texparserlib.bib.BibValueList;
 import com.dickimawbooks.bibgls.common.*;
@@ -1591,7 +1592,7 @@ public class Bib2Gls extends BibGlsTeXApp
       listener.putControlSequence(new HexUnicodeChar());
 
       // only defined by bib2gls interpreter:
-      listener.putControlSequence(new Bib2GlsPadNDigits());
+      listener.putControlSequence(new DTLpadleadingzeros("bibglspaddigits"));
 
       listener.putControlSequence(new GlsCombinedSep());
       listener.putControlSequence(new GlsCombinedSep("glscombinedfirstsep"));
