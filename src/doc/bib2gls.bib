@@ -107,6 +107,11 @@
   name={defining terms}
 }
 
+@topic{convertercommands,
+  name={converter commands},
+  text={converter command}
+}
+
 @topic{formattingcommands,
   name={formatting commands},
   text={formatting command}
@@ -4978,6 +4983,30 @@ and \L/\l\ treated as L/l},
   parent={fileformats}
 }
 
+@fileformat{ext.dbtex,
+  name={\extfmt{dbtex}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@fileformat{ext.dtltex,
+  name={\extfmt{dtltex}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@fileformat{ext.csv,
+  name={\extfmt{csv}},
+  category={fileformat},
+  parent={fileformats}
+}
+
+@fileformat{ext.tsv,
+  name={\extfmt{tsv}},
+  category={fileformat},
+  parent={fileformats}
+}
+
 @index{applications,
   name={applications},
   text={applications}
@@ -5355,31 +5384,37 @@ and \L/\l\ treated as L/l},
 }
 
 @package{textcase,
-  name={\styfmt{textcase}},
+  name={\styfmt{text\-case}},
   category={package},
   parent={packages}
 }
 
 @package{datetime2,
-  name={\styfmt{datetime2}},
+  name={\styfmt{date\-time2}},
   category={package},
   parent={packages}
 }
 
 @package{datatool-base,
-  name={\styfmt{datatool\dhyphen base}},
+  name={\styfmt{data\-tool\dhyphen base}},
   category={package},
   parent={packages}
 }
 
 @package{datatool,
-  name={\styfmt{datatool}},
+  name={\styfmt{data\-tool}},
+  category={package},
+  parent={packages}
+}
+
+@package{datagidx,
+  name={\styfmt{data\-gidx}},
   category={package},
   parent={packages}
 }
 
 @package{etoolbox,
-  name={\styfmt{etoolbox}},
+  name={\styfmt{etool\-box}},
   category={package},
   parent={packages}
 }
@@ -5397,13 +5432,13 @@ and \L/\l\ treated as L/l},
 }
 
 @package{tracklang,
-  name={\styfmt{tracklang}},
+  name={\styfmt{track\-lang}},
   category={package},
   parent={packages}
 }
 
 @package{accsupp,
-  name={\styfmt{accsupp}},
+  name={\styfmt{acc\-supp}},
   category={package},
   parent={packages}
 }
@@ -10840,6 +10875,26 @@ primary formats, if enabled.},
   parent={commandlineoptionsconverter}
 }
 
+@switch{switch.converter.no-ignore-fields,
+  name={\longargfmt{no\dhyphen ignore\dhyphen fields}},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.key-map,
+  name={\longargfmt{key\dhyphen map}},
+  symbol={\shortargfmt{m}},
+  user1={\meta{src=dest list}},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.no-key-map,
+  name={\longargfmt{no\dhyphen key\dhyphen map}},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
 @switch{switch.gls2bib.split-on-category,
   name={\longargfmt{split\dhyphen on\dhyphen category}},
   symbol={\shortargfmt{c}},
@@ -10926,6 +10981,13 @@ primary formats, if enabled.},
   parent={commandlineoptionsdatatool2bib}
 }
 
+@switch{switch.datatool2bib.setup,
+  name={\longargfmt{setup}},
+  category={switch},
+  user1={\meta{options}},
+  parent={commandlineoptionsdatatool2bib}
+}
+
 @switch{switch.datatool2bib.save-datum,
   name={\longargfmt{save\dhyphen datum}},
   category={switch},
@@ -10972,6 +11034,42 @@ primary formats, if enabled.},
 
 @switch{switch.datatool2bib.no-split,
   name={\longargfmt{no\dhyphen split}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.strip-glsadd,
+  name={\longargfmt{strip\dhyphen glsadd}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-strip-glsadd,
+  name={\longargfmt{no\dhyphen strip\dhyphen glsadd}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.strip-acronym-font,
+  name={\longargfmt{strip\dhyphen acronym\dhyphen font}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-strip-acronym-font,
+  name={\longargfmt{no\dhyphen strip\dhyphen acronym\dhyphen font}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.strip-case-change,
+  name={\longargfmt{strip\dhyphen case\dhyphen change}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-strip-case-change,
+  name={\longargfmt{no\dhyphen strip\dhyphen case\dhyphen change}},
   category={switch},
   parent={commandlineoptionsdatatool2bib}
 }
@@ -18938,6 +19036,159 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
+@glscommand{datagidx.newterm,
+  name={\csfmt{new\-term}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{new\-term}},
+  user1={\oargm{\keyvallist}\margm{name}},
+  description={defines a new term},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{datagidx.newacro,
+  name={\csfmt{new\-acro}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{new\-acro}},
+  user1={\oargm{\keyvallist}\margm{short}\margm{long}},
+  description={defines a new abbreviation},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{datagidx.newgidx,
+  name={\csfmt{new\-gidx}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{new\-gidx}},
+  user1={\oargm{\keyvallist}\margm{db-name}\margm{title}},
+  description={defines a new database customised for \sty{datagidx}},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{datagidx.glsadd,
+  name={\csfmt{gls\-add}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{gls\-add}},
+  user1={\marg{\oargm{format}\meta{label}}},
+  description={indexes the term identified by the given label},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{DTLsetup,
+  name={\csfmt{DTLsetup}},
+  user1={\margm{options}},
+  description={sets default \sty{datatool} options},
+  note={\styfmt{datatool-base}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLread,
+  name={\csfmt{DTLread}},
+  user1={\oargm{options}\margm{filename}},
+  description={loads a database from the given file, where the
+format should be identified in \meta{options}},
+  note={\styfmt{datatool}\texparserdefnote\ v3.0+},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLloaddb,
+  name={\csfmt{DTLloaddb}},
+  user1={\oargm{options}\margm{db-name}\margm{filename}},
+  description={loads CSV data from the given file},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLloaddbtex,
+  name={\csfmt{DTLloaddbtex}},
+  user1={\margm{cs}\margm{filename}},
+  description={loads \ext{dbtex} data from the given file},
+  note={\styfmt{datatool}\texparserdefnote\ v2.20+},
+  topics={convertercommands},
+  category={command}
+}
+
+@command{DTLwrite,
+  name={\csfmt{DTLwrite}},
+  note={\styfmt{datatool}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@glscommand{DTLnewcurrencysymbol,
+  name={\csfmt{DTL\-new\-currency\-symbol}},
+  user1={\margm{symbol}},
+  description={identifies \meta{symbol} as a currency symbol},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLsetnumberchars,
+  name={\csfmt{DTLsetnumberchars}},
+  user1={\margm{number group char}\margm{decimal char}},
+  description={sets the number group and decimal characters},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLnewdb,
+  name={\csfmt{DTLnewdb}},
+  user1={\margm{db-name}},
+  description={defines a new database},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLnewrow,
+  name={\csfmt{DTL\-new\-row}},
+  user1={\margm{db-name}},
+  description={creates a new row in the given database},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLnewdbentry,
+  name={\csfmt{DTL\-new\-db\-entry}},
+  user1={\margm{db-name}\margm{col-key}\margm{value}},
+  description={adds a new entry to the final row of the given database},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{DTLaction,
+  name={\csfmt{DTL\-action}},
+  user1={\oargm{options}\margm{action}},
+  description={general purpose action command},
+  note={\styfmt{datatool}\texparserdefnote\ v3.0+},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{dtlexpandnewvalue,
+  name={\csfmt{dtl\-expand\-new\-value}},
+  description={new values will be expanded before being added to the database},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
+@glscommand{dtlnoexpandnewvalue,
+  name={\csfmt{dtl\-no\-expand\-new\-value}},
+  description={new values will not be expanded before being added to the database},
+  note={\styfmt{datatool}\texparserdefnote},
+  topics={convertercommands},
+  category={command}
+}
+
 @command{tableofcontents,
   name={\csfmt{table\-of\-contents}},
   description={displays the \glsxtrlong{toc} (by reading in the
@@ -18952,6 +19203,7 @@ sectioning commands to write to it},
   user1={\margm{number}},
   description={expands to \meta{number} zero-padded to ensure at
   least two digits},
+  seealso={dtlpadleadingzeros,bibglspaddigits},
   note={kernel command\texparserdefnote},
   category={command}
 }
@@ -18966,11 +19218,21 @@ sectioning commands to write to it},
   category={command}
 }
 
+@command{dtlpadleadingzeros,
+  name={\csfmt{dtl\-pad\-lead\-ing\-zeros}},
+  user1={\margm{num digits}\margm{number}},
+  description={expands to \meta{number} zero-padded to ensure at
+   least \meta{num digits} digits},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
 @command{bibglspaddigits,
   name={\csfmt{bib\-gls\-pad\-digits}},
   user1={\margm{num digits}\margm{number}},
   description={expands to \meta{number} zero-padded to ensure at
    least \meta{num digits} digits},
+  seealso={dtlpadleadingzeros},
   note={\bibgls\ interpreter only},
   category={command}
 }

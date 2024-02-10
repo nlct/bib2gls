@@ -45,6 +45,7 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
+import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 
@@ -170,9 +171,46 @@ public class DataTool2Bib extends BibGlsConverter
    }
 
    @Override
+   public boolean isSpecialUsePackage(KeyValList options, String styName, 
+     boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {
+      if (styName.equals("datatool") || styName.equals("datatool-base"))
+      {
+         if (options != null)
+         {
+            for (Iterator<String> it = options.keySet().iterator();
+                 it.hasNext(); )
+            {
+               String key = it.next();
+
+               TeXObject value = options.get(key);
+
+               datatoolSty.processSetupOption(key, value, stack);
+            }
+         }
+
+         return true;
+      }
+      else
+      {
+         return false;
+      }
+   }
+
+   @Override
    public void process() throws IOException,Bib2GlsException
    {
       datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
+
+      parser.putControlSequence(new GobbleOpt("DTLwrite", 1, 1));
+
+      if (setup != null && !setup.isEmpty())
+      {
+         TeXReader reader = new TeXReader(String.format("\\DTLsetup{%s}", setup));
+
+         parser.parse(reader);
+      }
 
       if (readOpts == null)
       {
@@ -469,7 +507,7 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (entry != null)
             {
-               TeXObject content = entry.getContents();
+               TeXObject content = processValue(entry.getContents());
                String field = idxFieldMap.get(idx);
 
                out.println(",");
@@ -811,19 +849,42 @@ public class DataTool2Bib extends BibGlsConverter
       {
          TeXObject value = fields.get(field);
 
-         if (parser.isStack(value))
-         {
-            TeXObjectList stack = (TeXObjectList)value;
-
-            TeXObjectList list = listener.createStack();
-
-            processTermValue(stack, list);
-
-            fields.put(field, list);
-         }
+         fields.put(field, processValue(value));
       }
 
       datalist.add(data);
+   }
+
+   protected TeXObject processValue(TeXObject value)
+   {
+      if (parser.isStack(value)
+        && ( stripGlsAdd || stripAcronymFont || stripCaseChange ) )
+      {
+         TeXObjectList stack = (TeXObjectList)value;
+
+         TeXObjectList list = listener.createStack();
+
+         try
+         {
+            processTermValue(stack, list);
+         }
+         catch (TeXSyntaxException e)
+         {
+            warning(e.getMessage(this));
+            list.addAll(stack);
+         }
+         catch (IOException e)
+         {
+            warning(e.getMessage());
+            list.addAll(stack);
+         }
+
+         return list;
+      }
+      else
+      {
+         return value;
+      }
    }
 
    protected void processTermValue(TeXObjectList stack, TeXObjectList list)
@@ -837,17 +898,11 @@ public class DataTool2Bib extends BibGlsConverter
          {
             stack.popArg(parser);
          }
-         else if (TeXParserUtils.isControlSequence(obj, "acronymfont"))
+         else if (stripAcronymFont
+            && TeXParserUtils.isControlSequence(obj, "acronymfont"))
          {
-            if (stripAcronymFont)
-            {
-               obj = stack.popArg(parser);
-               stack.push(obj, true);
-            }
-            else
-            {
-               list.add(new TeXCsRef("glsabbrvfont"));
-            }
+            obj = stack.popArg(parser);
+            stack.push(obj, true);
          }
          else if (stripCaseChange
             && TeXParserUtils.isControlSequence(obj,
@@ -887,6 +942,7 @@ public class DataTool2Bib extends BibGlsConverter
    {
       if ( arg.equals("--label") || arg.equals("-L")
         || arg.equals("--read") || arg.equals("-r")
+        || arg.equals("--setup")
         || arg.equals("--auto-label-prefix")
         || arg.equals("--save-value")
         || arg.equals("--save-currency")
@@ -955,6 +1011,17 @@ public class DataTool2Bib extends BibGlsConverter
       {
          readOpts = null;
       }
+      else if (isArg(deque, arg, "--setup", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         setup = returnVals[0].toString();
+      }
       else if (arg.equals("--save-datum"))
       {
          dataValueSuffix = "-value";
@@ -1003,11 +1070,11 @@ public class DataTool2Bib extends BibGlsConverter
       {
          split = false;
       }
-      else if (arg.equals("--strip-gls-add"))
+      else if (arg.equals("--strip-glsadd"))
       {
          stripGlsAdd = true;
       }
-      else if (arg.equals("--no-strip-gls-add"))
+      else if (arg.equals("--no-strip-glsadd"))
       {
          stripGlsAdd = false;
       }
@@ -1078,6 +1145,7 @@ public class DataTool2Bib extends BibGlsConverter
    private String autoLabelPrefix = null;
    private String readOpts = null;
    private int autoLabelIdx = 0;
+   private String setup = null;
 
    private boolean stripGlsAdd = true;
    private boolean stripAcronymFont = true;

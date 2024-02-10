@@ -112,6 +112,13 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return false;
    }
 
+   public boolean isSpecialUsePackage(KeyValList options, String styName,
+     boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {
+      return false;
+   }
+
    public String processLabel(String label)
    {
       StringBuilder builder = new StringBuilder();
@@ -241,14 +248,18 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
                arg));
          }
 
-         if (returnVals[0].toString().isEmpty())
-         {
-            customIgnoreFields = null;
-         }
-         else
+         if (!returnVals[0].toString().isEmpty())
          {
             addCustomIgnoreField(returnVals[0].listValue());
          }
+      }
+      else if (arg.equals("--no-ignore-fields"))
+      {
+         customIgnoreFields = null;
+      }
+      else if (arg.equals("--no-key-map"))
+      {
+         keyToFieldMap = null;
       }
       else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
       {     
@@ -378,7 +389,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
       for (String f : fields)
       {
-         customIgnoreFields.add(f);
+         if (!f.isEmpty())
+         {
+            customIgnoreFields.add(f);
+         }
       }
    }
 

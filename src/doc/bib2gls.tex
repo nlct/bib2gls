@@ -512,6 +512,14 @@ Library}}
  #1{\texorpdfstring{\glsxtrglossentry{#2}}{\string\\#2}}%
 }
 
+\newcommand{\nameparen}[1]{ (#1)}
+\newcommand{\prefixedcssection}[3][\cssectioncmd]{%
+ {%
+   \renewcommand{\nameparen}[1]{}%
+   #1{\texorpdfstring{\glsxtrglossentry{#2.#3}}{\string\\#3}}%
+ }%
+}
+
 \newcommand{\format}[1]{%
   \gls{#1}\glsentryuseri{#1}%
 }
@@ -1194,6 +1202,12 @@ Library}}
 \newcommand*{\convertglsbiblongarg}[1]{%
   \texorpdfstring
   {\gls{switch.gls2bib.#1}}%
+  {\string-\string-#1}%
+}
+
+\newcommand*{\datatoolbiblongarg}[1]{%
+  \texorpdfstring
+  {\gls{switch.datatool2bib.#1}}%
   {\string-\string-#1}%
 }
 
@@ -2562,7 +2576,7 @@ The only external processes that are run by \bibgls\ are calls to
 \idx{kpsewhich} to check the security settings and locate files on
 \TeX's path. These are started with Java's \code{ProcessBuilder}
 class so there should be no issues with spaces or shell special characters
-in the argument.  The \longarg{debug} switch will write the process
+in the argument.  The \commonlongarg{debug} switch will write the process
 call in the transcript file and will delimit the argument in the log
 with single quote characters for convenience, but the process isn't
 actually called in that way.
@@ -2587,7 +2601,7 @@ valid \idx{IETF} language tag.
 
 The appropriate file is searched for in the following order, where
 \meta{locale} is the \gls{Java-locale} or the value supplied
-by the \longarg{locale} switch:
+by the \commonlongarg{locale} switch:
 \begin{enumerate}
 \item \meta{lang} exactly matches \meta{locale}.
 For example, my locale is \code{en-GB}, so \bibgls\ will first search
@@ -2955,18 +2969,20 @@ The sort values for these entries will be: \qt{John 04}, \qt{John
 will be typeset as \qt{John~IV}, \qt{John~VI}, \qt{John~IX} and
 \qt{John~XII}. Note that \ics{bibglspaddigits} is only recognised by
 the \bibgls\ interpreter. Alternatively, you can use the
-\csopt{sort-number-pad} option to pad the numbers.
+\csopt{sort-number-pad} option to pad the numbers (or use 
+\ics{dtlpadleadingzeros} which is also recognised by the
+\texparserlib\ and \sty{datatool-base} v3.0+).
 
 \TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple \idxpl!{regex}. The \texparserlib\ performs
 better than a simple pattern match, and that's the purpose of
 \file{texparserlib.jar} and why it's used by \bibgls\ (and by
-\idx!{convertgls2bib}). When the \longarg{debug} mode is on, any
+\idx!{convertgls2bib}). When the \commonlongarg{debug} mode is on, any
 warnings or errors triggered by the interpreter will be written to
 the transcript prefixed with \code{texparserlib:} (the results of
 the conversions will be included in the transcript as informational
 messages prefixed with \code{texparserlib:} even with
-\longarg{no-debug}).
+\commonlongarg{no-debug}).
 
 For example, suppose the \ext{bib} file includes:
 \begin{codeenv}
@@ -3133,7 +3149,7 @@ the order: \code{M} ($\mtx{M}$), \code{S} ($\set{S}$),
 \code{i} ($\imaginary$), \code{v} ($\vec{v}$) and
 \code{card} ($\card{S}$).
 In this case, the entries have been sorted according to
-the character codes. If you run \bibgls\ with \longarg{verbose}
+the character codes. If you run \bibgls\ with \commonlongarg{verbose}
 the decimal character codes will be included in the transcript.
 For this example:
 \begin{alltt}
@@ -3144,7 +3160,7 @@ S -> 'S' [83]
 v -> '\usebox\varrow' [118 8407]
 \end{alltt}
 
-The \longarg{group} option (in addition to \longarg{verbose}) 
+The \longarg{group} option (in addition to \commonlongarg{verbose}) 
 will place the letter group in 
 parentheses before the character code list:
 \begin{alltt}
@@ -3163,7 +3179,7 @@ by the interpreter, the sort values will all be changed to
 \idx{lowercase}. The order is now: \code{i} ($\imaginary$), 
 \code{M} ($\mtx{M}$), \code{S} ($\set{S}$),
 \code{v} ($\vec{v}$) and \code{card} ($\card{S}$).
-The transcript (with \longarg{verbose}) now shows
+The transcript (with \commonlongarg{verbose}) now shows
 \begin{alltt}
 i -> 'i' [105]
 card -> '|s|' [124 115 124]
@@ -3171,7 +3187,7 @@ M -> 'm' [109]
 S -> 's' [115]
 v -> '\usebox\varrow' [118 8407]
 \end{alltt}
-With \longarg{group} (in addition to \longarg{verbose}) 
+With \longarg{group} (in addition to \commonlongarg{verbose}) 
 the letter groups are again included:
 \begin{alltt}
 i -> 'i' (I) [105]
@@ -3189,7 +3205,7 @@ locale's alphabet rules. For example, with \csopt[en]{sort}
 (English, no region or variant), the order becomes:
 \code{card} ($\card{S}$), \code{i} ($\imaginary$), 
 \code{M} ($\mtx{M}$), \code{S} ($\set{S}$) and
-\code{v} ($\vec{v}$). The transcript (with \longarg{verbose}) 
+\code{v} ($\vec{v}$). The transcript (with \commonlongarg{verbose}) 
 shows the collation keys instead:
 \begin{alltt}
 i -> 'i' [0 92 0 0 0 0]
@@ -3266,38 +3282,38 @@ Available options are listed below.
 These command line switches are common to \bibgls\ and the
 supplementary command line conversion tools
 
-\commonargsection{help}
+\commonarg{help}
 
 Display the help message and quit.
 
-\commonargsection{version}
+\commonarg{version}
 
 Display the version information and quit. As from v2.5, this now
 includes the version number of the \file{texparserlib.jar} library.
 
-\commonargsection{verbose}
+\commonarg{verbose}
 
 Switches on the verbose mode. This writes extra information to the
 terminal and transcript file.
 
-\commonargsection{no-verbose}
+\commonarg{no-verbose}
 
 Switches off the verbose mode. This is the default behaviour.
 Some messages are written to the terminal. To completely suppress
 all messages (except errors), switch on the silent mode.
 For additional information messages, switch on the verbose mode.
 
-\commonargsection{quiet}
+\commonarg{quiet}
 
 Suppresses all messages except for errors that would normally be
 written to the terminal. Warnings and informational messages are
 written to the transcript file, which can be inspected afterwards.
 
-\commonargsection{silent}
+\commonarg{silent}
 
-Synonym of \longarg{quiet}.
+Synonym of \commonlongarg{quiet}.
 
-\commonargsection{locale}
+\commonarg{locale}
 
 Specify the preferred \langxml, where \meta{lang} is a valid \idx{IETF} language tag.
 This option requires an appropriate \metafilefmt{bib2gls-}{lang}{.xml}
@@ -3315,7 +3331,7 @@ the \csopt{locale} resource option, to specify the default
 \gls{resource-locale}, or set the locale for individual options,
 such as \csopt{sort}.
 
-\commonargsection{debug}
+\commonarg{debug}
 
 Sometimes when things go wrong it can be hard to diagnose the problem
 from the normal messages. If you report an issue, you may be asked
@@ -3326,7 +3342,7 @@ The \longargfmt{debug} option can be used to switch on debugging mode.
 If \meta{n} is present, it must be a non-negative integer indicating
 the debugging mode. If omitted, 1 is assumed. This option also
 switches on the verbose mode. A value of 0 is equivalent to
-\commonlongargfmt{no-debug}.
+\commonlongarg{no-debug}.
 
 The value of \meta{n} determines how much extra information is
 provided. If \meta{n} is greater than 0 then all \bibgls\ debugging
@@ -3345,7 +3361,7 @@ setting. An error message will start with \qt{Error:~} and a warning
 message will start with \qt{Warning:~}. Unknown commands will throw
 an exception with a stack trace in debug mode.
 
-\commonargsection{debug-mode}
+\commonarg{debug-mode}
 
 This option is an alternative to \longargfmt{debug} where the value
 of \meta{n} needs to be calculated. Debugging mode requires a
@@ -3409,9 +3425,9 @@ For example:
 bib2gls \longargfmt{debug-mode} catcode,sty-data \meta{filename}
 \end{alltt}
 
-\commonargsection{no-debug}
+\commonarg{no-debug}
 
-Switches off the debugging mode. Equivalent to \longarg{debug}~0.
+Switches off the debugging mode.
 
 \section{File Options}
 
@@ -12456,8 +12472,8 @@ texparserlib: {\glsentryname{gato}} -> gato
 texparserlib: {\glsentryname{gatinho}} -> gatinho
 \end{verbatim}
 The \code{kitten} entry has the same list, and the same process is
-repeated for that entry. The \longarg{verbose} mode will provide additional
-information. The \longarg{debug} mode will indicate whether the
+repeated for that entry. The \commonlongarg{verbose} mode will provide additional
+information. The \commonlongarg{debug} mode will indicate whether the
 referenced label was found in the current \igls{resourceset} or if it had
 to be fetched from another \igls{resourceset}. So if the resulting
 order isn't what you expect, check the transcript file for messages.
@@ -14166,7 +14182,7 @@ obtained from the label.
 
 Therefore both \code{glossarylist} and \code{glosscol} end
 up with the same sort value: \code{glossary}. This triggers a
-message in verbose mode (\longarg{verbose}) which can be found 
+message in verbose mode (\commonlongarg{verbose}) which can be found 
 in the transcript file:
 \begin{verbatim}
 Identical sort values for 'glossarylist' and 'glosscol'
@@ -14808,7 +14824,7 @@ above example) or an \igls{ignoredrecord} format such as
 \encap{glsignore}, that format will be skipped.  So in the above
 example, the second \gls{record} will be added to the \gls{locationlist}, but
 not the first. (A message will only be written to the transcript if
-the \longarg{debug} switch is used.) The default
+the \commonlongarg{debug} switch is used.) The default
 \encap{glsnumberformat} will take precedence over the
 \igls{ignoredrecord} formats (\encap{glsignore} and
 \encap{glstriggerrecordformat}).
@@ -16568,7 +16584,7 @@ had \csopt[doc]{sort} as the default.
 
 \item[\optfmt{doc}] The \gls{document-locale} if it has been detected by
 \sty{tracklang}. If no document language has been detected (or
-identified with \longarg{locale}), then
+identified with \commonlongarg{locale}), then
 \optfmt{doc} will be equivalent to \optfmt{locale}.
 
 \item[\optfmt{locale}] The default \gls{Java-locale}.
@@ -17553,7 +17569,7 @@ then I can sort them chronologically:
 and the locale matches my system locale, so I could omit
 both \csopt{date-sort-locale} and \csopt{date-sort-format}.)
 
-If \longarg{verbose} mode is on, the transcript will show
+If \commonlongarg{verbose} mode is on, the transcript will show
 the label, sort value and numeric value for each entry.
 In this case, the information is:
 \begin{verbatim}
@@ -17979,7 +17995,7 @@ This option is ignored when used with the non-alphabetic
 \csopt{sort} options. You can find the break points in the
 \field{sort} field for the entry's definition in the \ext{glstex}
 file (which is provided for information rather than for use in the
-document).  Alternatively, use the \longarg{debug} switch to show
+document).  Alternatively, use the \commonlongarg{debug} switch to show
 the break points in the transcript. (This will also show the
 collation rule.) 
 
@@ -18165,7 +18181,7 @@ The \csopt[\meta{field}]{sort-suffix} setting will only append a suffix
 if that field is set, but (if set) it will apply the suffix to all
 \field{sort} values, even those that are unique.
 
-If you use \longarg{verbose}, then \bibgls\ will write information
+If you use \commonlongarg{verbose}, then \bibgls\ will write information
 in the transcript when it appends a suffix to the sort value.  The
 message:
 \begin{alltt}
@@ -22793,16 +22809,20 @@ data (see \sectionref{sec:gls2bib}).
 These command line tools share the same common switches listed in
 \sectionref{sec:switches}. Additionally, they share the switches
 listed in \sectionref{sec:shared2bibswitches}, but they may also
-have their specific switches which are described in the revelant
+have their specific switches which are described in the relevant
 section.
 
-\begin{information}
+\begin{important}
 The \ext{bib} format has case-insensitive field names. However, the
 source files input by the converter tool typically have
 case-sensitive labels that correspond to the destination \ext{bib}
 field. The converter tools will convert the fields to
 \idx{lowercase} after any mappings have been applied.
-\end{information}
+\end{important}
+
+It's likely that you will need to post-process the \ext{bib} files
+or at least double-check that the conversion has been performed
+adequately.
 
 \section{Shared Conversion Tool Switches}
 \label{sec:shared2bibswitches}
@@ -22834,10 +22854,10 @@ operating system. For example:
 convertgls2bib --space-sub '' entries.tex entries.bib
 \end{verbatim}
 
-\begin{information}
+\begin{important}
 Note that all forbidden punctuation characters
 (such as commas, equal signs and braces) will be automatically stripped.
-\end{information}
+\end{important}
 
 \converterarg{preamble-only}
 
@@ -22861,7 +22881,26 @@ Don't allow existing \ext{bib} files to be overwritten.
 \converterarg{ignore-fields}
 
 Omit all the fields listed in \meta{list} from the \ext{bib} file.
-This option is not cumulative. 
+This option is cumulative. 
+Note that in earlier versions of \idx{convertgls2bib} an empty list 
+cancelled the list of ignored fields. As from version 4.0, you will
+need to use \converterlongarg{no-ignore-fields} to clear the list.
+
+\converterarg{no-ignore-fields}
+
+Cancels the effect of \converterlongarg{ignore-fields}.
+
+\converterarg{key-map}
+
+Provides a mapping from source field names to the field names used in
+the destination \ext{bib} file. The argument should be a
+comma-separated list of \code{\meta{src-field}=\meta{dest-field}}
+pairs.
+This option is cumulative.
+
+\converterarg{no-key-map}
+
+Cancels all field mappings.
 
 \converterarg{index-conversion}
 
@@ -22919,7 +22958,7 @@ Omit the \field{sort} field.  This is the default since \bibgls\ can
 work out a more intuitive sort value than either \idx!{makeindex} or
 \idx!{xindy}.
 This option is automatically set if the \field{sort} field is
-included in \converterbiblongarg{ignore-fields} (but it won't be
+included in \converterlongarg{ignore-fields} (but it won't be
 switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-sort}
@@ -22932,7 +22971,7 @@ Omit the \field{type} field in the \ext{bib} file.  You may find it
 more flexible not to be locked into a specific glossary type if you
 have a large database of entries.
 This option is automatically set if the \field{type} field is
-included in \converterbiblongarg{ignore-fields} (but it won't be
+included in \converterlongarg{ignore-fields} (but it won't be
 switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-type}
@@ -22979,7 +23018,7 @@ Don't split the entries into separate files according to their type
 
 Omit the \field{category} field in the \ext{bib} file.
 This option is automatically set if the \field{category} field is
-included in \converterbiblongarg{ignore-fields} (but it won't be
+included in \converterlongarg{ignore-fields} (but it won't be
 switched off automatically if it's not included in the list).
 
 \convertglsbibarg{no-ignore-category}
@@ -23043,7 +23082,7 @@ or \ics{glsxtrindexseealso} commands.
 
 \section{Recognised Commands}
 
-This application recognises the commands listed below as well as
+The \idx{convertgls2bib} application recognises the commands listed below as well as
 some standard commands such as \ics{newcommand}. Avoid any overly
 complicated code within the \ext{tex} file. The \texparserlib\ 
 isn't a \TeX\ engine! The
@@ -23051,7 +23090,7 @@ isn't a \TeX\ engine! The
 commands recognised from packages that the \texparserlib\ supports,
 you'll need to include \ics{usepackage} in the \ext{tex} file. If
 you want to quit parsing the \ext{tex} file at the start of the
-document, use the \convertglsbiblongarg{preamble-only} switch.
+document, use the \converterlongarg{preamble-only} switch.
 
 In all cases below, if \meta{\keyvallist} contains:
 \begin{codeenv*}
@@ -23381,7 +23420,7 @@ contain:
 \styfmt{datatool}}
 \label{sec:datatool2bib}
 
-A \sty{datatool} database can be converted to a \ext{bib} file
+A \isty{datatool} database can be converted to a \ext{bib} file
 with the supplementary tool \idx{datatool2bib}. The syntax is:
 \begin{alltt}
 datatool2bib \oargm{options} \meta{tex file} \meta{bib file}
@@ -23392,6 +23431,104 @@ it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and
 \texmfcnf{openoutany}. Take care not to accidentally overwrite
 existing \ext{bib} files as there's no check to determine if
 \meta{bib file} already exists with the default \converterlongarg{overwrite}. 
+
+The \meta{tex file} may be a complete document (in which case, you
+may want to use \converterlongarg{preamble-only} if the database
+commands are all in the preamble) or may be a file that just
+contains the database construction commands. The conversion tool
+uses the \texparserlib\ which has some limited support for
+\sty{datatool}, including database construction commands and file
+input commands \ics{DTLloaddb}, \ics{DTLloaddbtex} and the newer
+\ics{DTLread}.
+
+For example, suppose I have a document file called
+\filefmt{myDoc.tex} that contains:
+\begin{codeenv}
+\csfmt{documentclass}\marg{article}
+\csfmt{usepackage}\marg{datatool}
+\cs{DTLnewdb}\marg{mydata}
+\cs{DTLnewrow}\marg{mydata}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
+\comment{...}
+\cmd{begin}\marg{document}
+\comment{...}
+\cmd{end}\marg{document}
+\end{codeenv}
+Then I can extract this data with:
+\begin{codeenv}
+datatool2bib \converterlongarg{preamble-only} myDoc.tex mydata.bib
+\end{codeenv}
+If the database commands are instead in a separate file called, say,
+\filefmt{mydata.tex} which is simply input in \filefmt{myDoc.tex}
+then \filefmt{mydata.tex} can then be used for the \meta{tex file}
+input file:
+\begin{verbatim}
+datatool2bib mydata.tex mydata.bib
+\end{verbatim}
+Note that the \texparserlib\ also recognises commands such as
+\ics{dtlexpandnewvalue}. If this is in \filefmt{myDoc.tex} rather
+than in \filefmt{mydata.tex} and only \filefmt{mydata.tex} is parsed
+then the \texparserlib\ won't encounter \cs{dtlexpandnewvalue} and
+so won't enable new value expansion. You can, however, use
+\code{\datatoolbiblongarg{setup} expand-new-value} to switch on new
+value expansion.
+
+If the data source is in a CSV file, then the \texparserlib\ can
+parse it but only if the file is referenced in \ics{DTLloaddb} (pre
+\sty{datatool} v3.0) or \ics{DTLread} (\sty{datatool} v3.0+). 
+For the newer \cs{DTLread} command, the \code{format=\iext{csv}} setting is
+required to parse CSV files or \code{format=\iext{tsv}} for TSV files.
+If the file contains \LaTeX\ commands, \code{content=tex} is
+required otherwise \code{content=literal} is required.
+
+So in order to convert a CSV file called \filefmt{mydata.csv} to 
+a \ext{bib} file, the \texparserlib\ needs to parse:
+\begin{codeenv}
+\cs{DTLread}\oarg{format=csv,content=literal}\marg{mydata.csv}
+\end{codeenv}
+Rather than having to parse the entire document source file or
+create a stub file that simply contains this command, you can use
+the \datatoolbiblongarg{read} switch instead:
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{read} format=csv,content=literal mydata.csv mydata.bib
+\end{codeenv}
+This is equivalent to creating a stub file with just the
+\cs{DTLread} line.
+
+The \texparserlib\ does not support the \isty{datagidx} package.
+There are two ways of converting the special \sty{datagidx}
+databases: either save the required database using \ics{DTLwrite} to
+a file that can then be input by \idx{datatool2bib} or instruct
+\idx{datatool2bib} to parse a \LaTeX\ file that contains the
+\ics{datagidx.newterm} and \ics{datagidx.newacro} commands. The \idx{datatool2bib}
+tool has its own implementation of those commands.
+
+In general, better results are obtained if \idx{datatool2bib} parses
+\ics{datagidx.newterm} and \ics{datagidx.newacro} instead of the
+actual \sty{datagidx} databases. The custom \sty{datagidx} databases
+have a number of columns for internal use that are not applicable to
+\bibgls.
+
+When you run \idx{datatool2bib} from the command line, there will be
+two lines reporting the number of databases found by parsing the
+input. For example:
+\begin{verbatim}
+1 database (datatool) found
+0 databases (datagidx) found
+\end{verbatim}
+The first line indicates the number of regular \sty{datatool}
+databases that were found by the \texparserlib. The second line
+indicates the number of \sty{datagidx} databases that were detected
+by scanning for \ics{datagidx.newterm} and \ics{datagidx.newacro}.
+
+In the first case, the source field labels will correspond to the
+column keys (such as \optfmt{Label}, \optfmt{Name},
+\optfmt{Description} and \optfmt{Symbol}), whereas in the second
+case the source field labels will correspond to the option keys for
+\cs{datagidx.newterm} and \cs{datagidx.newacro} (such as \optfmt{description} and
+\optfmt{symbol}, but not the \optfmt{label} key, which will be
+dropped from the list after its value is saved elsewhere).
 
 \section{Command Line Arguments}
 
@@ -23406,15 +23543,20 @@ Obtain the \ext{bib} entry label from the column identified by the
 case-sensitive column label not the mapped field.
 The label will be obtained by copying the value from the given
 column and processing according to \converterlongarg{space-sub}
-(and stripping forbidden characters).
+(and stripping forbidden characters). This option is not applicable
+to \ics{datagidx.newterm} and \ics{datagidx.newacro}.
 
-\begin{information}
-The chosen column should have unique values (and will still be
+\begin{important}
+The chosen column should have unique values (and should still be
 unique after processing).
-\end{information}
+\end{important}
 
 The default setting is \code{\datatoolbiblongarg{label} Label}
-since this is the column used for labels with \styfmt{datagidx}.
+since this is the column used for labels with \styfmt{datagidx} (but
+is only applicable if you save the database with \cs{DTLwrite}
+rather than having \idx{datatool2bib} parse \cs{datagidx.newterm} 
+and \cs{datagidx.newacro}).
+
 If you are converting a general \sty{datatool} database, either
 choose a different column or switch on the auto label.
 
@@ -23442,53 +23584,351 @@ This option automatically implements
 Instead of parsing the provided \ext{tex} file in the usual manner, 
 the \datatoolbiblongarg{read} option will act as though the input
 is:
-\begin{alltt}
-\cs{DTLread}\oargm{options}\marg{filename}
-\end{alltt}
+\begin{codeenv}
+\ics{DTLread}\oargm{options}\marg{filename}
+\end{codeenv}
 where \meta{filename} is the input filename supplied to
 \idx{datatool2bib}. This can be use where the source file is a
 CSV file rather than a \LaTeX\ file.
 
+\datatoolbibarg{setup}
+Implements \code{\ics{DTLsetup}\margm{options}} before parsing.
+Note that this can be counteracted by any changes to the settings
+within the file being parsed.
+
 \datatoolbibarg{save-datum}
 Equivalent to:
-\begin{alltt}
+\begin{codeenv}
 \datatoolbiblongarg{save-value} "-value" \datatoolbiblongarg{save-currency} "-currency"
-\end{alltt}
-
-\datatoolbibarg{no-save-datum}
-Equivalent to:
-\begin{alltt}
-\datatoolbiblongarg{no-save-value} \datatoolbiblongarg{no-save-currency}
-\end{alltt}
-
-\datatoolbibarg{save-value}
-
-If a field contains a formatted numeric value or currency (according
-to the current \sty{datatool} settings), the numeric value will be
-saved in the field \meta{field}\meta{prefix} if it's different from
-the value in \meta{field}. For example, if the CSV file
+\end{codeenv}
+For example, if the CSV file
 \filefmt{products.csv} contains:
 \begin{alltt}
 ID,Product,Quantity,Price
 1,Sample,3,"\$1,234.50"
 \end{alltt}
 then with:
-\begin{alltt}
-\app{datatool2bib} \databiblongarg{read} "format=csv,content=literal" products.csv products.bib
-\end{alltt}
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{label} Product \datatoolbiblongarg{read} "format=csv,content=literal" products.csv products.bib
+\end{codeenv}
+The \filefmt{products.bib} file will contain:
+\begin{codeenv}
+\atentry{entry}\marg{Sample,
+  \fieldfmt{id} = \marg{1},
+  \fieldfmt{product} = \marg{Sample},
+  \fieldfmt{quantity} = \marg{3},
+  \fieldfmt{price} = \marg{\cs{cs.dollar}1,234.5}
+}
+\end{codeenv}
+Whereas with:
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{save-datum} \datatoolbiblongarg{label} Product \datatoolbiblongarg{read} "format=csv,content=literal" products.csv products.bib
+\end{codeenv}
+\begin{codeenv}
+\atentry{entry}\marg{Sample,
+  \fieldfmt{id} = \marg{1},
+  \fieldfmt{product} = \marg{Sample},
+  \fieldfmt{quantity} = \marg{3},
+  \fieldfmt{price} = \marg{\cs{cs.dollar}1,234.5},
+  \fieldfmt{price-value} = \marg{1234.5},
+  \fieldfmt{price-currency} = \marg{\cs{cs.dollar}}
+}
+\end{codeenv}
+Note that the original number formatting is retained in the
+\fieldfmt{price} field but the plain numeric value is saved in the
+\fieldfmt{price-value} field and the currency symbol is saved in the
+\fieldfmt{price-currency} field. These custom fields will all need
+to be defined or aliased when the \ext{bib} file is read by \bibgls.
 
+For further information on the \sty{datatool} datum format see the
+\sty{datatool} v3.0+ user manual. You need to set the
+decimal and number group characters with \ics{DTLsetnumberchars} and
+the currency symbol with \ics{DTLnewcurrencysymbol} for the values
+to be parsed correctly.
+
+\datatoolbibarg{no-save-datum}
+Equivalent to:
+\begin{codeenv}
+\datatoolbiblongarg{no-save-value} \datatoolbiblongarg{no-save-currency}
+\end{codeenv}
+
+\datatoolbibarg{save-value}
+
+If a field contains a formatted numeric value or currency (according
+to the current \sty{datatool} settings), the numeric value will be
+saved in the field \meta{field}\meta{prefix} if it's different from
+the value in \meta{field}.
 
 \datatoolbibarg{no-save-value}
 
+Don't save numeric values in a separate field (default).
+
 \datatoolbibarg{save-currency}
+
+If a field contains a formatted currency (according
+to the current \sty{datatool} settings), the currency symbol will be
+saved in the field \meta{field}\meta{prefix}.
 
 \datatoolbibarg{no-save-currency}
 
+Don't save the currency symbol in a separate field (default).
+
 \datatoolbibarg{split}
+
+If multiple databases are found in the input file, create a separate
+output file for each database. If the output \meta{bib file} provided to
+\idx{datatool2bib} is given as \filefmt{\meta{base}.bib} then each 
+database \meta{dbname} will be saved in the file
+\filefmt{\meta{base}-\meta{dbname}.bib}.
 
 \datatoolbibarg{no-split}
 
-% TODO
+All data found from parsing the input file will be saved in the
+single output \meta{bib file} (default).
+
+\datatoolbibarg{strip-glsadd}
+
+Any instance of \ics{datagidx.glsadd} found in field values will be
+stripped, along with the argument. Note that this command is
+provided by \sty{datagidx} and, unlike the analogous
+\sty{glossaries} command, it doesn't have an optional argument but
+instead allows the format option to be included in the mandatory
+argument. 
+
+This setting is the default as \cs{glsadd} is rarely needed in field
+values with \bibgls, as dependencies and the \csopt{selection}
+criteria are usually sufficient.
+
+\datatoolbibarg{no-strip-glsadd}
+
+No search is made for \ics{datagidx.glsadd} in field values. Note
+that this means that no adjustments for the different syntax will be
+made.
+
+\datatoolbibarg{strip-acronym-font}
+
+Any instance of \ics{acronymfont} found in field values will be
+strip and the braces around the argument will be removed.
+
+This setting is the default since \cs{acronymfont} should not be
+used with \sty{glossaries-extra}.
+
+\datatoolbibarg{no-strip-acronym-font}
+
+No search is made for \cs{acronymfont} in the field values. Note
+that the use of \cs{acronymfont} is deprecated with
+\sty{glossaries-extra} as it has a different abbreviation mechanism
+to the base \sty{glossaries} package.
+
+\datatoolbibarg{strip-case-change}
+
+The following \idxpl{casecommands} will be stripped from field
+values and the braces around the argument will be removed:
+\csfmt{uppercase}, \csfmt{lowercase},
+\ics{MakeTextUppercase}, \ics{MakeTextLowercase},
+\ics{MakeUppercase}, \ics{MakeLowercase}, and the \sty{mfirstuc}
+commands.
+
+\datatoolbibarg{no-strip-case-change}
+
+Don't strip the \idxpl{casecommands} from field values (default).
+
+\section{Recognised Commands}
+
+This section lists \isty{datatool} and \isty{datagidx} commands that
+are recognised by \idx{datatool2bib}. (There may be other commands
+that are also recognised but aren't relevant to the conversion
+process.) See the \sty{datatool} user manual for further
+information.
+
+\prefixedcssection{idx}{DTLsetup}
+Some but not all \sty{datatool} settings are
+recognised by the \texparserlib. Of those that are recognised, the
+settings pertinent to \idx{datatool2bib} are: \optfmt{default-name},
+\optfmt{store-datum}, \optfmt{new-value-trim},
+\optfmt{new-value-expand}, and \optfmt{io}.
+
+The \optfmt{io} setting
+takes a comma-separated list of default I/O options applicable to
+\cs{DTLread} (and \cs{DTLwrite}). Recognised I/O options:
+\optfmt{name}, \optfmt{keys}, \optfmt{headers}, \optfmt{expand}, 
+\optfmt{format}, \optfmt{add-delimiter}, \optfmt{csv-escape-chars},
+\optfmt{csv-content}, \optfmt{csv-blank}, \optfmt{csv-skip-lines}
+(and synonym \optfmt{omitlines}), \optfmt{no-header} (and synonym
+\optfmt{noheader}), \optfmt{auto-keys} (and synonym
+\optfmt{autokeys}), \optfmt{overwrite}, \optfmt{load-action},
+\optfmt{delimiter}, and \optfmt{separator}.
+
+\prefixedcssection{idx}{DTLread}
+Loads a database from the given file, where the format should be
+identified in \meta{options} with the \optfmt{format} key. The
+default is \code{format=csv}, which indicates that the file is a CSV
+file. For tab-separated files, use \code{format=tsv}. If the CSV/TSV
+file contains \TeX\ markup within the cells, use
+\code{csv-content=tex} otherwise use \code{csv-content=literal}.
+
+Note that:
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{read} \meta{io-options} \meta{filename} \meta{bib file}
+\end{codeenv}
+is equivalent to creating a file \filefmt{otherfile.tex} with a single line:
+\begin{codeenv}
+\cs{DTLread}\oargm{io-options}\margm{filename}
+\end{codeenv}
+and then running:
+\begin{alltt}
+datatool2bib otherfile.tex \meta{bib file}
+\end{alltt}
+
+\begin{important}
+The \texparserlib\ also recognises \ics{DTLwrite} but
+\idx{datatool2bib} redefines the command to do nothing.
+\end{important}
+
+\prefixedcssection{idx}{dtlexpandnewvalue}
+New values will be expanded before being added to the database.
+Note that the \texparserlib\ may not expand commands in the same way
+as \TeX, and it won't be able to expand unknown commands.
+
+\prefixedcssection{idx}{dtlnoexpandnewvalue}
+New values will not be expanded before being added to the database
+(default).
+
+\prefixedcssection{idx}{DTLnewdb}
+Defines a new database with the given label.
+
+\prefixedcssection{idx}{DTLnewrow}
+Creates a new row in the database identified the given label.
+
+\prefixedcssection{idx}{DTLnewdbentry}
+Adds a new entry to the final row of the given database.
+
+For example:
+\begin{codeenv}
+\ics{DTLnewdb}\marg{mydata}
+\ics{DTLnewrow}\marg{mydata}
+\ics{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.smith@example.com}
+\cs{DTLnewrow}\marg{mydata}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{Jane}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Doe}
+\cs{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.doe@example.com}
+\end{codeenv}
+This can be converted using, for example (assuming the above is in
+the file \filefmt{mydata.tex}):
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{auto-label} mydata.tex mydata.bib
+\end{codeenv}
+This will create the file \filefmt{mydata.bib}, which will contain:
+\begin{codeenv}
+\atentry{entry}\marg{mydata1,
+  \fieldfmt{forename} = \marg{John},
+  \fieldfmt{surname} = \marg{Smith},
+  \fieldfmt{email} = \marg{j.smith@example.com}
+}
+\strut
+\atentry{entry}\marg{mydata2,
+  \fieldfmt{forename} = \marg{Jane},
+  \fieldfmt{surname} = \marg{Doe},
+  \fieldfmt{email} = \marg{j.doe@example.com}
+}
+\end{codeenv}
+(Use \converterlongarg{index-conversion} to use \atentry{index} instead
+of \atentry{entry} where there's no \field{description}.)
+The \csopt{assign-fields} resource option can be used to set
+the \field{name} field to a concatenation of the forename and
+surname fields (which would need to be aliased or defined if
+required).
+
+\prefixedcssection{idx}{DTLaction}
+This general purpose action command can be used to create and append
+to databases. The applicable actions that are recognised by the
+\texparserlib\ (and therefore by \idx{datatool2bib}) are:
+\optfmt{new}, \optfmt{new row}, \optfmt{new entry}, and
+\optfmt{add column}.
+
+For example:
+\begin{codeenv}
+\ics{DTLsetup}\marg{default-name=mydata}
+\ics{DTLaction}\marg{new}
+\cs{DTLaction}\oarg{
+  assign =
+   \marg{
+      Name = \marg{José Arara},
+      Score = 68,
+      Award = \marg{\cs{cs.dollar}2,453.99}
+   }
+}\marg{new row}
+\cs{DTLaction}\oarg{
+  assign =
+   \marg{
+      Name = \marg{Zoë Zebra},
+      Score = 73,
+      Award = \marg{\cs{cs.dollar}2,542}
+   }
+}\marg{new row}
+\end{codeenv}
+This can be converted using, for example (assuming the above is in
+the file \filefmt{mydata.tex}):
+\begin{codeenv}
+datatool2bib \datatoolbiblongarg{label} Name mydata.tex mydata.bib
+\end{codeenv}
+This will create the file \filefmt{mydata.bib}, which will contain:
+\begin{codeenv}
+\atentry{entry}\marg{JoséArara,
+  \field{name} = \marg{José Arara},
+  \fieldfmt{score} = \marg{68},
+  \fieldfmt{award} = \marg{\cs{cs.dollar}2,453.99}
+}
+\strut
+\atentry{entry}{ZoëZebra,
+  \field{name} = \marg{Zoë Zebra},
+  \fieldfmt{score} = \marg{73},
+  \fieldfmt{award} = \marg{\cs{cs.dollar}2,542}
+}
+\end{codeenv}
+Again, use \converterlongarg{index-conversion} to use
+\atentry{index} instead of \atentry{entry} if the
+\field{description} field is missing.
+
+The \iext{dtltex} and \ext{dbtex} file formats are also recognised
+by the \texparserlib. The commands used in those files are not
+intended for document use, but the files may be passed to
+\idx{datatool2bib} as the input file. See the \sty{datatool} v3.0+
+user manual for further details of those formats.
+
+\prefixedcssection{idx.datagidx}{newgidx}
+Defines a new \sty{datagidx} database, which may be referenced in
+\cs{datagidx.newterm} and \cs{datagidx.newacro} by the
+\optfmt{database} key in their optional argument (which be parsed
+and then dropped from the field list).
+
+\prefixedcssection{idx.datagidx}{newterm}
+This is similar to the \cs{newterm} command provided by
+\sty{glossaries} (via the \styopt{index} package option), but has
+slightly different behaviour. With \sty{datagidx}, the mandatory
+argument is the name. The label may be supplied in the optional
+argument. If omitted, the label is obtained from the name. The
+\idx{datatool2bib} application will try to mimic the process used by
+\sty{datagidx} to create the label from the name, but may not
+produce an exact match. It's therefore important to double-check the
+resulting \ext{bib} file afterwards.
+
+Each \cs{datagidx.newterm} will be converted to \atentry{entry}
+unless it has both the \field{long} and \field{short} fields set, in
+which case it will be converted to \atentry{abbreviation}. If there
+is no \field{description} and \converterlongarg{index-conversion} is
+used, then \atentry{index} will be used instead of \atentry{entry}
+(but not if the term has been identified as an abbreviation).
+
+\prefixedcssection{idx.datagidx}{newacro}
+This is simply a wrapper command that internally uses
+\cs{datagidx.newterm}. However, \idx{datatool2bib} has a slightly
+different behaviour that doesn't add the formatting or case-changing
+commands (since these can be dealt with by the abbreviation style or
+\bibgls\ resource options).
+
 \chapter{Examples}
 \label{sec:examples}
 \setsecdepth*{0}

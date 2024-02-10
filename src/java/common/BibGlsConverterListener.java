@@ -111,6 +111,21 @@ public class BibGlsConverterListener extends LaTeXParserListener
       return super.getLaTeXSty(options, styName, loadParentOptions, stack);
    }
 
+   @Override
+   public LaTeXSty usepackage(KeyValList options, String styName,
+     boolean loadParentOptions, TeXObjectList stack)
+   throws IOException
+   {
+      if (texApp.isSpecialUsePackage(options, styName, loadParentOptions, stack))
+      {
+         return null;
+      }
+      else
+      {
+         return super.usepackage(options, styName, loadParentOptions, stack);
+      }
+   }
+
    // Ignore unknown control sequences
    @Override
    public ControlSequence createUndefinedCs(String name)
