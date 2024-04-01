@@ -1,4 +1,8 @@
-TARGET_VERSION := --release 8
+ifeq ($(shell javac -version 2>&1 | grep 1.8),)
+  target_version := --release 8
+else
+  target_version =
+endif
 
 all	: lib/bib2gls.jar lib/convertgls2bib.jar lib/datatool2bib.jar
 
@@ -10,7 +14,7 @@ lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bibgls/bib
 classes/com/dickimawbooks/bibgls/bib2gls/Bib2Gls.class	: classes/com/dickimawbooks/bibgls/bib2gls \
 	java/bib2gls/*.java lib/bibglscommon.jar
 	cd java/bib2gls; \
-	javac $(TARGET_VERSION) -d ../../classes \
+	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
@@ -25,7 +29,7 @@ lib/convertgls2bib.jar	: java/gls2bib/Manifest.txt classes/com/dickimawbooks/bib
 classes/com/dickimawbooks/bibgls/gls2bib/Gls2Bib.class	: classes/com/dickimawbooks/bibgls/gls2bib \
 	java/gls2bib/*.java lib/bibglscommon.jar
 	cd java/gls2bib; \
-	javac $(TARGET_VERSION) -d ../../classes \
+	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
@@ -40,7 +44,7 @@ lib/datatool2bib.jar	: java/datatool2bib/Manifest.txt classes/com/dickimawbooks/
 classes/com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib.class	: classes/com/dickimawbooks/bibgls/datatool2bib \
 	java/datatool2bib/*.java lib/bibglscommon.jar
 	cd java/datatool2bib; \
-	javac $(TARGET_VERSION) -d ../../classes \
+	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
 
@@ -55,7 +59,7 @@ lib/bibglscommon.jar	: classes/com/dickimawbooks/bibgls/common/BibGlsCommon.clas
 classes/com/dickimawbooks/bibgls/common/BibGlsCommon.class	: classes/com/dickimawbooks/bibgls/common \
 	java/common/*.java
 	cd java/common; \
-	javac $(TARGET_VERSION) -d ../../classes \
+	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
 	 -cp ../../lib/texparserlib.jar *.java
 

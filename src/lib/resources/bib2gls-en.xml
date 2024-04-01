@@ -98,6 +98,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="message.charset">Encoding: {0}</entry>
 
 <!-- bib2gls messages -->
+<entry key="message.cwd">Current working directory: {0}</entry>
 <entry key="message.repruning">Pruning iteration {0}/{1}</entry>
 <entry key="message.crossref.found">Entry {0}: found cross-reference ({1}): {2}</entry>
 <entry key="message.crossref.pruned">Entry {0}: pruned cross-reference ({1}): {2}</entry>
@@ -393,6 +394,20 @@ Aliased entries must be in the same resource set as their target entries with op
 <entry key="warning.mappings.cant.parse">Can''t parse mapping list: {0}</entry>
 <entry key="warning.mismatched.sty">Mismatching versions of packages {0} ({1}) and {2} ({3}). Please upgrade {2}</entry>
 <entry key="warning.get.entry.no.data">Entry ''{0}'' referenced before data initialised.</entry>
+<entry key="warning.ignoring_var.not_dir">Ignoring ''{0}'' variable, not a directory: {1}</entry>
+<entry key="warning.ignoring_var.no_exists">Ignoring ''{0}'' variable, not such directory: {1}</entry>
+<entry key="warning.missing_variable.assuming">Variable ''{0}'' not set. Assuming {0}={1}</entry>
+<entry key="warning.invalid_variable.assuming">Variable setting {0}={1} invalid. Assuming {0}={2}</entry>
+<entry key="warning.read_forbidden.hidden">Read access forbidden with security setting {0}={1} for hidden file {2}</entry>
+<entry key="warning.read_forbidden.absolute">Read access forbidden with security setting {0}={1} for absolute path {2}</entry>
+<entry key="warning.read_forbidden.cwd">Read access forbidden with security setting {0}={1} for path {2} (outside current working directory).</entry>
+<entry key="warning.read_forbidden.io">Read access forbidden by Java Virtual Machine for file {0}</entry>
+<entry key="warning.read_forbidden.security_manager">Read access forbidden by Java's Security Manager for file {0}</entry>
+<entry key="warning.write_forbidden.hidden">Write access forbidden with security setting {0}={1} for hidden file {2}</entry>
+<entry key="warning.write_forbidden.absolute">Write access forbidden with security setting {0}={1} for absolute path {2}</entry>
+<entry key="warning.write_forbidden.cwd">Write access forbidden with security setting {0}={1} for path {2} (outside current working directory).</entry>
+<entry key="warning.write_forbidden.io">Write access forbidden by Java Virtual Machine for file {0}</entry>
+<entry key="warning.write_forbidden.security_manager">Write access forbidden by Java's Security Manager for file {0}</entry>
 
 <entry key="error.title">Error: {0}</entry>
 <entry key="error.no_log">File {0} not found. Remember to run LaTeX before {1}.

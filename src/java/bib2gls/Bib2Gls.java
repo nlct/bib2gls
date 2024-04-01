@@ -138,12 +138,13 @@ public class Bib2Gls extends BibGlsTeXApp
       else if (openinAny == -1)
       {
          // not set, probably MikTeX distribution
-         debugMessage("error.missing.value", "openin_any");
+         logMessage(getMessage("warning.missing_variable.assuming",
+           "openin_any", "a"));
          openin_any = 'a';
       }
       else
       {
-         warningMessage("error.invalid.opt.value", "openin_any", openin);
+         warningMessage("warning.invalid_variable.assuming", "openin_any", openin, "a");
          openin_any = 'a';
       }
 
@@ -154,12 +155,13 @@ public class Bib2Gls extends BibGlsTeXApp
       else if (openoutAny == -1)
       {
          // not set, probably MikTeX distribution
-         debugMessage("error.missing.value", "openout_any");
+         logMessage(getMessage("warning.missing_variable.assuming",
+           "openout_any", "p"));
          openout_any = 'p';
       }
       else
       {
-         warningMessage("error.invalid.opt.value", "openout_any", openout);
+         warningMessage("warning.invalid_variable.assuming", "openout_any", openout, "p");
          openout_any = 'p';
       }
 
@@ -175,12 +177,19 @@ public class Bib2Gls extends BibGlsTeXApp
             {
                texmfoutput = f.toPath();
             }
-            else
+            else if (f.exists())
             {
                // not a directory so ignore it
 
-               System.err.println("TEXMFOUT not a directory: "
-                 + texmfoutputPath);
+               warningMessage("warning.ignoring_var.not_dir", "TEXMFOUTPUT",
+                  texmfoutputPath);
+            }
+            else
+            {
+               // doesn't exist
+
+               logMessage(getMessage("warning.ignoring_var.no_exists", "TEXMFOUTPUT",
+                  texmfoutputPath));
             }
          }
       }
@@ -203,6 +212,8 @@ public class Bib2Gls extends BibGlsTeXApp
       }
 
       cwd = cwdFile.toPath();
+
+      verboseMessage("message.cwd", cwd);
    }
 
    public void checkReadAccess(TeXPath path)
@@ -240,6 +251,32 @@ public class Bib2Gls extends BibGlsTeXApp
    {
       debugMessage("message.checking.read", path);
 
+      Path base = path.getBaseDir();
+      Path relPath = path.getRelativePath();
+
+      // normalize() eliminates redundant path elements.
+
+      Path p = (base == null ? relPath.normalize() : 
+         base.resolve(relPath).normalize());
+
+      try
+      {
+         if (!p.toFile().canRead())
+         {
+            warningMessage("warning.read_forbidden.io", path);
+
+            return false;
+         }
+      }
+      catch (SecurityException e)
+      {
+         warningMessage("warning.read_forbidden.security_manager", path);
+
+         debug(e);
+
+         return false;
+      }
+
       if (openin_any == 'a')
       {
          return true;
@@ -247,6 +284,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       if (path.isHidden())
       {
+         warningMessage("warning.read_forbidden.hidden", "openin_any",
+           openin_any, path);
+
          return false;
       }
 
@@ -265,14 +305,6 @@ public class Bib2Gls extends BibGlsTeXApp
          return true;
       }
 
-      Path base = path.getBaseDir();
-      Path relPath = path.getRelativePath();
-
-      // normalize() eliminates redundant path elements.
-
-      Path p = (base == null ? relPath.normalize() : 
-         base.resolve(relPath).normalize());
-
       if (p.isAbsolute())
       {
          if (p.startsWith(cwd))
@@ -282,17 +314,30 @@ public class Bib2Gls extends BibGlsTeXApp
             return true;
          }
 
-         if (texmfoutput != null)
+         if (texmfoutput != null && p.startsWith(texmfoutput))
          {
-            return p.startsWith(texmfoutput);
+            return true;
          }
+
+         warningMessage("warning.read_forbidden.hidden", "openin_any",
+           openin_any, path);
 
          return false;
       }
 
       // Not absolute path. Is it on the cwd path?
 
-      return p.toAbsolutePath().normalize().startsWith(cwd);
+      if (p.toAbsolutePath().normalize().startsWith(cwd))
+      {
+         return true;
+      }
+      else
+      {
+         warningMessage("warning.read_forbidden.cwd", "openin_any",
+           openin_any, path);
+
+         return false;
+      }
    }
 
    @Override
@@ -305,6 +350,24 @@ public class Bib2Gls extends BibGlsTeXApp
    {
       debugMessage("message.checking.read", path);
 
+      try
+      {
+         if (!path.toFile().canRead())
+         {
+            warningMessage("warning.read_forbidden.io", path);
+
+            return false;
+         }
+      }
+      catch (SecurityException e)
+      {
+         warningMessage("warning.read_forbidden.security_manager", path);
+
+         debug(e);
+
+         return false;
+      }
+
       if (openin_any == 'a')
       {
          return true;
@@ -312,6 +375,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       if (isHidden(path))
       {
+         warningMessage("warning.read_forbidden.hidden", "openin_any",
+           openin_any, path);
+
          return false;
       }
 
@@ -372,17 +438,30 @@ public class Bib2Gls extends BibGlsTeXApp
             }
          }
 
-         if (texmfoutput != null)
+         if (texmfoutput != null && path.startsWith(texmfoutput))
          {
-            return path.startsWith(texmfoutput);
+            return true;
          }
+
+         warningMessage("warning.read_forbidden.hidden", "openin_any",
+           openin_any, path);
 
          return false;
       }
 
       // Not absolute path. Is it on the cwd path?
 
-      return path.toAbsolutePath().normalize().startsWith(cwd);
+      if (path.toAbsolutePath().normalize().startsWith(cwd))
+      {
+         return true;
+      }
+      else
+      {
+         warningMessage("warning.read_forbidden.cwd", "openin_any",
+           openin_any, path);
+
+         return false;
+      }
    }
 
    public void checkWriteAccess(Path path)
@@ -400,8 +479,7 @@ public class Bib2Gls extends BibGlsTeXApp
    {
       if (!isWriteAccessAllowed(file.toPath()))
       {
-         throw new IOException(getMessage("error.openout.forbidden",
-           file));
+         throw new IOException(getMessage("error.openout.forbidden", file));
       }
    }
 
@@ -457,15 +535,30 @@ public class Bib2Gls extends BibGlsTeXApp
            ||name.equals("ins") || name.equals("def")
            ||name.equals("ldf"))
          {
-            if (isDebuggingOn())
-            {
-               logAndPrintMessage(getMessageWithFallback(
+            warningMessage(getMessageWithFallback(
                "error.forbidden.ext",
                "Write access forbidden for extension: {0}", name));
-            }
 
             return false;
          }
+      }
+
+      try
+      {
+         if (path.toFile().exists() && !path.toFile().canWrite())
+         {
+            warningMessage("warning.write_forbidden.io", path);
+
+            return false;
+         }
+      }
+      catch (SecurityException e)
+      {
+         warningMessage("warning.write_forbidden.security_manager", path);
+
+         debug(e);
+
+         return false;
       }
 
       if (openout_any == 'a')
@@ -475,6 +568,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       if (isHidden(path))
       {
+         warningMessage("warning.write_forbidden.hidden", "openout_any",
+           openout_any, path);
+
          return false;
       }
 
@@ -496,17 +592,30 @@ public class Bib2Gls extends BibGlsTeXApp
             return true;
          }
 
-         if (texmfoutput != null)
+         if (texmfoutput != null && path.startsWith(texmfoutput))
          {
-            return path.startsWith(texmfoutput);
+            return true;
          }
+
+         warningMessage("warning.write_forbidden.absolute", "openout_any",
+           openout_any, path);
 
          return false;
       }
 
       // Not absolute path. Is it on the cwd path?
 
-      return path.toAbsolutePath().normalize().startsWith(cwd);
+      if (path.toAbsolutePath().normalize().startsWith(cwd))
+      {
+         return true;
+      }
+      else
+      {
+         warningMessage("warning.write_forbidden.cwd", "openout_any",
+           openout_any, path);
+
+         return false;
+      }
    }
 
    /*
@@ -541,6 +650,7 @@ public class Bib2Gls extends BibGlsTeXApp
       if (texmfoutput != null && !dir.canWrite())
       {
          warningMessage("warning.dir.no.write", dir, texmfoutput);
+
          file = new File(texmfoutput.toFile(), file.getName());
       }
 
@@ -2008,11 +2118,26 @@ public class Bib2Gls extends BibGlsTeXApp
       auxParser.setAllowCatCodeChangers(allowAuxCatChangers);
 
       TeXParser parser = createTeXParser(auxParser);
+      File parserBaseFile = parser.getBaseDir();
+
+      if (dirName != null)
+      {
+         // ensure any \@input in the aux file uses the required directory
+         parser.setBaseDir(basePath);
+      }
+
       Vector<AuxData> auxData;
 
       try
       {
          auxParser.parseAuxFile(parser, auxFile);
+
+         if (dirName != null)
+         {
+            // reset base directory
+
+            parser.setBaseDir(parserBaseFile);
+         }
       }
       catch (MalformedInputException e)
       {

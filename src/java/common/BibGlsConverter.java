@@ -42,7 +42,7 @@ import com.dickimawbooks.texparserlib.generic.UndefinedActiveChar;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
-import com.dickimawbooks.texparserlib.latex.NewDocumentCommand;
+import com.dickimawbooks.texparserlib.latex.latex3.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 
 public abstract class BibGlsConverter extends BibGlsTeXApp
