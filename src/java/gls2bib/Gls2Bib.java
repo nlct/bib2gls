@@ -56,6 +56,7 @@ import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.GobbleOptMandOpt;
+import com.dickimawbooks.texparserlib.latex.glossaries.LoadGlsEntries;
 
 import com.dickimawbooks.bibgls.common.*;
 
@@ -195,6 +196,8 @@ public class Gls2Bib extends BibGlsConverter
       parser.putControlSequence(new GlsSetExpandField(this));
       parser.putControlSequence(new GlsSetExpandField(
         "glssetnoexpandfield", false, this));
+
+      parser.putControlSequence(new LoadGlsEntries());
 
       // ignore common glossary preamble commands
 
