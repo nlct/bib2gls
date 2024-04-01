@@ -1,0 +1,20 @@
+\documentclass{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[record]{glossaries-extra}
+
+\GlsXtrLoadResources[
+ src={subdir/entries.bib}
+]
+
+\title{Sample Document}
+\author{Ann Other}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\include{chapters/chapter1}
+\include{chapters/chapter2}
+
+\printunsrtglossaries
+\end{document}
