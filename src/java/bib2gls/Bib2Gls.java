@@ -261,7 +261,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       try
       {
-         if (!p.toFile().canRead())
+         File f = p.toFile();
+
+         if (f.exists() && !f.canRead())
          {
             warningMessage("warning.read_forbidden.io", path);
 
@@ -352,7 +354,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       try
       {
-         if (!path.toFile().canRead())
+         File f = path.toFile();
+
+         if (f.exists() && !f.canRead())
          {
             warningMessage("warning.read_forbidden.io", path);
 
@@ -545,7 +549,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
       try
       {
-         if (path.toFile().exists() && !path.toFile().canWrite())
+         File file = path.toFile();
+
+         if (file.exists() && !file.canWrite())
          {
             warningMessage("warning.write_forbidden.io", path);
 
