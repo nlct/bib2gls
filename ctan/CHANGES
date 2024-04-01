@@ -1,5 +1,14 @@
 v4.0 (pending)
 
+ * bib2gls
+
+   - bug fix issue #29 "Version 3.8 and 3.9 fail to find aux files in subdirectories of build directory"
+     https://github.com/nlct/bib2gls/issues/29
+
+ * convertgls2bib
+
+   - added support for \loadglsentries
+
  * Added datatool2bib command-line conversion tool.
 
 v3.9 (2024-01-30)
