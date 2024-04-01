@@ -408,14 +408,14 @@
   This can be set with the \csopt{locale} resource option. If not
   explicitly set, then the default will be the document language, if
   it has been detected by \sty{tracklang} or identified with
-  \longarg{locale}, or the \idx{JRE} locale otherwise.}
+  \commonlongarg{locale}, or the \idx{JRE} locale otherwise.}
 }
 
 @entry{document-locale,
   name = {document locale},
   user1={idx.locale-doc},
   description={the locale associated with the document
-  language (or by \longarg{locale}, if no document language has been
+  language (or by \commonlongarg{locale}, if no document language has been
   detected). In the case of a multi-lingual document, this
   is the locale of the last language resource file to be loaded through
   \isty{tracklang}'s interface. It's best to explicitly set the locale

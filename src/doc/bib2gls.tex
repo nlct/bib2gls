@@ -1147,9 +1147,9 @@ Library}}
 
 \newcommand{\converterarg}[2][\subsection]{\argsection[#1]{converter.#2}}
 
-\newcommand{\convertglsbibarg}[2][\subsection]{\argsection[#1]{gls2bib.#2}}
+\newcommand{\convertglsbibarg}[2][\subsubsection]{\argsection[#1]{gls2bib.#2}}
 
-\newcommand{\datatoolbibarg}[2][\subsection]{\argsection[#1]{datatool2bib.#2}}
+\newcommand{\datatoolbibarg}[2][\subsubsection]{\argsection[#1]{datatool2bib.#2}}
 
 \newcommand{\argsection}[2][\subsection]{%
  \def\switcharg{}%
@@ -1476,7 +1476,7 @@ If you have extensively used the \styfmt{glossaries}~\cite{glossaries} or
 you may have found yourself creating a large \iext{tex} file
 containing many definitions that you frequently use in documents.
 This file can then simply be loaded using \ics{input} or
-\ics{loadglsentries}, but a large file like this can be difficult to
+\gls{loadglsentries}, but a large file like this can be difficult to
 maintain and if the document only actually uses a small proportion
 of those entries, the document build is unnecessarily slow due to
 the time and resources taken on defining the unwanted entries.
@@ -3278,6 +3278,7 @@ extension may be omitted.) Only one \meta{filename} is permitted.
 Available options are listed below.
 
 \section{Common Options}
+\label{sec:commonswitches}
 
 These command line switches are common to \bibgls\ and the
 supplementary command line conversion tools
@@ -4734,7 +4735,7 @@ Any special characters found in the sort value are always substituted
 before writing the \ext{bib} file to avoid syntax errors.
 
 Any unrecognised fields will be ignored by \bibgls. This is more
-convenient than using \ics{input} or \ics{loadglsentries}, which
+convenient than using \ics{input} or \gls{loadglsentries}, which
 requires all the keys used in the file to be defined, regardless of
 whether or not you actually need them in the document.
 
@@ -22792,7 +22793,8 @@ been set.
 
 \chapter{Converting Existing \iext{tex} to \iext{bib}}
 \label{sec:tex2bib}
-\setsecdepth{2}
+\setsecdepth{1}
+\renewcommand{\cssectioncmd}{\subsubsection}
 
 There are some supplementary command line tools provided with
 \bibgls\ that can convert certain types of data from existing
@@ -22807,9 +22809,9 @@ data (see \sectionref{sec:gls2bib}).
 \end{itemize}
 
 These command line tools share the same common switches listed in
-\sectionref{sec:switches}. Additionally, they share the switches
+\sectionref{sec:commonswitches}. Additionally, they share the switches
 listed in \sectionref{sec:shared2bibswitches}, but they may also
-have their specific switches which are described in the relevant
+have their specific switches, which are described in the relevant
 section.
 
 \begin{important}
@@ -22843,7 +22845,7 @@ The character \igls{encoding} of the \ext{bib} file. If omitted, the same
 The \ext{bib} format doesn't allow spaces in labels. If your original
 definitions in your \ext{tex} file have spaces, use this option to
 replace spaces in labels. Each space will be substituted with
-\meta{replacement}. The cross-referencing fields, \field{see},
+\meta{replacement}. Where applicable, the cross-referencing fields, \field{see},
 \field{seealso} and \field{alias}, will also be adjusted, but any
 references using \ics{gls} etc will have to be substituted manually 
 (or use a global search and replace in your text editor).
@@ -22925,6 +22927,7 @@ logging information to this file (which can be sizable).
 \section{\glsfmttext{idx.convertgls2bib}: Conversion from \styfmt{glossaries} or
 \styfmt{glossaries-extra}}
 \label{sec:gls2bib}
+\setsecdepth{2}
 
 If you have already been using the \styfmt{glossaries} or
 \styfmt{glossaries-extra} package with a large file containing all your
@@ -22944,10 +22947,10 @@ existing \ext{bib} files as there's no check to determine if
 If the \ext{bib} extension is missing from \meta{bib file}, it will
 be added. The extension is required for \meta{tex file}.
 
-\section{Command Line Arguments}
+\subsection{Command Line Arguments}
 
 The \meta{options} specific to \idx{convertgls2bib} are described below.
-This is in addition to those described in \sectionref{sec:switches}
+This is in addition to those described in \sectionref{sec:commonswitches}
 and \sectionref{sec:shared2bibswitches}. Note that
 \convertglsbiblongarg{split-on-type} overrides the default
 \converterlongarg{overwrite} setting.
@@ -23007,7 +23010,7 @@ of the definition of \ics{acronymtype} or \ics{glsxtrabbrvtype});
 \end{itemize}
 
 This option automatically implements \convertglsbiblongarg{ignore-type} and
-\convertglsbiblongarg{no-overwrite}.
+\converterlongarg{no-overwrite}.
 
 \convertglsbibarg{no-split-on-type}
 
@@ -23061,7 +23064,7 @@ have \convertglsbiblongarg{split-on-category} and not
 \gls{newabbreviation} will be \filefmt{abbreviation.bib}.
 
 This option automatically implements \convertglsbiblongarg{ignore-category} and
-\convertglsbiblongarg{no-overwrite}.
+\converterlongarg{no-overwrite}.
 
 \convertglsbibarg{no-split-on-category}
 
@@ -23080,7 +23083,7 @@ the corresponding entry (default).
 Don't absorb any cross-referencing information identified with \ics{glssee} 
 or \ics{glsxtrindexseealso} commands.
 
-\section{Recognised Commands}
+\subsection{Recognised Commands}
 
 The \idx{convertgls2bib} application recognises the commands listed below as well as
 some standard commands such as \ics{newcommand}. Avoid any overly
@@ -23125,7 +23128,7 @@ Additionally, if \meta{\keyvallist} contains:
 \end{codeenv}
 then this field will be ignored. (This \field{type} value is
 recommended in \meta{\keyvallist} when loading files with
-\ics{loadglsentries}\oargm{type}\margm{file} to allow the optional
+\gls{loadglsentries}\oargm{type}\margm{file} to allow the optional
 argument to set the \field{type}. With \bibgls\ you can use the
 \csopt{type} option instead.)
 
@@ -23158,8 +23161,14 @@ The base \styfmt{glossaries} package provides:
 If present, this instructs \idx{convertgls2bib} to not expand the
 given field, even if \gls{glsexpandfields} has been used.
 Unlike the default behaviour with the \sty{glossaries} package, there are no
-fields switched explicitly switched off by default with
-\idx{convertgls2bib}.
+fields explicitly switched off by default with \idx{convertgls2bib}.
+
+\cssection{loadglsentries}
+The base \styfmt{glossaries} package provides:
+\formatdef{loadglsentries}
+This locally redefines \ics{glsdefaulttype} to \meta{type} (if the optional argument is supplied)
+and inputs \meta{file}. If the \meta{file} doesn't have an extension, \ext{tex} is assumed.
+(The \TeX\ Parser Library also recognises \ics{input}.)
 
 \cssection{newglossaryentry}
 The base \styfmt{glossaries} package provides:
@@ -23439,17 +23448,17 @@ contains the database construction commands. The conversion tool
 uses the \texparserlib\ which has some limited support for
 \sty{datatool}, including database construction commands and file
 input commands \ics{DTLloaddb}, \ics{DTLloaddbtex} and the newer
-\ics{DTLread}.
+\gls{DTLread}.
 
 For example, suppose I have a document file called
 \filefmt{myDoc.tex} that contains:
 \begin{codeenv}
 \csfmt{documentclass}\marg{article}
 \csfmt{usepackage}\marg{datatool}
-\cs{DTLnewdb}\marg{mydata}
-\cs{DTLnewrow}\marg{mydata}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
+\gls{DTLnewdb}\marg{mydata}
+\gls{DTLnewrow}\marg{mydata}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
 \comment{...}
 \cmd{begin}\marg{document}
 \comment{...}
@@ -23467,17 +23476,17 @@ input file:
 datatool2bib mydata.tex mydata.bib
 \end{verbatim}
 Note that the \texparserlib\ also recognises commands such as
-\ics{dtlexpandnewvalue}. If this is in \filefmt{myDoc.tex} rather
+\gls{dtlexpandnewvalue}. If this is in \filefmt{myDoc.tex} rather
 than in \filefmt{mydata.tex} and only \filefmt{mydata.tex} is parsed
-then the \texparserlib\ won't encounter \cs{dtlexpandnewvalue} and
+then the \texparserlib\ won't encounter \gls{dtlexpandnewvalue} and
 so won't enable new value expansion. You can, however, use
 \code{\datatoolbiblongarg{setup} expand-new-value} to switch on new
 value expansion.
 
 If the data source is in a CSV file, then the \texparserlib\ can
 parse it but only if the file is referenced in \ics{DTLloaddb} (pre
-\sty{datatool} v3.0) or \ics{DTLread} (\sty{datatool} v3.0+). 
-For the newer \cs{DTLread} command, the \code{format=\iext{csv}} setting is
+\sty{datatool} v3.0) or \gls{DTLread} (\sty{datatool} v3.0+). 
+For the newer \gls{DTLread} command, the \code{format=\iext{csv}} setting is
 required to parse CSV files or \code{format=\iext{tsv}} for TSV files.
 If the file contains \LaTeX\ commands, \code{content=tex} is
 required otherwise \code{content=literal} is required.
@@ -23485,7 +23494,7 @@ required otherwise \code{content=literal} is required.
 So in order to convert a CSV file called \filefmt{mydata.csv} to 
 a \ext{bib} file, the \texparserlib\ needs to parse:
 \begin{codeenv}
-\cs{DTLread}\oarg{format=csv,content=literal}\marg{mydata.csv}
+\gls{DTLread}\oarg{format=csv,content=literal}\marg{mydata.csv}
 \end{codeenv}
 Rather than having to parse the entire document source file or
 create a stub file that simply contains this command, you can use
@@ -23494,18 +23503,18 @@ the \datatoolbiblongarg{read} switch instead:
 datatool2bib \datatoolbiblongarg{read} format=csv,content=literal mydata.csv mydata.bib
 \end{codeenv}
 This is equivalent to creating a stub file with just the
-\cs{DTLread} line.
+\gls{DTLread} line.
 
 The \texparserlib\ does not support the \isty{datagidx} package.
 There are two ways of converting the special \sty{datagidx}
 databases: either save the required database using \ics{DTLwrite} to
 a file that can then be input by \idx{datatool2bib} or instruct
 \idx{datatool2bib} to parse a \LaTeX\ file that contains the
-\ics{datagidx.newterm} and \ics{datagidx.newacro} commands. The \idx{datatool2bib}
+\gls{datagidx.newterm} and \gls{datagidx.newacro} commands. The \idx{datatool2bib}
 tool has its own implementation of those commands.
 
 In general, better results are obtained if \idx{datatool2bib} parses
-\ics{datagidx.newterm} and \ics{datagidx.newacro} instead of the
+\gls{datagidx.newterm} and \gls{datagidx.newacro} instead of the
 actual \sty{datagidx} databases. The custom \sty{datagidx} databases
 have a number of columns for internal use that are not applicable to
 \bibgls.
@@ -23520,20 +23529,20 @@ input. For example:
 The first line indicates the number of regular \sty{datatool}
 databases that were found by the \texparserlib. The second line
 indicates the number of \sty{datagidx} databases that were detected
-by scanning for \ics{datagidx.newterm} and \ics{datagidx.newacro}.
+by scanning for \gls{datagidx.newterm} and \gls{datagidx.newacro}.
 
 In the first case, the source field labels will correspond to the
 column keys (such as \optfmt{Label}, \optfmt{Name},
 \optfmt{Description} and \optfmt{Symbol}), whereas in the second
 case the source field labels will correspond to the option keys for
-\cs{datagidx.newterm} and \cs{datagidx.newacro} (such as \optfmt{description} and
+\gls{datagidx.newterm} and \gls{datagidx.newacro} (such as \optfmt{description} and
 \optfmt{symbol}, but not the \optfmt{label} key, which will be
 dropped from the list after its value is saved elsewhere).
 
-\section{Command Line Arguments}
+\subsection{Command Line Arguments}
 
 The \meta{options} specific to \idx{datatool2bib} are described below.
-This is in addition to those described in \sectionref{sec:switches}
+This is in addition to those described in \sectionref{sec:commonswitches}
 and \sectionref{sec:shared2bibswitches}.
 
 \datatoolbibarg{label}
@@ -23544,7 +23553,7 @@ case-sensitive column label not the mapped field.
 The label will be obtained by copying the value from the given
 column and processing according to \converterlongarg{space-sub}
 (and stripping forbidden characters). This option is not applicable
-to \ics{datagidx.newterm} and \ics{datagidx.newacro}.
+to \gls{datagidx.newterm} and \gls{datagidx.newacro}.
 
 \begin{important}
 The chosen column should have unique values (and should still be
@@ -23554,8 +23563,8 @@ unique after processing).
 The default setting is \code{\datatoolbiblongarg{label} Label}
 since this is the column used for labels with \styfmt{datagidx} (but
 is only applicable if you save the database with \cs{DTLwrite}
-rather than having \idx{datatool2bib} parse \cs{datagidx.newterm} 
-and \cs{datagidx.newacro}).
+rather than having \idx{datatool2bib} parse \gls{datagidx.newterm} 
+and \gls{datagidx.newacro}).
 
 If you are converting a general \sty{datatool} database, either
 choose a different column or switch on the auto label.
@@ -23585,14 +23594,14 @@ Instead of parsing the provided \ext{tex} file in the usual manner,
 the \datatoolbiblongarg{read} option will act as though the input
 is:
 \begin{codeenv}
-\ics{DTLread}\oargm{options}\marg{filename}
+\gls+{DTLread}\oargm{options}\marg{filename}
 \end{codeenv}
 where \meta{filename} is the input filename supplied to
 \idx{datatool2bib}. This can be use where the source file is a
 CSV file rather than a \LaTeX\ file.
 
 \datatoolbibarg{setup}
-Implements \code{\ics{DTLsetup}\margm{options}} before parsing.
+Implements \code{\gls{DTLsetup}\margm{options}} before parsing.
 Note that this can be counteracted by any changes to the settings
 within the file being parsed.
 
@@ -23733,7 +23742,7 @@ commands.
 
 Don't strip the \idxpl{casecommands} from field values (default).
 
-\section{Recognised Commands}
+\subsection{Recognised Commands}
 
 This section lists \isty{datatool} and \isty{datagidx} commands that
 are recognised by \idx{datatool2bib}. (There may be other commands
@@ -23741,7 +23750,7 @@ that are also recognised but aren't relevant to the conversion
 process.) See the \sty{datatool} user manual for further
 information.
 
-\prefixedcssection{idx}{DTLsetup}
+\cssection{DTLsetup}
 Some but not all \sty{datatool} settings are
 recognised by the \texparserlib. Of those that are recognised, the
 settings pertinent to \idx{datatool2bib} are: \optfmt{default-name},
@@ -23750,7 +23759,7 @@ settings pertinent to \idx{datatool2bib} are: \optfmt{default-name},
 
 The \optfmt{io} setting
 takes a comma-separated list of default I/O options applicable to
-\cs{DTLread} (and \cs{DTLwrite}). Recognised I/O options:
+\gls{DTLread} (and \cs{DTLwrite}). Recognised I/O options:
 \optfmt{name}, \optfmt{keys}, \optfmt{headers}, \optfmt{expand}, 
 \optfmt{format}, \optfmt{add-delimiter}, \optfmt{csv-escape-chars},
 \optfmt{csv-content}, \optfmt{csv-blank}, \optfmt{csv-skip-lines}
@@ -23759,7 +23768,7 @@ takes a comma-separated list of default I/O options applicable to
 \optfmt{autokeys}), \optfmt{overwrite}, \optfmt{load-action},
 \optfmt{delimiter}, and \optfmt{separator}.
 
-\prefixedcssection{idx}{DTLread}
+\cssection{DTLread}
 Loads a database from the given file, where the format should be
 identified in \meta{options} with the \optfmt{format} key. The
 default is \code{format=csv}, which indicates that the file is a CSV
@@ -23773,7 +23782,7 @@ datatool2bib \datatoolbiblongarg{read} \meta{io-options} \meta{filename} \meta{b
 \end{codeenv}
 is equivalent to creating a file \filefmt{otherfile.tex} with a single line:
 \begin{codeenv}
-\cs{DTLread}\oargm{io-options}\margm{filename}
+\gls{DTLread}\oargm{io-options}\margm{filename}
 \end{codeenv}
 and then running:
 \begin{alltt}
@@ -23785,35 +23794,35 @@ The \texparserlib\ also recognises \ics{DTLwrite} but
 \idx{datatool2bib} redefines the command to do nothing.
 \end{important}
 
-\prefixedcssection{idx}{dtlexpandnewvalue}
+\cssection{dtlexpandnewvalue}
 New values will be expanded before being added to the database.
 Note that the \texparserlib\ may not expand commands in the same way
 as \TeX, and it won't be able to expand unknown commands.
 
-\prefixedcssection{idx}{dtlnoexpandnewvalue}
+\cssection{dtlnoexpandnewvalue}
 New values will not be expanded before being added to the database
 (default).
 
-\prefixedcssection{idx}{DTLnewdb}
+\cssection{DTLnewdb}
 Defines a new database with the given label.
 
-\prefixedcssection{idx}{DTLnewrow}
+\cssection{DTLnewrow}
 Creates a new row in the database identified the given label.
 
-\prefixedcssection{idx}{DTLnewdbentry}
+\cssection{DTLnewdbentry}
 Adds a new entry to the final row of the given database.
 
 For example:
 \begin{codeenv}
-\ics{DTLnewdb}\marg{mydata}
-\ics{DTLnewrow}\marg{mydata}
-\ics{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.smith@example.com}
-\cs{DTLnewrow}\marg{mydata}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{Jane}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Doe}
-\cs{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.doe@example.com}
+\gls+{DTLnewdb}\marg{mydata}
+\gls+{DTLnewrow}\marg{mydata}
+\gls+{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{John}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Smith}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.smith@example.com}
+\gls{DTLnewrow}\marg{mydata}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Forename}\marg{Jane}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Surname}\marg{Doe}
+\gls{DTLnewdbentry}\marg{mydata}\marg{Email}\marg{j.doe@example.com}
 \end{codeenv}
 This can be converted using, for example (assuming the above is in
 the file \filefmt{mydata.tex}):
@@ -23841,7 +23850,7 @@ the \field{name} field to a concatenation of the forename and
 surname fields (which would need to be aliased or defined if
 required).
 
-\prefixedcssection{idx}{DTLaction}
+\cssection{DTLaction}
 This general purpose action command can be used to create and append
 to databases. The applicable actions that are recognised by the
 \texparserlib\ (and therefore by \idx{datatool2bib}) are:
@@ -23850,9 +23859,9 @@ to databases. The applicable actions that are recognised by the
 
 For example:
 \begin{codeenv}
-\ics{DTLsetup}\marg{default-name=mydata}
-\ics{DTLaction}\marg{new}
-\cs{DTLaction}\oarg{
+\gls+{DTLsetup}\marg{default-name=mydata}
+\gls+{DTLaction}\marg{new}
+\gls{DTLaction}\oarg{
   assign =
    \marg{
       Name = \marg{José Arara},
@@ -23860,7 +23869,7 @@ For example:
       Award = \marg{\cs{cs.dollar}2,453.99}
    }
 }\marg{new row}
-\cs{DTLaction}\oarg{
+\gls{DTLaction}\oarg{
   assign =
    \marg{
       Name = \marg{Zoë Zebra},
@@ -23898,14 +23907,14 @@ intended for document use, but the files may be passed to
 \idx{datatool2bib} as the input file. See the \sty{datatool} v3.0+
 user manual for further details of those formats.
 
-\prefixedcssection{idx.datagidx}{newgidx}
+\prefixedcssection{datagidx}{newgidx}
 Defines a new \sty{datagidx} database, which may be referenced in
-\cs{datagidx.newterm} and \cs{datagidx.newacro} by the
+\gls{datagidx.newterm} and \gls{datagidx.newacro} by the
 \optfmt{database} key in their optional argument (which be parsed
 and then dropped from the field list).
 
-\prefixedcssection{idx.datagidx}{newterm}
-This is similar to the \cs{newterm} command provided by
+\prefixedcssection{datagidx}{newterm}
+This is similar to the \gls{newterm} command provided by
 \sty{glossaries} (via the \styopt{index} package option), but has
 slightly different behaviour. With \sty{datagidx}, the mandatory
 argument is the name. The label may be supplied in the optional
@@ -23915,16 +23924,16 @@ argument. If omitted, the label is obtained from the name. The
 produce an exact match. It's therefore important to double-check the
 resulting \ext{bib} file afterwards.
 
-Each \cs{datagidx.newterm} will be converted to \atentry{entry}
+Each \gls{datagidx.newterm} will be converted to \atentry{entry}
 unless it has both the \field{long} and \field{short} fields set, in
 which case it will be converted to \atentry{abbreviation}. If there
 is no \field{description} and \converterlongarg{index-conversion} is
 used, then \atentry{index} will be used instead of \atentry{entry}
 (but not if the term has been identified as an abbreviation).
 
-\prefixedcssection{idx.datagidx}{newacro}
+\prefixedcssection{datagidx}{newacro}
 This is simply a wrapper command that internally uses
-\cs{datagidx.newterm}. However, \idx{datatool2bib} has a slightly
+\gls{datagidx.newterm}. However, \idx{datatool2bib} has a slightly
 different behaviour that doesn't add the formatting or case-changing
 commands (since these can be dealt with by the abbreviation style or
 \bibgls\ resource options).
@@ -23932,6 +23941,7 @@ commands (since these can be dealt with by the abbreviation style or
 \chapter{Examples}
 \label{sec:examples}
 \setsecdepth*{0}
+\renewcommand{\cssectioncmd}{\subsection}
 
 The example files described here can be found in the
 \filefmt{examples} sub-directory. The \ext{bib} files are listed

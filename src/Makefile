@@ -78,6 +78,7 @@ expl	: ../unstable/bib2gls.zip
 	cp lib/resources/*.xml ../unstable/bib2gls/lib/resources/
 	cp bin/bib2gls ../unstable/bib2gls/bin/
 	cp bin/convertgls2bib ../unstable/bib2gls/bin/
+	cp bin/datatool2bib ../unstable/bib2gls/bin/
 	cp doc/bib2gls.pdf ../unstable/bib2gls/doc/
 	cd ../unstable; zip -r bib2gls.zip bib2gls/
 

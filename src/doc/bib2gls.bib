@@ -13880,7 +13880,7 @@ can be referenced in \meta{true} or \meta{false} with
   category={command}
 }
 
-@glscommand{loadglsentries,
+@mainglscommand{loadglsentries,
   name={\csfmt{load\-gls\-entries}},
   user1={\oargm{type}\margm{file}},
   description={locally redefines \cs{glsdefaulttype}
@@ -19036,7 +19036,18 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
-@glscommand{datagidx.newterm,
+@glscommand{acronymfont,
+  name={\csfmt{acronym\-font}},
+  user1={\margm{text}},
+  description={used by the base \sty{glossaries} package's acronyms to
+  encapsulate the short form. This command should not be used with
+  \sty{glossaries-extra}},
+  topics={formattingcommands},
+  note={\styfmt{glossaries} (base only)},
+  category={command}
+}
+
+@mainglscommand{datagidx.newterm,
   name={\csfmt{new\-term}\nameparen{\styfmt{datagidx}}},
   text={\csfmt{new\-term}},
   user1={\oargm{\keyvallist}\margm{name}},
@@ -19046,7 +19057,7 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
-@glscommand{datagidx.newacro,
+@mainglscommand{datagidx.newacro,
   name={\csfmt{new\-acro}\nameparen{\styfmt{datagidx}}},
   text={\csfmt{new\-acro}},
   user1={\oargm{\keyvallist}\margm{short}\margm{long}},
@@ -19056,7 +19067,7 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
-@glscommand{datagidx.newgidx,
+@mainglscommand{datagidx.newgidx,
   name={\csfmt{new\-gidx}\nameparen{\styfmt{datagidx}}},
   text={\csfmt{new\-gidx}},
   user1={\oargm{\keyvallist}\margm{db-name}\margm{title}},
@@ -19076,7 +19087,7 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
-@glscommand{DTLsetup,
+@mainglscommand{DTLsetup,
   name={\csfmt{DTLsetup}},
   user1={\margm{options}},
   description={sets default \sty{datatool} options},
@@ -19085,7 +19096,7 @@ displays the given entry's \field{text} field},
   category={command}
 }
 
-@glscommand{DTLread,
+@mainglscommand{DTLread,
   name={\csfmt{DTLread}},
   user1={\oargm{options}\margm{filename}},
   description={loads a database from the given file, where the
@@ -19137,7 +19148,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{DTLnewdb,
+@mainglscommand{DTLnewdb,
   name={\csfmt{DTLnewdb}},
   user1={\margm{db-name}},
   description={defines a new database},
@@ -19146,7 +19157,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{DTLnewrow,
+@mainglscommand{DTLnewrow,
   name={\csfmt{DTL\-new\-row}},
   user1={\margm{db-name}},
   description={creates a new row in the given database},
@@ -19155,7 +19166,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{DTLnewdbentry,
+@mainglscommand{DTLnewdbentry,
   name={\csfmt{DTL\-new\-db\-entry}},
   user1={\margm{db-name}\margm{col-key}\margm{value}},
   description={adds a new entry to the final row of the given database},
@@ -19164,7 +19175,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{DTLaction,
+@mainglscommand{DTLaction,
   name={\csfmt{DTL\-action}},
   user1={\oargm{options}\margm{action}},
   description={general purpose action command},
@@ -19173,7 +19184,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{dtlexpandnewvalue,
+@mainglscommand{dtlexpandnewvalue,
   name={\csfmt{dtl\-expand\-new\-value}},
   description={new values will be expanded before being added to the database},
   note={\styfmt{datatool}\texparserdefnote},
@@ -19181,7 +19192,7 @@ format should be identified in \meta{options}},
   category={command}
 }
 
-@glscommand{dtlnoexpandnewvalue,
+@mainglscommand{dtlnoexpandnewvalue,
   name={\csfmt{dtl\-no\-expand\-new\-value}},
   description={new values will not be expanded before being added to the database},
   note={\styfmt{datatool}\texparserdefnote},
