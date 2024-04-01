@@ -51,12 +51,12 @@ classes/com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib.class	: classes/com/d
 classes/com/dickimawbooks/bibgls/datatool2bib	:
 	mkdir -p classes/com/dickimawbooks/bibgls/datatool2bib
 
-lib/bibglscommon.jar	: classes/com/dickimawbooks/bibgls/common/BibGlsCommon.class
+lib/bibglscommon.jar	: classes/com/dickimawbooks/bibgls/common/BibGlsTeXApp.class
 		cd classes; \
 		jar cf ../lib/bibglscommon.jar \
 		com/dickimawbooks/bibgls/common/*.class
 
-classes/com/dickimawbooks/bibgls/common/BibGlsCommon.class	: classes/com/dickimawbooks/bibgls/common \
+classes/com/dickimawbooks/bibgls/common/BibGlsTeXApp.class	: classes/com/dickimawbooks/bibgls/common \
 	java/common/*.java
 	cd java/common; \
 	javac $(target_version) -d ../../classes \
