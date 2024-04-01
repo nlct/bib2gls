@@ -1,10 +1,17 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
 \documentclass{book}
 
 \usepackage[T1]{fontenc}
-\usepackage[record]{glossaries-extra}
+\usepackage[record,index,stylemods={list,bookindex}]{glossaries-extra}
+
+\newcommand{\bibglsnewindex}[2]{%
+ \newglossaryentry{#1}{name={#1},type=index,category={index},description={},#2}%
+}
 
 \GlsXtrLoadResources[
- src={subdir/entries.bib}
+ src={bibfiles/entries.bib,bibfiles/index.bib}
 ]
 
 \title{Sample Document}
@@ -16,5 +23,6 @@
 \include{chapters/chapter1}
 \include{chapters/chapter2}
 
-\printunsrtglossaries
+\printunsrtglossary
+\printunsrtglossary[type=index,style=bookindex]
 \end{document}
