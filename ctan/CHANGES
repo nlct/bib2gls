@@ -5,6 +5,9 @@ v4.0 (pending)
    - bug fix issue #29 "Version 3.8 and 3.9 fail to find aux files in subdirectories of build directory"
      https://github.com/nlct/bib2gls/issues/29
 
+   - bash script no longer set java.locale.providers when running the jar file
+     (not necessary for Java 9 onwards)
+
  * convertgls2bib
 
    - added support for \loadglsentries

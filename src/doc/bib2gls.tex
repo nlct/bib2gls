@@ -2714,8 +2714,9 @@ the document build}}~\cite{buildglossaries}.
 
 \section{Manual Installation}
 
-If you are unable to install \bibgls\ through your \TeX\ package
-manager, you can install manually using the instructions below.
+In general it's best to install \bibgls\ via your \TeX\ package manager.
+However, if you are unable to do this or if you are testing a development version,
+you can install manually using the instructions below.
 Replace \meta{TEXMF} with the path to your local or home TEXMF tree 
 (for example, \filefmt{\glstildechar/texmf}).
 
@@ -2725,10 +2726,18 @@ Copy the files provided to the following locations:
 (Java application.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/convertgls2bib.jar}
 (Java application.)
+\item \meta{TEXMF}\filefmt{/scripts/bib2gls/datatool2bib.jar}
+(Java application.)
+\item \meta{TEXMF}\filefmt{/scripts/bib2gls/bibglscommon.jar}
+(Java library.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/texparserlib.jar}
 (Java library.)
 \item \meta{TEXMF}\filefmt{/scripts/bib2gls/resources/bib2gls-en.xml}
 (English resource file.)
+\item \meta{TEXMF}\filefmt{/scripts/bib2gls/resources/bib2gls-extra-en.xml}
+(Extra English resource file.)
+\item \meta{TEXMF}\filefmt{/scripts/bib2gls/resources/bib2gls-extra-nl.xml}
+(Extra Dutch resource file.)
 \item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls.pdf}
 (This document.)
 \item \meta{TEXMF}\filefmt{/doc/support/bib2gls/bib2gls-begin.pdf}
@@ -2739,24 +2748,27 @@ If you use the Unix \appfmt{man} command, copy the
 appropriate location.
 
 If you are using a Unix-like system, there are also bash scripts
-provided called \file{bib2gls.sh} and \file{convertgls2bib.sh}. 
-Either copy then directly to somewhere on your path without the \iext{sh} 
+provided called \file{bib2gls.sh}, \file{convertgls2bib.sh} and \file{datatool2bib.sh}. 
+Either copy them directly to somewhere on your path without the \iext{sh} 
 extension, for example:
 \begin{verbatim}
 cp bib2gls.sh ~/bin/bib2gls
 cp convertgls2bib.sh ~/bin/convertgls2bib
+cp datatool2bib.sh ~/bin/datatool2bib
 \end{verbatim}
 or copy the files to
 \meta{TEXMF}\filefmt{/scripts/bib2gls/} and create a
-symbolic link to them called just \filefmt{bib2gls} and
-\filefmt{convertgls2bib} from somewhere on
+symbolic link to them called just \filefmt{bib2gls},
+\filefmt{convertgls2bib} and \filefmt{datatool2bib} from somewhere on
 your path, for example:
 \begin{verbatim}
 cp bib2gls.sh ~/texmf/scripts/bib2gls/
 cp convertgls2bib.sh ~/texmf/scripts/bib2gls/
+cp datatool2bib.sh ~/texmf/scripts/bib2gls/
 cd ~/bin
 ln -s ~/texmf/scripts/bib2gls/bib2gls.sh bib2gls
 ln -s ~/texmf/scripts/bib2gls/convertgls2bib.sh convertgls2bib
+ln -s ~/texmf/scripts/bib2gls/datatool2bib.sh datatool2bib
 \end{verbatim}
 The \file{texparserlib.jar} file isn't an application but is a
 library used by both \file{bib2gls.jar} and
@@ -2773,10 +2785,10 @@ similar way to the bash scripts. To do this, create a file called
 @ECHO OFF
 FOR /F "tokens=*" %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts
 bib2gls.jar') DO SET JARPATH=%%I
-java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
+java -jar "%JARPATH%" %*
 \end{verbatim}
 Save this file to somewhere on your system's path.
-(Similarly for \filefmt{convertgls2bib}.) Note that \TeX\
+(Similarly for \filefmt{convertgls2bib} and \filefmt{datatool2bib}.) Note that \TeX\
 distributions for Windows usually convert \iext{jar} files to
 executables.
 
@@ -2787,6 +2799,7 @@ command prompt or terminal and run the following command:
 \begin{verbatim}
 bib2gls --version
 convertgls2bib --version
+datatool2bib --version
 \end{verbatim}
 This should display the version information for both applications.
 
@@ -3264,6 +3277,9 @@ or in Windows:
 \begin{verbatim}
 set JAVA_TOOL_OPTIONS=-Djava.locale.providers=CLDR,JRE,SPI
 \end{verbatim}
+Note that newer versions of Java support \idx{CLDR} by 
+default, and the \idx{JRE} synonym for the \code{COMPAT} provider is now 
+deprecated.\footnote{https://www.oracle.com/java/technologies/javase/jdk21-suported-locales.html}
 
 \chapter{Command Line Options}
 \label{sec:switches}

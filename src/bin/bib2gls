@@ -5,8 +5,4 @@
 
 bindir="$(dirname "$(readlink -f "$0")")"
 
-if [ -z "$JAVA_TOOL_OPTIONS" ]; then
-  java -Djava.locale.providers=CLDR,JRE,SPI -jar "$bindir/../lib/bib2gls.jar" "$@"
-else
-  java -jar "$bindir/../lib/bib2gls.jar" "$@"
-fi
+java -jar "$bindir/../lib/bib2gls.jar" "$@"
