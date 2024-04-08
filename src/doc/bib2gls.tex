@@ -8016,14 +8016,13 @@ Suppose I have a \ext{bib} file that contains:
 \begin{codeenv}
 \atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{csfmt}}[1]\marg{\gls{glsbackslash} \idx{param}1}}}
 \atentry{index}\marg{relax,\field{name}=\marg{\cmd{csfmt}\marg{relax}}}
-\atentry{index}\narg{comment,\field{name}=\marg{\cs{cs.percent} comment}}
+\atentry{index}\marg{comment,\field{name}=\marg{\cs{cs.percent} comment}}
 \end{codeenv}
 If the resource options include:
 \begin{codeenv}
 \csopt[
  \field{user1} = \gls{INTERPRET} \marg{ \field{name} } ,
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 Then the definitions in the \ext{glstex} file will be:
 \begin{codeenv}
@@ -8069,8 +8068,7 @@ Now suppose instead that the resource options include:
 \begin{codeenv}
 \csopt[
  \field{user1} = \gls{FIRSTUC} \marg{ \gls{INTERPRET} \marg{ \field{name} } },
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 This first interprets the value of the \field{name} field and substitutes the special
 characters (so \code{\csfmt{relax}} becomes the string \qtt{\csfmt{glsbackslash} relax}). 
@@ -8095,8 +8093,7 @@ Suppose the order of the quarks is swapped:
 \begin{codeenv}
 \csopt[
  \field{user1} = \gls{INTERPRET} \marg{ \gls{FIRSTUC} \marg{ \field{name} } },
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 This results in valid \LaTeX\ code:
 \begin{codeenv}
@@ -8122,8 +8119,7 @@ Consider an adjustment to the previous example:
 \begin{codeenv}
 \csopt[
  \field{user1} = \gls{FIRSTUC} \marg{ \gls{INTERPRETNOREPL} \marg{ \field{name} } },
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 Now \code{\csfmt{csfmt}\marg{relax}} is converted into the literal string
 \qtt{\csfmt{csfmt}\marg{relax}} and then the case-conversion is performed,
@@ -8135,7 +8131,7 @@ an undefined command in the \ext{glstex} file:
 In the case of the \qt{comment} entry, \code{\cs{cs.percent} comment} will 
 be converted to the literal string \qtt{\% comment}, which will then have the case-conversion 
 applied, but the \ext{glstex} file will be invalid:
-\begin{codeent}
+\begin{codeenv}
 \field{user1}=\marg{\% Comment},
 \end{codeenv}
 
@@ -8146,15 +8142,13 @@ For example:
 \csopt[
  \field{user1} = \gls{REPLACESPCHARS} \marg {
    \gls{FIRSTUC} \marg{ \gls{INTERPRETNOREPL} \marg{ \field{name} } } },
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 This rather long-winded assignment produces the same result as:
 \begin{codeenv}
 \csopt[
  \field{user1} = \gls{INTERPRET} \marg{ \gls{FIRSTUC} \marg{ \field{name} } },
-]
-{assign-fields}
+]{assign-fields}
 \end{codeenv}
 A difference can be observed if the custom command is made a blocker or exclusion
 using \ics{MFUblocker} or \ics{MFUexcl}.
