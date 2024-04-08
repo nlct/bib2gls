@@ -13265,6 +13265,25 @@ field value},
   category={command}
 }
 
+@command{MFUblocker,
+  name={\csfmt{MFU\-block\-er}},
+  user1={\margm{cs}},
+  description={identifies \meta{cs} as a command that, if it occurs
+   at the start of the argument of \idx{makefirstuc}, it should prevent
+   any case-change},
+  note={\styfmt{mfirstuc} v2.08+\texparserdefnote},
+  category={command}
+}
+
+@command{MFUexcl,
+  name={\csfmt{MFU\-excl}},
+  user1={\margm{cs}},
+  description={identifies \meta{cs} as a command whose argument should
+   not have its case changed},
+  note={\styfmt{mfirstuc} v2.08+\texparserdefnote},
+  category={command}
+}
+
 @glscommand{glsxtrusefield,
   name={\csfmt{gls\-xtr\-use\-field}},
   user1={\margm{entry label}\margm{field label}},
@@ -15738,6 +15757,27 @@ conditional in \csopt{assign-fields} conditionals. This token needs
   \csopt{assign-fields}. This token needs
   to be protected from expansion in the argument of
   \gls{GlsXtrLoadResources}},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{INTERPRETNOREPL,
+  name={\csfmt{INTER\-PRET\-NO\-REPL}},
+  user1={\margm{element-list}},
+  description={as \gls{INTERPRET} but doesn't replace \TeX\ special characters},
+  note={\bibgls\ \idx{quark}},
+  topics={quark},
+  category={command},
+  annote={quark}
+}
+
+@mainglscommand{REPLACESPCHARS,
+  name={\csfmt{RE\-PLACE\-SP\-CHARS}},
+  user1={\margm{element-list}},
+  description={a \idx{quark} that replaces \TeX\ special characters with commands like
+  \gls{glsbackslash} which expand to the literal character},
   note={\bibgls\ \idx{quark}},
   topics={quark},
   category={command},

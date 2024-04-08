@@ -351,6 +351,14 @@ public class FieldValueList extends Vector<FieldValueElement>
       {
          return new FieldValueInterpret(argList);
       }
+      else if (name.equals("INTERPRETNOREPL"))
+      {
+         return new FieldValueInterpret(argList, false);
+      }
+      else if (name.equals("REPLACESPCHARS"))
+      {
+         return new FieldValueReplaceSpChars(argList);
+      }
       else if (name.equals("LABELIFY"))
       {
          return new FieldValueLabelify(argList, false);

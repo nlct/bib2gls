@@ -2,6 +2,8 @@ v4.0 (pending)
 
  * bib2gls
 
+   - added \INTERPRETNOREPL and \REPLACESPCHARS quarks
+
    - bug fix issue #29 "Version 3.8 and 3.9 fail to find aux files in subdirectories of build directory"
      https://github.com/nlct/bib2gls/issues/29
 

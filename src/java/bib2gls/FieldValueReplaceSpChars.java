@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023-2024 Nicola L.C. Talbot
+    Copyright (C) 2024 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -29,20 +29,13 @@ import com.dickimawbooks.texparserlib.bib.BibUserString;
 import com.dickimawbooks.bibgls.common.Bib2GlsException;
 
 /**
- * Represents the INTERPRET or INTERPRETNOREPLACE quark.
- * Note that the interpreted value isn't trimmed.
+ * Represents the REPLACESPCHARS quark.
  */
-public class FieldValueInterpret implements FieldValueElement
+public class FieldValueReplaceSpChars implements FieldValueElement
 {
-   public FieldValueInterpret(FieldValueElement fieldValueElem)
-   {
-      this(fieldValueElem, true);
-   }
-
-   public FieldValueInterpret(FieldValueElement fieldValueElem, boolean replace)
+   public FieldValueReplaceSpChars(FieldValueElement fieldValueElem)
    {
       this.fieldValueElem = fieldValueElem;
-      this.replace = replace;
    }
 
    @Override
@@ -82,24 +75,15 @@ public class FieldValueInterpret implements FieldValueElement
 
          String orgStrVal = list.toString(parser);
 
-         String result = bib2gls.interpret(orgStrVal, list, false);
-
-         if (replace)
-         {
-            result = bib2gls.replaceSpecialChars(result);
-         }
-
-         return result;
+         return bib2gls.replaceSpecialChars(orgStrVal);
       }
    }
 
    @Override
    public String toString()
    {
-      return String.format("\\%s{%s}",
-       replace ? "INTERPRET" : "INTERPRETNOREPL", fieldValueElem);
+      return String.format("\\REPLACESPCHARS{%s}", fieldValueElem);
    }
 
    private FieldValueElement fieldValueElem;
-   protected boolean replace = true;
 }

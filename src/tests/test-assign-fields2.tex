@@ -1,0 +1,31 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[record]{glossaries-extra}
+
+\newcommand{\csfmt}[1]{\texttt{\char`\\ #1}}
+
+\renewcommand*{\glsxtrresourceinit}{%
+ \GlsXtrResourceInitEscSequences
+ \def\INTERPRETNOREPL{\string\INTERPRETNOREPL}%
+ \def\REPLACESPCHARS{\string\REPLACESPCHARS}%
+}
+
+\GlsXtrLoadResources
+[
+  selection=all,
+  assign-fields =
+   {
+%      user1 = \INTERPRET { name } ,
+%      user1 = \FIRSTUC { \INTERPRET { name } },
+%      user2 = \INTERPRET { \FIRSTUC { name } },
+%      user1 = \FIRSTUC { \INTERPRETNOREPL { name } } ,
+      user3 = \REPLACESPCHARS { \FIRSTUC { \INTERPRETNOREPL { name } } },
+   }
+]
+
+\begin{document}
+\printunsrtglossary
+\end{document}

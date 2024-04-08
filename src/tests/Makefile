@@ -42,7 +42,7 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-mergegroups.pdf test-break-at.pdf test-prune-xr.pdf \
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
 	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
-	  test-nl.pdf test-match-action.pdf
+	  test-nl.pdf test-match-action.pdf test-assign-fields2.pdf
 	@grep Exception *.glg || true
 	@grep -E 'glossaries(-extra)? Warning' *.log || true
 
@@ -811,6 +811,13 @@ test-assign-fields.pdf	: test-assign-fields.glstex
 test-assign-fields.glstex	: test-assign-fields.tex $(DEPS) test-assign-fields.bib
 		pdflatex test-assign-fields
 		$(BIB2GLS) test-assign-fields
+
+test-assign-fields2.pdf	: test-assign-fields2.glstex
+		pdflatex test-assign-fields2
+
+test-assign-fields2.glstex	: test-assign-fields2.tex $(DEPS) test-assign-fields2.bib
+		pdflatex test-assign-fields2
+		$(BIB2GLS) test-assign-fields2
 
 test-nl.pdf	: test-nl.glstex
 		pdflatex test-nl

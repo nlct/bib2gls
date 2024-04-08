@@ -2440,6 +2440,18 @@ so you can change the above to the following:
   \cs{GlsXtrResourceInitEscSequences}
 }
 \end{codeenv}
+Note that if new quarks, such as \gls{INTERPRETNOREPL} and \gls{REPLACESPCHARS},
+are added to \bibgls, they may not be included in \cs{GlsXtrResourceInitEscSequences} if they
+were introduced to \bibgls\ after the version date of the \sty{glossaries-extra}
+package installed on your system. In this case, you will need to add them. For example:
+\begin{codeenv}
+\cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\comment{}
+  \cs{GlsXtrResourceInitEscSequences}
+  \cmd{def}\gls{INTERPRETNOREPL}\marg{\cs{string}\gls{INTERPRETNOREPL}}\comment{}
+  \cmd{def}\gls{REPLACESPCHARS}\marg{\cs{string}\gls{REPLACESPCHARS}}\comment{}
+}
+\end{codeenv}
+
 
 This will locally define the quarks listed below. Since
 \cs{glsxtrresourceinit} is used in a scoped context, the
@@ -2484,6 +2496,7 @@ or \idx{regex.dollar} to denote the start and end.
 \item[Field assignments] The following commands may be used in the
 \meta{element-list} syntax of \csopt{assign-fields}:
 \gls{CS}, \gls{MGP}, \gls{LEN}, \gls{TRIM}, \gls{INTERPRET},
+\gls{INTERPRETNOREPL}, \gls{REPLACESPCHARS},
 \gls{LC}, \gls{UC}, \gls{FIRSTLC}, \gls{FIRSTUC}, and \gls{TITLE}.
 
 \item[Conditionals] The \meta{condition} part of the \csopt{assign-fields}
@@ -7991,7 +8004,160 @@ Returns its argument with any leading and trailing spaces removed.
 \nosecdef{INTERPRET}
 Interprets the contents of \meta{element-list} using \bibgls's
 interpreter and returns the result, which may be an empty string if
-the content only contains unknown commands.
+the content only contains unknown commands. Note that the result is 
+a string with any special characters replaced by detokenized commands, such as
+\gls{glsbackslash}. This ensures that the value is suitable to be written
+in the entry definition in the \ext{glstex} file.
+
+It's important to remember that the result of \gls{INTERPRET} is a detokenized string.
+In general, it's therefore best to have \gls{INTERPRET} as the outermost quark.
+
+Suppose I have a \ext{bib} file that contains:
+\begin{codeenv}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{csfmt}}[1]\marg{\gls{glsbackslash} \idx{param}1}}}
+\atentry{index}\marg{relax,\field{name}=\marg{\cmd{csfmt}\marg{relax}}}
+\atentry{index}\narg{comment,\field{name}=\marg{\cs{cs.percent} comment}}
+\end{codeenv}
+If the resource options include:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{INTERPRET} \marg{ \field{name} } ,
+]
+{assign-fields}
+\end{codeenv}
+Then the definitions in the \ext{glstex} file will be:
+\begin{codeenv}
+\gls{bibglsnewindex}\marg{comment}\comment{}
+\marg{\field{user1}=\marg{\gls{glspercentchar} \gls{space} comment},
+\field{name}=\marg{\cs{cs.percent} comment},
+\field{sort}=\marg{comment|}}
+\strut
+\gls{bibglsnewindex}\marg{relax}\comment{}
+\marg{\field{user1}=\marg{\gls{glsbackslash} relax},
+\field{name}=\marg{\cmd{csfmt}\marg{relax}},
+\field{sort}=\marg{relax|}}
+\end{codeenv}
+This ensures that the \LaTeX\ syntax in the \ext{glstex} definitions is valid and 
+the \field{user1} field can expand to a literal string. (Remember that the document
+definition of the custom \csfmt{csfmt} command may be different from the one provided
+in the \atentry{preamble} content.)
+
+The \gls{INTERPRET} quark converts \code{\cs{cs.percent} comment} to 
+\qtt{\% comment} since the interpreter recognises \ics{cs.percent}. However, 
+if this value is written to the \ext{glstex} file:
+\begin{codeenv}
+\field{user1}=\marg{\% comment},
+\end{codeenv}
+then this is invalid. When the \ext{glstex} file is input by \gls{GlsXtrLoadResources},
+\LaTeX\ will interpret the percent symbol \code{\%} as a comment and the rest of the
+line, including the closing brace, will be ignored. This leads to a missing closing brace error.
+
+In the case of the \qt{relax} entry, since a definition of the custom \csfmt{csfmt}
+is provided in \atentry{preamble}, the interpreter will convert \code{\csfmt{csfmt}\marg{relax}}
+to the string \qtt{\csfmt{relax}}. If this value is written to the \ext{glstex} file:
+\begin{codeenv}
+\field{user1}=\marg{\csfmt{relax}},
+\end{codeenv}
+then this would be parsed as the command \csfmt{relax} when the file is input
+by \gls{GlsXtrLoadResources}.
+
+Therefore, \gls{INTERPRET} automatically replaces all the \TeX\ special characters
+in the resulting string to ensure that they expand to their literal meanings 
+in the \LaTeX\ document.
+
+Now suppose instead that the resource options include:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{FIRSTUC} \marg{ \gls{INTERPRET} \marg{ \field{name} } },
+]
+{assign-fields}
+\end{codeenv}
+This first interprets the value of the \field{name} field and substitutes the special
+characters (so \code{\csfmt{relax}} becomes the string \qtt{\csfmt{glsbackslash} relax}). 
+The resulting string is then converted to sentence case, which results in
+\qtt{\csfmt{Glsbackslash} relax} because the initial backslash is now a literal character,
+and since it's a non-letter character it's skipped by the case-conversion.
+So now the code written to the \ext{glstex} file is:
+\begin{codeenv}
+\gls{bibglsnewindex}\marg{comment}\comment{}
+\marg{\field{user1}=\marg{\csfmt{Glspercentchar} \gls{space} comment},
+\field{name}=\marg{\cs{cs.percent} comment},
+\field{sort}=\marg{comment|}}
+\strut
+\gls{bibglsnewindex}\marg{relax}\comment{}
+\marg{\field{user1}=\marg{\csfmt{Glsbackslash} relax},
+\field{name}=\marg{\cmd{csfmt}\marg{relax}},
+\field{sort}=\marg{relax|}}
+\end{codeenv}
+This is invalid because \csfmt{Glspercentchar} and \csfmt{Glsbackslash} are not defined.
+
+Suppose the order of the quarks is swapped:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{INTERPRET} \marg{ \gls{FIRSTUC} \marg{ \field{name} } },
+]
+{assign-fields}
+\end{codeenv}
+This results in valid \LaTeX\ code:
+\begin{codeenv}
+\gls{bibglsnewindex}\marg{comment}\comment{}
+\marg{\field{user1}=\marg{\gls{glspercentchar} \gls{space} comment},
+\field{name}=\marg{\cs{cs.percent} comment},
+\field{sort}=\marg{comment|}}
+\strut
+\gls{bibglsnewindex}\marg{relax}\comment{}
+\marg{\field{user1}=\marg{\gls{glsbackslash} Relax},
+\field{name}=\marg{\cmd{csfmt}\marg{relax}},
+\field{sort}=\marg{relax|}}
+\end{codeenv}
+If you don't want the argument of a command to be affected by case-changing
+commands, you can use \ics{MFUblocker} or \ics{MFUexcl}. The 
+\sty{glossaries-extra} package writes this information in the \ext{aux}
+file for the benefit of \bibgls. See the \sty{mfirstuc}
+manual for further details of those commands.
+
+\nosecdef{INTERPRETNOREPL}
+As \gls{INTERPRET} but doesn't replace special characters.
+Consider an adjustment to the previous example:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{FIRSTUC} \marg{ \gls{INTERPRETNOREPL} \marg{ \field{name} } },
+]
+{assign-fields}
+\end{codeenv}
+Now \code{\csfmt{csfmt}\marg{relax}} is converted into the literal string
+\qtt{\csfmt{csfmt}\marg{relax}} and then the case-conversion is performed,
+which results in the literal string \qtt{\csfmt{csfmt}\marg{Relax}} but this will become
+an undefined command in the \ext{glstex} file:
+\begin{codeenv}
+\field{user1}=\marg{\csfmt{Relax}},
+\end{codeenv}
+In the case of the \qt{comment} entry, \code{\cs{cs.percent} comment} will 
+be converted to the literal string \qtt{\% comment}, which will then have the case-conversion 
+applied, but the \ext{glstex} file will be invalid:
+\begin{codeent}
+\field{user1}=\marg{\% Comment},
+\end{codeenv}
+
+\nosecdef{REPLACESPCHARS}
+Detokenises and replaces special characters with commands like \gls{glsbackslash}.
+For example:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{REPLACESPCHARS} \marg {
+   \gls{FIRSTUC} \marg{ \gls{INTERPRETNOREPL} \marg{ \field{name} } } },
+]
+{assign-fields}
+\end{codeenv}
+This rather long-winded assignment produces the same result as:
+\begin{codeenv}
+\csopt[
+ \field{user1} = \gls{INTERPRET} \marg{ \gls{FIRSTUC} \marg{ \field{name} } },
+]
+{assign-fields}
+\end{codeenv}
+A difference can be observed if the custom command is made a blocker or exclusion
+using \ics{MFUblocker} or \ics{MFUexcl}.
 
 \nosecdef{LABELIFY}
 Converts the contents of \meta{element-list} into a label string,
