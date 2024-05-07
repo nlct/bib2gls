@@ -132,9 +132,19 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
       }
    }
 
+   protected void setMissingFields()
+   {
+      if (getFieldValue("text") == null)
+      {
+         putField("text", getOriginalId());
+      }
+   }
+
    public void writeBibEntry(PrintWriter writer)
    throws IOException
    {
+      setMissingFields();
+
       writer.format("\\%s{%s}%%%n{", getCsName(), getId());
 
       String sep = "";
