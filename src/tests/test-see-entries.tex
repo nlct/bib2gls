@@ -3,9 +3,13 @@
 % arara: pdflatex
 \documentclass{article}
 
-\usepackage[record]{glossaries-extra}
+\usepackage[record,style=tree]{glossaries-extra}
 
-\GlsXtrLoadResources[src={testseeentries},
+\GlsXtrLoadResources[
+  src={
+   testseeentries,
+   test-see-entries2
+  },
   selection={recorded and deps and see}
 %  selection={recorded and deps}
 ]
