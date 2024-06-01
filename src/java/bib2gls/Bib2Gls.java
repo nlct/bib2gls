@@ -1244,47 +1244,9 @@ public class Bib2Gls extends BibGlsTeXApp
    private void initInterpreter(Vector<AuxData> data)
      throws IOException
    {
-      L2HStringConverter listener = new L2HStringConverter(
-         new Bib2GlsAdapter(this), data, customPackages != null)
-      {
-         @Override
-         public void writeCodePoint(int codePoint) throws IOException
-         {
-            if (getWriter() == null) return;
+      InterpreterListener listener
+        = new InterpreterListener(this, data, customPackages);
 
-            if (codePoint == '&')
-            {
-               getWriter().write("&amp;");
-            }
-            else if (codePoint == '<')
-            {
-               getWriter().write("&le;");
-            }
-            else if (codePoint == '>')
-            {
-               getWriter().write("&ge;");
-            }
-            else
-            {
-               getWriter().write(new String(Character.toChars(codePoint)));
-            }
-         }
-
-         @Override
-         public void parsePackageFile(LaTeXSty sty, TeXObjectList stack) throws IOException
-         {
-            if (isParsePackageSupportOn() 
-                 && customPackages.contains(sty.getName()))
-            {
-               sty.parseFile(stack);
-            }
-         }
-
-      };
-
-      listener.setUndefinedAction(UndefAction.WARN);
-      listener.setUseMathJax(false);
-      listener.setIsInDocEnv(true);
       listener.setSupportUnicodeScript(supportUnicodeSubSuperScripts);
 
       interpreter = createTeXParser(listener);
@@ -6413,7 +6375,8 @@ public class Bib2Gls extends BibGlsTeXApp
       "textcomp",
       "tipa",
       "upgreek",
-      "wasysym"
+      "wasysym",
+      "texjavahelp"
     };
 
    public static final String[] EXTRA_SUPPORTED_PACKAGES = new String[]
