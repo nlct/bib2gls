@@ -4,6 +4,8 @@ v4.0 (pending)
 
    - added \INTERPRETNOREPL and \REPLACESPCHARS quarks
 
+   - added action=provide
+
    - bug fix: indexplural not setting text field if missing, which
      results in the text field defaulting to the plural form.
 

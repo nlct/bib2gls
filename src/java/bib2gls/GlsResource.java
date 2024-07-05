@@ -874,11 +874,15 @@ public class GlsResource
          else if (opt.equals("action"))
          {
             writeActionSetting = getChoice(list, opt,
-              "define", "define or copy", "copy");
+              "define", "provide", "define or copy", "copy");
 
             if (writeActionSetting.equals("define"))
             {
                writeAction = WRITE_ACTION_DEFINE;
+            }
+            else if (writeActionSetting.equals("provide"))
+            {
+               writeAction = WRITE_ACTION_PROVIDE;
             }
             else if (writeActionSetting.equals("define or copy"))
             {
@@ -3416,7 +3420,7 @@ public class GlsResource
           "limit="+limit, "master"));
       }
 
-      if (writeAction != WRITE_ACTION_DEFINE)
+      if (writeAction != WRITE_ACTION_DEFINE && writeAction != WRITE_ACTION_PROVIDE)
       {
          if (type == null)
          {
@@ -10695,6 +10699,11 @@ public class GlsResource
       {
          case WRITE_ACTION_DEFINE:
            writeBibEntryDef(writer, entry);
+         break;
+         case WRITE_ACTION_PROVIDE:
+           writer.format("\\ifglsentryexists{%s}{}{%n", entry.getId());
+           writeBibEntryDef(writer, entry);
+           writer.println("}");
          break;
          case WRITE_ACTION_COPY:
            writeBibEntryCopy(writer, entry);
@@ -18141,6 +18150,7 @@ public class GlsResource
    private final byte WRITE_ACTION_DEFINE=0;
    private final byte WRITE_ACTION_COPY=1;
    private final byte WRITE_ACTION_DEFINE_OR_COPY=2;
+   private final byte WRITE_ACTION_PROVIDE=3;
 
    private byte writeAction = WRITE_ACTION_DEFINE;
 

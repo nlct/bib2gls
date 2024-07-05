@@ -2447,8 +2447,8 @@ package installed on your system. In this case, you will need to add them. For e
 \begin{codeenv}
 \cs{renewcommand}*\marg{\cs{glsxtrresourceinit}}\marg{\comment{}
   \cs{GlsXtrResourceInitEscSequences}
-  \cmd{def}\gls{INTERPRETNOREPL}\marg{\cs{string}\gls{INTERPRETNOREPL}}\comment{}
-  \cmd{def}\gls{REPLACESPCHARS}\marg{\cs{string}\gls{REPLACESPCHARS}}\comment{}
+  \cmd{def}\gls{INTERPRETNOREPL}\marg{\idx{cs.string}\gls{INTERPRETNOREPL}}\comment{}
+  \cmd{def}\gls{REPLACESPCHARS}\marg{\idx{cs.string}\gls{REPLACESPCHARS}}\comment{}
 }
 \end{codeenv}
 
@@ -8006,7 +8006,7 @@ Interprets the contents of \meta{element-list} using \bibgls's
 interpreter and returns the result, which may be an empty string if
 the content only contains unknown commands. Note that the result is 
 a string with any special characters replaced by detokenized commands, such as
-\gls{glsbackslash}. This ensures that the value is suitable to be written
+\ics{glsbackslash}. This ensures that the value is suitable to be written
 in the entry definition in the \ext{glstex} file.
 
 It's important to remember that the result of \gls{INTERPRET} is a detokenized string.
@@ -8014,7 +8014,7 @@ In general, it's therefore best to have \gls{INTERPRET} as the outermost quark.
 
 Suppose I have a \ext{bib} file that contains:
 \begin{codeenv}
-\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{csfmt}}[1]\marg{\gls{glsbackslash} \idx{param}1}}}
+\atentry{preamble}\marg{\qtdelim{\cs{providecommand}\marg{\cmd{csfmt}}[1]\marg{\cs{glsbackslash} \idx{param}1}}}
 \atentry{index}\marg{relax,\field{name}=\marg{\cmd{csfmt}\marg{relax}}}
 \atentry{index}\marg{comment,\field{name}=\marg{\cs{cs.percent} comment}}
 \end{codeenv}
@@ -8027,12 +8027,12 @@ If the resource options include:
 Then the definitions in the \ext{glstex} file will be:
 \begin{codeenv}
 \gls{bibglsnewindex}\marg{comment}\comment{}
-\marg{\field{user1}=\marg{\gls{glspercentchar} \gls{space} comment},
+\marg{\field{user1}=\marg{\cs{glspercentchar} \cs{space} comment},
 \field{name}=\marg{\cs{cs.percent} comment},
 \field{sort}=\marg{comment|}}
 \strut
 \gls{bibglsnewindex}\marg{relax}\comment{}
-\marg{\field{user1}=\marg{\gls{glsbackslash} relax},
+\marg{\field{user1}=\marg{\cs{glsbackslash} relax},
 \field{name}=\marg{\cmd{csfmt}\marg{relax}},
 \field{sort}=\marg{relax|}}
 \end{codeenv}
@@ -8078,7 +8078,7 @@ and since it's a non-letter character it's skipped by the case-conversion.
 So now the code written to the \ext{glstex} file is:
 \begin{codeenv}
 \gls{bibglsnewindex}\marg{comment}\comment{}
-\marg{\field{user1}=\marg{\csfmt{Glspercentchar} \gls{space} comment},
+\marg{\field{user1}=\marg{\csfmt{Glspercentchar} \cs{space} comment},
 \field{name}=\marg{\cs{cs.percent} comment},
 \field{sort}=\marg{comment|}}
 \strut
@@ -8098,12 +8098,12 @@ Suppose the order of the quarks is swapped:
 This results in valid \LaTeX\ code:
 \begin{codeenv}
 \gls{bibglsnewindex}\marg{comment}\comment{}
-\marg{\field{user1}=\marg{\gls{glspercentchar} \gls{space} comment},
+\marg{\field{user1}=\marg{\cs{glspercentchar} \cs{space} comment},
 \field{name}=\marg{\cs{cs.percent} comment},
 \field{sort}=\marg{comment|}}
 \strut
 \gls{bibglsnewindex}\marg{relax}\comment{}
-\marg{\field{user1}=\marg{\gls{glsbackslash} Relax},
+\marg{\field{user1}=\marg{\cs{glsbackslash} Relax},
 \field{name}=\marg{\cmd{csfmt}\marg{relax}},
 \field{sort}=\marg{relax|}}
 \end{codeenv}
@@ -8136,7 +8136,7 @@ applied, but the \ext{glstex} file will be invalid:
 \end{codeenv}
 
 \nosecdef{REPLACESPCHARS}
-Detokenises and replaces special characters with commands like \gls{glsbackslash}.
+Detokenises and replaces special characters with commands like \ics{glsbackslash}.
 For example:
 \begin{codeenv}
 \csopt[
@@ -8854,6 +8854,7 @@ This governs how the entries are written in the \iext{glstex} file.
 The \meta{value} may be one of: 
 \begin{itemize}
 \item\code{define}: define the entries;
+\item\code{provide}: provide the entries;
 \item\code{copy}: copy the entries;
 \item\code{define or copy}: copy existing entries and define
 non-existing entries.
@@ -8867,6 +8868,14 @@ will generate a warning rather than an error. The duplicate
 definition will be ignored. (The warnings can be found in the
 \ext{log} file since they are warnings produce by
 \sty{glossaries-extra} not by \bibgls.)
+
+If you have multiple \iglspl{resourceset} to help group different types of
+entry for the same glossary, the \csopt[provide]{action} setting can
+be used to suppress any warnings if the selection criteria is too
+complex to filter out entries that were selected by a previous
+\gls{resourceset}. If, however, you want duplicate entries so that
+you can have the same entry listed in multiple glossary, you need a
+different approach.
 
 For example, if you try:
 \begin{codeenv}
