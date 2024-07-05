@@ -26,6 +26,7 @@ import com.dickimawbooks.texparserlib.TeXCsRef;
 import com.dickimawbooks.texparserlib.ControlSequence;
 import com.dickimawbooks.texparserlib.GenericCommand;
 import com.dickimawbooks.texparserlib.TextualContentCommand;
+import com.dickimawbooks.texparserlib.TeXParserUtils;
 import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.LaTeXParserListener;
@@ -108,6 +109,13 @@ public class Bib2GlsTeXJavaHelpSty extends LaTeXSty
       registerControlSequence(new Symbol("nlctcloseparen", ')'));
       registerControlSequence(new Symbol("nlctopensqbracket", '['));
       registerControlSequence(new Symbol("nlctclosesqbracket", ']'));
+
+      registerControlSequence(new Symbol("homedir", '~'));
+      registerControlSequence(new LaTeXGenericCommand(true,
+       "homefilefmt", "m", TeXParserUtils.createStack(getListener(),
+       new TeXCsRef("filefmt"), TeXParserUtils.createGroup(getListener(),
+       new TeXCsRef("homedir"), getListener().getOther('/'),
+       getListener().getParam(1)))));
 
       registerControlSequence(new Symbol("codesym", 0x1F5B9));
       registerControlSequence(new Symbol("resultsym", 0x1F5BA));
