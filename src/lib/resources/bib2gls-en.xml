@@ -766,6 +766,11 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool.warn.dbtex3exp">Detected DBTEX v3.0 experimental format. Resave database file as DBTEX v3.0</entry>
 <entry key="datatool.unsupported.action">Unsupported action: ''{0}''</entry>
 
+<entry key="datagidx.term_not_defined">Term ''{0}'' not defined</entry>
+<entry key="datagidx.database_not_defined">Index database ''{0}'' not defined</entry>
+<entry key="datagidx.no_databases">No index databases defined</entry>
+<entry key="datagidx.not_index_database">Database ''{0}'' is not a datagidx index database</entry>
+
 <!--  ifthen messages -->
 
 <entry key="ifthen.invalid.condition">Invalid condition ''{0}''.</entry>
@@ -778,6 +783,11 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="color.unsupported">Unsupported ''{0}'' model colour {1}</entry>
 <entry key="color.invalid.specs">Invalid specification ''{0}'' for colour model {1}</entry>
 <entry key="color.unknown">Unknown named colour ''{0}''</entry>
+
+<!--  etoolbox messages -->
+
+<entry key="etoolbox.toggle_already_defined">Toggle ''{0}'' already defined.</entry>
+<entry key="etoolbox.toggle_not_defined">Toggle ''{0}'' undefined.</entry>
 
 <!--  fontawesome messages -->
 

@@ -6704,7 +6704,7 @@ public class GlsResource
 
             try
             {
-               reader = Files.newBufferedReader(bibFile.toPath(),
+               reader = bib2gls.createBufferedReader(bibFile.toPath(),
                   bib2gls.getDefaultCharset());
 
                String line;

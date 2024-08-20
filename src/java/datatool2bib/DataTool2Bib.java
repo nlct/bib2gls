@@ -207,7 +207,7 @@ public class DataTool2Bib extends BibGlsConverter
 
       if (setup != null && !setup.isEmpty())
       {
-         TeXReader reader = new TeXReader(String.format("\\DTLsetup{%s}", setup));
+         TeXReader reader = new TeXReader(this, String.format("\\DTLsetup{%s}", setup));
 
          parser.parse(reader);
       }
@@ -220,7 +220,7 @@ public class DataTool2Bib extends BibGlsConverter
       {
          TeXPath texPath = new TeXPath(parser, texFile);
 
-         TeXReader reader = new TeXReader(String.format("\\DTLread[%s]{%s}",
+         TeXReader reader = new TeXReader(this, String.format("\\DTLread[%s]{%s}",
            readOpts, texPath.getTeXPath(false)));
 
          parser.parse(reader);
@@ -245,6 +245,18 @@ public class DataTool2Bib extends BibGlsConverter
       message(getMessage("datatool2bib.gidxdata.found", numGidxDataBases));
 
       Enumeration<String> nameEnum = datatoolSty.getDataBaseNames();
+
+      Charset bibCharset;
+
+      if (bibCharsetName == null)
+      {
+         bibCharset = getDefaultCharset();
+         bibCharsetName = bibCharset.name();
+      }
+      else
+      {
+         bibCharset = Charset.forName(bibCharsetName);
+      }
 
       PrintWriter out = null;
 
@@ -276,16 +288,9 @@ public class DataTool2Bib extends BibGlsConverter
 
             try
             {
-               if (bibCharsetName == null)
-               {
-                  out = new PrintWriter(file);
-               }
-               else
-               {
-                  out = new PrintWriter(file, bibCharsetName);
+               out = new PrintWriter(createBufferedWriter(file.toPath(), bibCharset));
 
-                  out.println("% Encoding: "+bibCharsetName);
-               }
+               out.println("% Encoding: "+bibCharsetName);
 
                writeEntries(datatoolSty.getDataBase(dbName), out);
             }
@@ -314,16 +319,9 @@ public class DataTool2Bib extends BibGlsConverter
 
                try
                {
-                  if (bibCharsetName == null)
-                  {
-                     out = new PrintWriter(file);
-                  }
-                  else
-                  {
-                     out = new PrintWriter(file, bibCharsetName);
+                  out = new PrintWriter(createBufferedWriter(file.toPath(), bibCharset));
 
-                     out.println("% Encoding: "+bibCharsetName);
-                  }
+                  out.println("% Encoding: "+bibCharsetName);
 
                   writeGidxPreamble(out);
 
@@ -351,16 +349,9 @@ public class DataTool2Bib extends BibGlsConverter
 
             message(getMessage("message.writing", bibFile));
 
-            if (bibCharsetName == null)
-            {
-               out = new PrintWriter(bibFile);
-            }
-            else
-            {
-               out = new PrintWriter(bibFile, bibCharsetName);
+            out = new PrintWriter(createBufferedWriter(bibFile.toPath(), bibCharset));
 
-               out.println("% Encoding: "+bibCharsetName);
-            }
+            out.println("% Encoding: "+bibCharsetName);
 
             while (nameEnum != null && nameEnum.hasMoreElements())
             {

@@ -7,7 +7,7 @@ Author: Nicola Talbot (https://www.dickimaw-books.com/contact)
 
 Application Home Page: https://www.dickimaw-books.com/software/bib2gls
 
-# Licence
+## Licence
 
 Copyright (C) 2017-2024 Nicola L. C. Talbot (dickimaw-books.com)
 
@@ -16,14 +16,14 @@ http://gnu.org/licenses/gpl.html
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
-# Requirements
+## Requirements
 
   - Java Runtime Environment (at least Java 8).
 
   - TeX distribution that includes `glossaries-extra.sty` 
     and dependent packages (such as `glossaries.sty`).
 
-# Summary
+## Summary
 
 This application may be used to extract glossary information
 stored in a `.bib` file and convert it into glossary entry
@@ -64,7 +64,7 @@ convertgls2tex entries.tex entries.bib
 ```
 to create `entries.bib`.
 
-# Example
+## Example
 
 File `entries.bib`:
 
@@ -124,7 +124,7 @@ pdflatex myDoc
 (Replace `pdflatex` with `latex`, `xelatex` or `lualatex` as
 appropriate.)
 
-# Related Resources
+## Related Resources
 
   - [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls).
   - [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
@@ -140,7 +140,7 @@ TUGboat articles:
     poisons), issue [43:1, 2022](https://tug.org/TUGboat/Contents/contents43-1.html).
     [(PDF)](https://tug.org/TUGboat/tb43-1/tb133talbot-bib2gls-reorder.pdf)
 
-# Installation
+## Installation
 
 The files should be installed as follows where *TEXMF* indicates
 your local or home TEXMF path (for example, `~/texmf/`):
@@ -173,7 +173,7 @@ convertgls2bib --version
 ```
 These should display the version details.
 
-# Source Code
+## Source Code
 
 Instructions for compiling the manual and jar files are listed
 below. The source is also available on GitHub, but that may be for
@@ -183,7 +183,7 @@ a newer experimental version.
   - https://github.com/nlct/texparser
 
 
-## User Manual (bib2gls.pdf)
+### User Manual (bib2gls.pdf)
 
 The examples directory needs to be ../examples relative to directory
 containing bib2gls.tex as the .bib, .tex and .pdf files are included
@@ -201,7 +201,7 @@ xelatex bib2gls
 
 Similarly for the bib2gls-begin.pdf document.
 
-## JAR Files
+### JAR Files
 
 Create the following directories:
 

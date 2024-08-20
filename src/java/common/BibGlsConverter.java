@@ -60,7 +60,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       if (transcriptFile != null)
       {
          logWriter = new PrintWriter(
-           Files.newBufferedWriter(transcriptFile.toPath(), defaultCharset));
+           createBufferedWriter(transcriptFile.toPath(), defaultCharset));
 
          parser.setLogWriter(logWriter);
          parser.setLogging(true);

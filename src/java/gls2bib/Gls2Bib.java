@@ -410,16 +410,21 @@ public class Gls2Bib extends BibGlsConverter
 
          message(getMessage("message.writing", bibFile));
 
+         Charset bibCharset;
+
          if (bibCharsetName == null)
          {
-            out = new PrintWriter(bibFile);
+            bibCharset = getDefaultCharset();
+            bibCharsetName = bibCharset.name();
          }
          else
          {
-            out = new PrintWriter(bibFile, bibCharsetName);
-
-            out.println("% Encoding: "+bibCharsetName);
+            bibCharset = Charset.forName(bibCharsetName);
          }
+
+         out = new PrintWriter(createBufferedWriter(bibFile.toPath(), bibCharset));
+
+         out.println("% Encoding: "+bibCharsetName);
 
          for (GlsData entry : data)
          {
@@ -463,16 +468,10 @@ public class Gls2Bib extends BibGlsConverter
 
                      message(getMessage("message.writing", splitBibFile));
 
-                     if (bibCharsetName == null)
-                     {
-                        splitOut = new PrintWriter(splitBibFile);
-                     }
-                     else
-                     {
-                        splitOut = new PrintWriter(splitBibFile, bibCharsetName);
+                     splitOut = new PrintWriter(
+                       createBufferedWriter(splitBibFile.toPath(), bibCharset));
 
-                        splitOut.println("% Encoding: "+bibCharsetName);
-                     }
+                     splitOut.println("% Encoding: "+bibCharsetName);
 
                      splitOuts.put(tag, splitOut);
                   }

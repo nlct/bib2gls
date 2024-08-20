@@ -948,7 +948,7 @@ public class Bib2Gls extends BibGlsTeXApp
          logMessage(getMessage("message.reading", texLogFile));
          logEncoding(texLogCharset);
 
-         in = Files.newBufferedReader(texLogFile.toPath(), getTeXLogCharset());
+         in = createBufferedReader(texLogFile.toPath(), getTeXLogCharset());
 
          String line = null;
 
@@ -6107,7 +6107,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       try
       {
-         logWriter = new PrintWriter(Files.newBufferedWriter(transcriptFile.toPath(),
+         logWriter = new PrintWriter(createBufferedWriter(transcriptFile.toPath(),
            defaultCharset));
       }
       catch (IOException e)
