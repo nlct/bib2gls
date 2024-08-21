@@ -43,7 +43,15 @@ import java.nio.file.NoSuchFileException;
 
 import com.dickimawbooks.texparserlib.*;
 
-public abstract class BibGlsTeXApp implements TeXApp
+/**
+ * An abstract TeXApp class that provides messages and I/O methods
+ * for bib2gls and friends.
+ * This now extends AbstractTeXApp rather than
+ * implementing TeXApp, which makes it easier to pick up new default
+ * methods.
+ */
+
+public abstract class BibGlsTeXApp extends AbstractTeXApp
 {
    protected BibGlsTeXApp()
    {
@@ -222,68 +230,6 @@ public abstract class BibGlsTeXApp implements TeXApp
       if (isDebuggingOn())
       {
          logAndPrintMessage(getMessage(key, params));
-      }
-   }
-
-   @Override
-   public boolean isWriteAccessAllowed(File file)
-   {
-      return file.canWrite();
-   }
-
-   @Override
-   public boolean isWriteAccessAllowed(TeXPath path)
-   {
-      return isWriteAccessAllowed(path.getFile());
-   }
-
-   @Override
-   public boolean isReadAccessAllowed(File file)
-   {
-      return file.canRead();
-   }
-
-   @Override
-   public boolean isReadAccessAllowed(TeXPath path)
-   {
-      return isReadAccessAllowed(path.getFile());
-   }
-
-   @Override
-   public BufferedReader createBufferedReader(Path path,
-     Charset charset) throws IOException, SecurityException
-   {
-      /*
-       * The use of Files.newBufferedReader(Path,Charset)
-       * can cause an exception when running inside a 
-       * restricted container (see https://github.com/nlct/bib2gls/issues/30)
-       * so first try the newer method but if that fails fallback
-       * on the older method.
-       */
-
-      try
-      {
-         return Files.newBufferedReader(path, charset);
-      }
-      catch (Throwable e)
-      {
-         return new BufferedReader(
-          new InputStreamReader(new FileInputStream(path.toFile()), charset));
-      } 
-   }
-
-   @Override
-   public BufferedWriter createBufferedWriter(Path path,
-     Charset charset) throws IOException, SecurityException
-   {
-      try
-      {
-         return Files.newBufferedWriter(path, charset);
-      }
-      catch (Throwable e)
-      {
-         return new BufferedWriter(
-            new OutputStreamWriter(new FileOutputStream(path.toFile()), charset));
       }
    }
 
@@ -1708,7 +1654,7 @@ public abstract class BibGlsTeXApp implements TeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "3.9.20240820";
-   public static final String DATE = "2024-08-20";
+   public static final String VERSION = "3.9.20240821";
+   public static final String DATE = "2024-08-21";
 
 }
