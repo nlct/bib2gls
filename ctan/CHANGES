@@ -6,6 +6,8 @@ v4.0 (pending)
 
    - added action=provide
 
+   - added support for \BibGlsOptions (provided by glossaries-extra v1.54+)
+
    - bug fix: indexplural not setting text field if missing, which
      results in the text field defaulting to the plural form.
 

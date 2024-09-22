@@ -3306,6 +3306,53 @@ where \meta{filename} is the name of the \ext{aux} file. (The
 extension may be omitted.) Only one \meta{filename} is permitted.
 Available options are listed below.
 
+If you are using an automated build system that makes it difficult
+to change the command line options and you have at least version
+1.54 of \sty{glossaries-extra} and at least version 4.0 of \bibgls,
+then most (but not all) switches can be specified within the
+argument of 
+\nosecformatdef{BibGlsOptions}
+This command may be placed anywhere within the preamble, but the
+options will always be processed before the resource commands. This
+command may be used multiple times.
+Unlike the resource options, which are local to the resource set, the options 
+described here are global and are applied to all resource sets,
+where applicable.
+For example:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{replace-quotes=true}
+\gls{GlsXtrLoadResources}
+\gls{BibGlsOptions}\marg{collapse-same-location-range=true}
+\end{codeenv}
+This is equivalent to:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{replace-quotes=true,collapse-same-location-range=true}
+\gls{GlsXtrLoadResources}
+\end{codeenv}
+The \meta{options} list should be a \keyvallist\ where the \meta{key}
+is the same as the long switch without the preceding
+\code{\longswitch}. Any \code{\longswitch no-\meta{option}} should 
+be specified as \code{\meta{option}=false} within
+\gls{BibGlsOptions}.
+For example, to set global options via the command line:
+\begin{verbatim}
+bib2gls --group --no-replace-quotes myDoc
+\end{verbatim}
+Alternatively, the document may contain:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{group=true,replace-quotes=false}
+\end{codeenv}
+You can omit the value if it is \code{true}, so the above can also
+be written:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{group,replace-quotes=false}
+\end{codeenv}
+ 
+\begin{important}
+Options that must be set before the \ext{log} and \ext{aux} file are read can
+only be set via the command line switch.
+\end{important}
+
 \section{Common Options}
 \label{sec:commonswitches}
 
@@ -3315,16 +3362,19 @@ supplementary command line conversion tools
 \commonarg{help}
 
 Display the help message and quit.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{version}
 
 Display the version information and quit. As from v2.5, this now
 includes the version number of the \file{texparserlib.jar} library.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{verbose}
 
 Switches on the verbose mode. This writes extra information to the
 terminal and transcript file.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{no-verbose}
 
@@ -3332,16 +3382,19 @@ Switches off the verbose mode. This is the default behaviour.
 Some messages are written to the terminal. To completely suppress
 all messages (except errors), switch on the silent mode.
 For additional information messages, switch on the verbose mode.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{quiet}
 
 Suppresses all messages except for errors that would normally be
 written to the terminal. Warnings and informational messages are
 written to the transcript file, which can be inspected afterwards.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{silent}
 
 Synonym of \commonlongarg{quiet}.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \commonarg{locale}
 
@@ -3353,6 +3406,7 @@ keyword (in options such as \csopt[doc]{sort}) is
 used and the document doesn't have any language support.
 Note that the \optfmt{locale} keyword (in options such as \csopt[locale]{sort})
 uses the \gls{Java-locale} and is not governed by this switch.
+This option cannot be set in \gls{BibGlsOptions}.
 
 If a document doesn't have any locale support or has support
 for more than one language then it's best to explicitly set
@@ -3373,6 +3427,7 @@ If \meta{n} is present, it must be a non-negative integer indicating
 the debugging mode. If omitted, 1 is assumed. This option also
 switches on the verbose mode. A value of 0 is equivalent to
 \commonlongarg{no-debug}.
+This option cannot be set in \gls{BibGlsOptions}.
 
 The value of \meta{n} determines how much extra information is
 provided. If \meta{n} is greater than 0 then all \bibgls\ debugging
@@ -3394,7 +3449,9 @@ an exception with a stack trace in debug mode.
 \commonarg{debug-mode}
 
 This option is an alternative to \longargfmt{debug} where the value
-of \meta{n} needs to be calculated. Debugging mode requires a
+of \meta{n} needs to be calculated. 
+This option cannot be set in \gls{BibGlsOptions}.
+Debugging mode requires a
 transcript file, which is automatically created with \bibgls, but is
 optional for the converter tools (see \sectionref{sec:tex2bib}). The
 \meta{setting} is required and should be a comma-separated list of
@@ -3458,10 +3515,13 @@ bib2gls \longargfmt{debug-mode} catcode,sty-data \meta{filename}
 \commonarg{no-debug}
 
 Switches off the debugging mode.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \section{File Options}
 
 \argsection{dir}
+
+This option cannot be set in \gls{BibGlsOptions}.
 
 By default \bibgls\ assumes that the output files should be written
 in the current working directory. The input \iext{bib} files are assumed to be
@@ -3521,11 +3581,14 @@ same as the \iext{aux} file but with a \iext{glg} extension. Note that
 if you use \bibgls\ in combination with \idx{xindy} or
 \idx{makeindex}, you will need to change the transcript file name to
 prevent conflict.
+This option cannot be set in \gls{BibGlsOptions}.
 
 The transcript file encoding is governed by
 \longarg{log-encoding}.
 
 \argsection{tex-encoding}
+
+This option cannot be set in \gls{BibGlsOptions}.
 
 In general, it's best to have all your files (\ext{aux}, \ext{bib}
 and \iext{glstex}) in the same \igls{encoding} that matches your
@@ -3551,6 +3614,7 @@ The \igls{encoding} of the \iext{log} file. If omitted, the default
 encoding will be used.  See \sectionref{sec:defencoding}.  (Note
 that the \ext{log} file may not have the same encoding as the
 \ext{tex} file~\cite{tex.sx.2013}.)
+This option cannot be set in \gls{BibGlsOptions}.
 
 \argsection{default-encoding}
 
@@ -3561,6 +3625,7 @@ globally change the encoding for the \idx{JVM}, which will affect
 all Java applications installed on your device, or you can use 
 \longarg{default-encoding} just to set the default for \bibgls.
 See \sectionref{sec:defencoding}.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \argsection{date-in-header}
 
@@ -3575,6 +3640,10 @@ timestamp changes.
 
 The comment header block at the start of the \iext{glstex} files
 won't include the file modification date (default).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{date-in-header=false}
+\end{codeenv}
 
 \section{Interpreter Options}
 
@@ -3588,6 +3657,10 @@ space. Similarly \ics{nobreakspace} just produces a space.
 The interpreter treats a tilde character \idx{nbspchar} as a non-breakable
 space (default). Similarly the interpreter will define
 \ics{nobreakspace} to produce a non-breakable space character (\hex{00A0}).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{break-space=false}
+\end{codeenv}
 
 \argsection{custom-packages}
 
@@ -3600,6 +3673,24 @@ but it can't deal with complicated code.  In the case of
 \ics{RequirePackage}, support will also be governed by
 \longargfmt{custom-packages}.  This option has a cumulative action.
 
+Multiple instances of this switch can occur on the command line.
+If used in \gls{BibGlsOptions}, the nature of the \keyvallist\
+parser means that multiple instances within the same option list
+will override each other. Instead, you will need a comma-separated
+list as the argument.
+For example, from the command line:
+\begin{verbatim}
+bib2gls --custom-packages 'pkg1,pkg2,pkg3' myDoc
+\end{verbatim}
+This is equivalent to:
+\begin{verbatim}
+bib2gls --custom-packages pkg1 --custom-packages pkg2 --custom-packages pkg3 myDoc
+\end{verbatim}
+Alternatively, within the document:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{custom-packages=\marg{pkg1,pkg2,pkg3}}
+\end{codeenv}
+
 \argsection{ignore-packages}
 
 This option is cumulative. When the document \iext{log} file is
@@ -3610,6 +3701,7 @@ that are identified with \longarg{packages} will be passed to the
 interpreter if support is available, even if the package is also
 listed in \longargfmt{ignore-packages}.  Note that
 unknown packages can't be included in the ignored \meta{list}.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \argsection{interpret}
 
@@ -3620,11 +3712,18 @@ for more details.
 
 Switch off the interpreter mode. See \sectionref{sec:texparserlib}
 for more details about the interpreter. 
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{interpret=false}
+\end{codeenv}
 
 \argsection{list-known-packages}
 
 This option will list all the packages supported by the \texparserlib\
-and will then exit \bibgls. The results are divided into two
+and will then exit \bibgls. 
+This option cannot be set in \gls{BibGlsOptions}.
+
+The results are divided into two
 sections: those packages that are searched for in the \iext{log}
 file and those packages that aren't searched for in the \iext{log}
 file but have some support available. Some of the support is very
@@ -3672,7 +3771,11 @@ Instruct the interpreter to assume the packages listed
 in \meta{list} have been used by the document.
 This option has a cumulative action so \code{\longarg{packages}
 "wasysym,pifont"} is the same as \code{\longarg{packages} wasysym 
-\longarg{packages} pifont}.
+\longarg{packages} pifont}.  
+
+This option may also be used in \gls{BibGlsOptions} but, as with 
+\longarg{custom-packages}, multiple instances of the \code{packages}
+key in the same option list will override each other.
 
 Note that there's only a limited number of packages supported by the
 \texparserlib. This option is provided for cases where you're
@@ -3728,17 +3831,24 @@ this setting. For example, if \csfmt{superiortwo} is defined as
 then it will be interpreted as \hex{00B2} (superscript two) even if
 this setting is on.
 
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{support-unicode-script=false}
+\end{codeenv}
+
 \argsection{obey-aux-catcode}
 
 By default, the \ext{aux} parser ignores category code changing
 commands. This option will instruct the parser to implement the
 category code, but note that it can only do this for known commands
 that the parser is able to implement.
+This option cannot be set in \gls{BibGlsOptions}.
 
 \argsection{no-obey-aux-catcode}
 
 Instructs the \ext{aux} parser to ignore category code changing
 commands. (Default.)
+This option cannot be set in \gls{BibGlsOptions}.
 
 \section{Record Options}
 
@@ -3758,6 +3868,10 @@ This switch is most useful in conjunction with
 
 Don't check for instances of \ics{citation} in the \ext{aux} file
 (default).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{cite-as-record=false}
+\end{codeenv}
 
 \argsection{collapse-same-location-range}
 
@@ -3773,6 +3887,10 @@ Don't collapse any \idx{explicit-range} into a normal
 \gls{record} if the start and end \glspl{location} are the same.
 The \idx{explicit-range} will only be able to merge with
 neighbouring \glspl{location} if \csopt[true]{merge-ranges}.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{collapse-same-location-range=false}
+\end{codeenv}
 
 \argsection{map-format}
 
@@ -3781,7 +3899,10 @@ matches (see \sectionref{sec:locationopts}). The argument may be
 a comma-separated list of \meta{map}\code{:}\meta{value} pairs.
 Alternatively, you can have multiple instances of 
 \longarg{map-format} \meta{map}\dcolon\meta{value} which have a
-cumulative effect.
+cumulative effect on the command line. You can also use
+\code{map-format} as an option within \gls{BibGlsOptions}, but
+multiple instances of this key in the same option list will override
+each other.
 
 For example, 
 \begin{verbatim}
@@ -3942,6 +4063,10 @@ default setting. (See also \csopt{save-index-counter}.)
 Don't merge an entry's \counter{wrglossary} records. This means that you
 may end up with duplicate page numbers in the entry's \gls{locationlist},
 but they will link to different parts of the page.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{merge-wrglossary-records=false}
+\end{codeenv}
 
 \argsection{record-count}
 
@@ -4013,6 +4138,10 @@ obtained by \bibgls\ from the \ext{aux} file.
 \argsection{no-record-count}
 
 Switch off record counting. (Default.)
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{record-count=false}
+\end{codeenv}
 
 \argsection{record-count-unit}
 
@@ -4027,6 +4156,10 @@ to determine which records should be counted.
 Switches off unit record counting. (Default.)
 Note that you need \longarg{no-record-count} to completely
 switch off record counting.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{record-count-unit=false}
+\end{codeenv}
 
 \argsection{record-count-rule}
 
@@ -4086,6 +4219,10 @@ to an ordinary \gls{record}. (You may need to use
 \argsection{no-retain-formats}
 
 Normal \gls{location} merging rules apply (default).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{retain-formats=false}
+\end{codeenv}
 
 \section{Bib File Options}
 
@@ -4115,6 +4252,10 @@ have taken appropriate precautions to avoid unexpected results.
 Switches off the check for non-bib fields. If you use this option
 you need to make sure you have taken appropriate precautions to
 avoid unexpected results.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{warn-non-bib-fields=false}
+\end{codeenv}
 
 \argsection{warn-unknown-entry-types}
 
@@ -4125,6 +4266,10 @@ will issue a warning with this option set (default).
 
 This option will suppress the warning if an unknown \glspl{entrytype} are
 found in the \ext{bib} file.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{warn-unknown-entry-types=false}
+\end{codeenv}
 
 \section{Field Options}
 
@@ -4344,6 +4489,10 @@ Don't automatically set the \field{group} field with
 \csopt[auto]{group} (default). The glossary won't have groups even if a
 group style, such as \glostyle{indexgroup}, is used (unless the
 \field{group} field is set to a custom value).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{group=false}
+\end{codeenv}
 
 \argsection{no-expand-fields}
 
@@ -4360,6 +4509,11 @@ fetching the data from \iext{bib} files, it's unlikely
 that this automatic expansion is required and since it can
 also be problematic this option is on by default. You can
 switch it off with \longarg{expand-fields}.
+
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{expand-fields=false}
+\end{codeenv}
 
 \argsection{expand-fields}
 
@@ -4421,6 +4575,10 @@ equivalent to \longarg{no-mfirstuc-protection}. The default value is
 
 Switches off the \isty{mfirstuc} protection mechanism described
 above.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{mfirstuc-protection=false}
+\end{codeenv}
 
 \argsection{mfirstuc-math-protection}
 
@@ -4447,6 +4605,10 @@ write a warning in the transcript. This setting is on by default.
 \argsection{no-mfirstuc-math-protection}
 
 Switches off the above.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{mfirstuc-math-protection=false}
+\end{codeenv}
 
 \argsection{nested-link-check}
 
@@ -4467,6 +4629,14 @@ list of fields to be checked.
 \argsection{no-nested-link-check}
 
 Equivalent to \longarg{nested-link-check} \optfmt{none}.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{nested-link-check=none}
+\end{codeenv}
+or
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{nested-link-check=false}
+\end{codeenv}
 
 \argsection{shortcuts}
 
@@ -4549,6 +4719,10 @@ bib2gls --trim-except-fields short --trim-except-fields long myDoc
 
 Don't trim any leading or trailing spaces from field values (but see
 the above note about \sty{xkeyval}). This is the default setting.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{trim-fields=false}
+\end{codeenv}
 
 \section{Other Options}
 
@@ -4562,6 +4736,10 @@ Force \igls{crossresourceref} mode on (see
 Don't force \igls{crossresourceref} mode on (default). 
 The mode will be enabled if applicable (see
 \sectionref{sec:resourcesets}).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{force-cross-resource-refs=false}
+\end{codeenv}
 
 \argsection{provide-glossaries}
 
@@ -4586,6 +4764,10 @@ except in a few documented situations (the \csopt{master},
 default since it's a useful way of detecting misspelt glossary
 labels. It's harder to detect the problem if a misspelt label has
 caused an entry to be added to a hidden glossary.
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{provide-glossaries=false}
+\end{codeenv}
 
 \argsection{replace-quotes}
 
@@ -4599,6 +4781,10 @@ written to the \ext{glstex} file.
 Single and double-quote characters (\idx{aposchar} and
 \idx{doublequotechar}) will be written as those actual characters
 (default).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{replace-quotes=false}
+\end{codeenv}
 
 \chapter{\iext{bib} Format}
 \label{sec:bib}

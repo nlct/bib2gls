@@ -444,6 +444,7 @@ Have you indexed your entries using commands like \gls?</entry>
 {0}</entry>
 <entry key="error.invalid.sort.value">Invalid sort method ''{0}'' given in option: {1}</entry>
 <entry key="error.invalid.opt.value">Invalid ''{0}'' value: {1}</entry>
+<entry key="error.invalid.opt.bool.value">Invalid ''{0}'' value: {1} (boolean ''true'' or ''false'' required)</entry>
 <entry key="error.invalid.opt.intorbool.value">Invalid ''{0}'' value: {1} (number or boolean required)</entry>
 <entry key="error.invalid.opt.int.value">Invalid ''{0}'' value: {1} (number required)</entry>
 <entry key="error.invalid.opt.minint.value">Invalid ''{0}'' value: {1} (can''t be less than {2,number})</entry>
@@ -539,6 +540,7 @@ Use {1} {0} instead.</entry>
 <entry key="error.sort.requires.switch">Sort method ''{0}'' requires {1} switch.</entry>
 <entry key="error.selected_before.none_selected">Selection setting ''{0}'' requires previous selections from other resource sets.</entry>
 <entry key="error.duplicate.compoundset">Duplicate compound set: {0}</entry>
+<entry key="error.switch_only">''{0}'' option may only be used as a command line switch</entry>
 
 <!--
     The following messages are used by convertgls2bib and datatool2bib
@@ -630,6 +632,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="error.interrupted">Process interrupted</entry>
 <entry key="error.syntax">Syntax error: {0}</entry>
 <entry key="error.syntax.unknown_option">Unknown option: {0}</entry>
+<entry key="error.syntax.unknown_option.try">Unknown option: {0}. Try {1}</entry>
 <entry key="error.syntax.only_one">Only one {0} permitted</entry>
 <entry key="error.syntax.only_one_input">Only one input file permitted</entry>
 <entry key="error.syntax.missing_filename">Filename expected after {0}</entry>

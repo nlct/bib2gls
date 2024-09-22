@@ -167,7 +167,20 @@ public class Bib2Gls extends BibGlsTeXApp
 
       try
       {
-         String texmfoutputPath = kpsewhich("--var-value=TEXMFOUTPUT");
+         String texmfoutputPath = null;
+
+         try
+         {
+            texmfoutputPath = System.getenv("TEXMFOUTPUT");
+         }
+         catch (Throwable thr)
+         {// ignore
+         }
+
+         if (texmfoutputPath == null || texmfoutputPath.isEmpty())
+         {
+            texmfoutputPath = kpsewhich("--var-value=TEXMFOUTPUT");
+         }
 
          if (texmfoutputPath != null && !texmfoutputPath.isEmpty())
          {
@@ -246,6 +259,21 @@ public class Bib2Gls extends BibGlsTeXApp
       }
    }
 
+   protected boolean isOnOutputPath(Path normAbsPath)
+   {
+      if (texmfoutput != null && normAbsPath.startsWith(texmfoutput))
+      {
+         return true;
+      }
+
+      if (dirPath != null && normAbsPath.startsWith(dirPath))
+      {
+         return true;
+      }
+
+      return false;
+   }
+
    @Override
    public boolean isReadAccessAllowed(TeXPath path)
    {
@@ -256,12 +284,12 @@ public class Bib2Gls extends BibGlsTeXApp
 
       // normalize() eliminates redundant path elements.
 
-      Path p = (base == null ? relPath.normalize() : 
+      Path normPath = (base == null ? relPath.normalize() : 
          base.resolve(relPath).normalize());
 
       try
       {
-         File f = p.toFile();
+         File f = normPath.toFile();
 
          if (f.exists() && !f.canRead())
          {
@@ -280,6 +308,14 @@ public class Bib2Gls extends BibGlsTeXApp
       }
 
       if (openin_any == 'a')
+      {
+         return true;
+      }
+
+      Path normAbsPath = normPath.isAbsolute() ? normPath
+         : normPath.toAbsolutePath().normalize();
+
+      if (isOnOutputPath(normAbsPath))
       {
          return true;
       }
@@ -307,17 +343,12 @@ public class Bib2Gls extends BibGlsTeXApp
          return true;
       }
 
-      if (p.isAbsolute())
+      if (normPath.isAbsolute())
       {
-         if (p.startsWith(cwd))
+         if (normPath.startsWith(cwd))
          {
             // on the current working directory path so allow
 
-            return true;
-         }
-
-         if (texmfoutput != null && p.startsWith(texmfoutput))
-         {
             return true;
          }
 
@@ -329,7 +360,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       // Not absolute path. Is it on the cwd path?
 
-      if (p.toAbsolutePath().normalize().startsWith(cwd))
+      if (normPath.toAbsolutePath().normalize().startsWith(cwd))
       {
          return true;
       }
@@ -377,6 +408,14 @@ public class Bib2Gls extends BibGlsTeXApp
          return true;
       }
 
+      Path normPath = path.normalize();
+      Path normAbsPath = path.toAbsolutePath().normalize();
+
+      if (isOnOutputPath(normAbsPath))
+      {
+         return true;
+      }
+
       if (isHidden(path))
       {
          warningMessage("warning.read_forbidden.hidden", "openin_any",
@@ -394,9 +433,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       if (path.isAbsolute())
       {
-         path = path.normalize();
-
-         if (path.startsWith(cwd))
+         if (normPath.startsWith(cwd))
          {
             // on the current working directory path so allow
 
@@ -406,7 +443,7 @@ public class Bib2Gls extends BibGlsTeXApp
          // has kpsewhich found this file?
 
          String result = kpsewhichResults.get(
-            path.getName(path.getNameCount()-1).toString());
+            normPath.getName(normPath.getNameCount()-1).toString());
 
          if (result != null)
          {
@@ -431,7 +468,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
             try
             {
-               if (Files.isSameFile(path, file.toPath()))
+               if (Files.isSameFile(normPath, file.toPath()))
                {
                   return true;
                }
@@ -442,27 +479,22 @@ public class Bib2Gls extends BibGlsTeXApp
             }
          }
 
-         if (texmfoutput != null && path.startsWith(texmfoutput))
-         {
-            return true;
-         }
-
          warningMessage("warning.read_forbidden.hidden", "openin_any",
-           openin_any, path);
+           openin_any, normPath);
 
          return false;
       }
 
       // Not absolute path. Is it on the cwd path?
 
-      if (path.toAbsolutePath().normalize().startsWith(cwd))
+      if (normAbsPath.startsWith(cwd))
       {
          return true;
       }
       else
       {
          warningMessage("warning.read_forbidden.cwd", "openin_any",
-           openin_any, path);
+           openin_any, normPath);
 
          return false;
       }
@@ -572,6 +604,15 @@ public class Bib2Gls extends BibGlsTeXApp
          return true;
       }
 
+      Path normPath = path.normalize();
+      Path normAbsPath = normPath.isAbsolute() ? normPath
+         : normPath.toAbsolutePath().normalize();
+
+      if (isOnOutputPath(normAbsPath))
+      {
+         return true;
+      }
+
       if (isHidden(path))
       {
          warningMessage("warning.write_forbidden.hidden", "openout_any",
@@ -589,36 +630,29 @@ public class Bib2Gls extends BibGlsTeXApp
 
       if (path.isAbsolute())
       {
-         path = path.normalize();
-
-         if (path.startsWith(cwd))
+         if (normPath.startsWith(cwd))
          {
             // on the current working directory path so allow
 
             return true;
          }
 
-         if (texmfoutput != null && path.startsWith(texmfoutput))
-         {
-            return true;
-         }
-
          warningMessage("warning.write_forbidden.absolute", "openout_any",
-           openout_any, path);
+           openout_any, normPath);
 
          return false;
       }
 
       // Not absolute path. Is it on the cwd path?
 
-      if (path.toAbsolutePath().normalize().startsWith(cwd))
+      if (normAbsPath.startsWith(cwd))
       {
          return true;
       }
       else
       {
          warningMessage("warning.write_forbidden.cwd", "openout_any",
-           openout_any, path);
+           openout_any, normPath);
 
          return false;
       }
@@ -2002,11 +2036,6 @@ public class Bib2Gls extends BibGlsTeXApp
    public void process() 
      throws IOException,InterruptedException,Bib2GlsException
    {
-      if (saveRecordCount)
-      {
-         recordCount = new HashMap<GlsRecord,Integer>();
-      }
-
       try
       {
          parseLog();
@@ -2047,41 +2076,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       Charset auxCharset = texCharset==null ? getDefaultCharset() : texCharset;
 
-      AuxParser auxParser = new AuxParser(this, auxCharset)
-      {
-         protected void addPredefined()
-         {
-            super.addPredefined();
-
-            putControlSequence(new Input("@bibgls@input", Input.NOT_FOUND_ACTION_WARN));
-            addAuxCommand("glsxtr@resource", 2);
-            addAuxCommand("glsxtr@fields", 1);
-            addAuxCommand("glsxtr@record", 5);
-            addAuxCommand("glsxtr@recordsee", 2);
-            addAuxCommand("glsxtr@record@nameref", 8);
-            addAuxCommand("glsxtr@select@entry", 5);
-            addAuxCommand("glsxtr@select@entry@nameref", 8);
-            addAuxCommand("glsxtr@texencoding", 1);
-            addAuxCommand("glsxtr@langtag", 1);
-            addAuxCommand("glsxtr@shortcutsval", 1);
-            addAuxCommand("glsxtr@pluralsuffixes", 4);
-            addAuxCommand("@glsxtr@altmodifier", 1);
-            addAuxCommand("@glsxtr@newglslike", 2);
-            addAuxCommand("@glsxtr@newglslikefamily", 8);
-            addAuxCommand("@glsxtr@prefixlabellist", 1);
-            addAuxCommand("@glsxtr@multientry", 4);
-            addAuxCommand("@glsxtr@mglsrefs", 1);
-            addAuxCommand("@glsxtr@mglslike", 1);
-            addAuxCommand("@mfu@excls", 1);
-            addAuxCommand("@mfu@blockers", 1);
-            addAuxCommand("@mfu@mappings", 1);
-
-            if (knownGlossaries != null)
-            {
-               addAuxCommand("@newglossary", 4);
-            }
-         }
-      };
+      AuxParser auxParser = new BibGlsAuxParser(this, auxCharset);
 
       auxParser.setAllowCatCodeChangers(allowAuxCatChangers);
 
@@ -2186,6 +2181,16 @@ public class Bib2Gls extends BibGlsTeXApp
       records = new Vector<GlsRecord>();
       seeRecords = new Vector<GlsSeeRecord>();
       selectedEntries = new Vector<String>();
+
+      if (saveRecordCount)
+      {
+         recordCount = new HashMap<GlsRecord,Integer>();
+      }
+
+      if (provideknownGlossaries)
+      {
+         knownGlossaries = new Vector<String>();
+      }
 
       auxData = auxParser.getAuxData();
 
@@ -5441,6 +5446,810 @@ public class Bib2Gls extends BibGlsTeXApp
       }
    }
 
+   public void processGlobalOptions(KeyValList options, TeXParser parser)
+    throws Bib2GlsSyntaxException
+   {
+      for (Iterator<String> it = options.keySet().iterator(); it.hasNext(); )
+      {
+         String key = it.next();
+
+         if (key.equals("log-file")
+           || key.equals("ignore-packages")
+           || key.equals("list-known-packages")
+           || key.equals("obey-aux-catcode")
+           || key.equals("dir")
+           || key.equals("tex-encoding")
+           || key.equals("log-encoding")
+           || key.equals("default-encoding")
+           || key.equals("verbose")
+           || key.equals("silent")
+           || key.equals("quiet")
+           || key.equals("debug")
+           || key.equals("debug-mode")
+           || key.equals("help")
+           || key.equals("version"))
+         {
+            throw new Bib2GlsSyntaxException(getMessage("error.switch_only", key));
+         }
+         else if (key.equals("packages"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            addKnownPackages(obj.toString(parser).trim().split(" *, *"), false);
+         }
+         else if (key.equals("custom-packages"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            addCustomPackages(obj.toString(parser).trim().split(" *, *"), false);
+         }
+         else if (key.equals("expand-fields"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               expandFields = true;
+            }
+            else if (val.equals("false"))
+            {
+               expandFields = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("warn-non-bib-fields"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               checkNonBibFields = true;
+            }
+            else if (val.equals("false"))
+            {
+               checkNonBibFields = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("warn-unknown-entry-types"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               warnUnknownEntryTypes = true;
+            }
+            else if (val.equals("false"))
+            {
+               warnUnknownEntryTypes = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("interpret"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               interpret = true;
+            }
+            else if (val.equals("false"))
+            {
+               interpret = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("break-space"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               useNonBreakSpace = true;
+            }
+            else if (val.equals("false"))
+            {
+               useNonBreakSpace = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("cite-as-record"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               useCiteAsRecord = true;
+            }
+            else if (val.equals("false"))
+            {
+               useCiteAsRecord = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("merge-wrglossary-records"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               mergeWrGlossaryLocations = true;
+            }
+            else if (val.equals("false"))
+            {
+               mergeWrGlossaryLocations = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("merge-nameref-on"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+
+            if (val.equals("href"))
+            {
+               mergeNameRefOn = MERGE_NAMEREF_ON_HREF;
+            }
+            else if (val.equals("title"))
+            {
+               mergeNameRefOn = MERGE_NAMEREF_ON_TITLE;
+            }
+            else if (val.equals("location"))
+            {
+               mergeNameRefOn = MERGE_NAMEREF_ON_LOCATION;
+            }
+            else if (val.equals("hcounter"))
+            {
+               mergeNameRefOn = MERGE_NAMEREF_ON_HCOUNTER;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.choice.value", key, val));
+            }
+         }
+         else if (key.equals("force-cross-resource-refs"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               forceCrossResourceRefs = true;
+            }
+            else if (val.equals("false"))
+            {
+               forceCrossResourceRefs = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("support-unicode-script"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               supportUnicodeSubSuperScripts = true;
+            }
+            else if (val.equals("false"))
+            {
+               supportUnicodeSubSuperScripts = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("replace-quotes"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               replaceQuotes = true;
+            }
+            else if (val.equals("false"))
+            {
+               replaceQuotes = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("collapse-same-location-range"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               collapseSamePageRange = true;
+            }
+            else if (val.equals("false"))
+            {
+               collapseSamePageRange = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("mfirstuc-protection"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+
+            if (val.equals("false"))
+            {
+               mfirstucProtect = false;
+            }
+            else
+            {
+               mfirstucProtect = true;
+
+               if (val.equals("all"))
+               {
+                  mfirstucProtectFields = null;
+               }
+               else if (val.isEmpty())
+               {
+                  mfirstucProtect = false;
+               }
+               else
+               {
+                  mfirstucProtectFields = val.split(" *, *");
+               }
+            }
+         }
+         else if (key.equals("mfirstuc-math-protection"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               mfirstucMProtect = true;
+            }
+            else if (val.equals("false"))
+            {
+               mfirstucMProtect = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("shortcuts"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+
+            try
+            {
+               setShortCuts(val);
+            }
+            catch (IllegalArgumentException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.invalid.choice.value", 
+                 key, val), e);
+            }
+         }
+         else if (key.equals("nested-link-check"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+
+            if (val.equals("none") || val.equals("false") || val.isEmpty())
+            {
+               nestedLinkCheckFields = null;
+            }
+            else
+            {
+               nestedLinkCheckFields = val.split(" *, *");
+            }
+         }
+         else if (key.equals("map-format"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+            String[] list = val.split(" *, *");
+
+            for (String value : list)
+            {
+               String[] values = value.split(" *: *");
+
+               if (values.length != 2)
+               {
+                  throw new Bib2GlsSyntaxException(
+                    getMessage("error.invalid.opt.value", key, val));
+               }
+
+               formatMap.put(values[0], values[1]);
+            }
+         }
+         else if (key.equals("retain-formats"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            if (retainFormatList == null)
+            {
+               retainFormatList = new Vector<String>();
+            }
+
+            String val = obj.toString(parser).trim();
+
+            if (val.equals("false"))
+            {
+               retainFormatList = null;
+            }
+            else
+            {
+               String[] list = val.split(" *, *");
+
+               for (String field : list)
+               {
+                  retainFormatList.add(field);
+               }
+            }
+         }
+         else if (key.equals("group"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               addGroupField = true;
+            }
+            else if (val.equals("false"))
+            {
+               addGroupField = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("record-count-rule"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            recordCountRule.setRule(obj.toString(parser).trim());
+            saveRecordCount = true;
+         }
+         else if (key.equals("record-count"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               saveRecordCount = true;
+            }
+            else if (val.equals("false"))
+            {
+               saveRecordCount = false;
+               saveRecordCountUnit = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("record-count-unit"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               saveRecordCountUnit = true;
+               saveRecordCount = true;
+            }
+            else if (val.equals("false"))
+            {
+               saveRecordCountUnit = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("date-in-header"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               dateInHeader = true;
+            }
+            else if (val.equals("false"))
+            {
+               dateInHeader = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("trim-fields"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               trimFields = true;
+               trimOnlyFields = null;
+               trimExceptFields = null;
+            }
+            else if (val.equals("false"))
+            {
+               trimFields = false;
+               trimOnlyFields = null;
+               trimExceptFields = null;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("trim-only-fields"))
+         {
+            if (trimExceptFields != null)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.option.clash",
+                  "--trim-only-fields", "--trim-except-fields"));
+            }
+
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+            String[] list = val.split(" *, *");
+
+            if (trimOnlyFields == null)
+            {
+               trimOnlyFields = new Vector<String>();
+            }
+
+            for (String field : list)
+            {
+               trimOnlyFields.add(field);
+            }
+
+            trimFields = true;
+         }
+         else if (key.equals("trim-except-fields"))
+         {
+            if (trimOnlyFields != null)
+            {
+               throw new Bib2GlsSyntaxException(
+                 getMessage("error.option.clash",
+                  "--trim-only-fields", "--trim-except-fields"));
+            }
+
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+            String[] list = val.split(" *, *");
+
+            if (trimExceptFields == null)
+            {
+               trimExceptFields = new Vector<String>();
+            }
+
+            for (String field : list)
+            {
+               trimExceptFields.add(field);
+            }
+
+            trimFields = true;
+         }
+         else if (key.equals("provide-glossaries"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               provideknownGlossaries = true;
+            }
+            else if (val.equals("false"))
+            {
+               provideknownGlossaries = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.startsWith("no-"))
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.syntax.unknown_option_try",
+               key, key.substring(3)+"=false"));
+         }
+         else if (key.startsWith("--"))
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.syntax.unknown_option_try",
+               key, key.substring(2)));
+         }
+         else
+         {
+            throw new Bib2GlsSyntaxException(
+              getMessage("error.syntax.unknown_option", key));
+         }
+      }
+   }
+
+   protected void addKnownPackages(String[] list, boolean isSwitch)
+    throws Bib2GlsSyntaxException
+   {
+      for (String sty : list)
+      {
+         if (isKnownPackage(sty))
+         {
+            packages.add(sty);
+
+            if (!isSwitch)
+            {
+               if (sty.equals("fontspec"))
+               {
+                  fontspec = true;
+               }
+
+               debug(sty);
+            }
+         }
+         else
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.unsupported.package", sty, 
+               isSwitch ? "--custom-packages" : "custom-packages"));
+         }
+      }
+   }
+
+   protected void addCustomPackages(String[] list, boolean isSwitch)
+    throws Bib2GlsSyntaxException
+   {
+      if (customPackages == null)
+      {
+         customPackages = new Vector<String>();
+      }
+
+      for (String sty : list)
+      {
+         if (isKnownPackage(sty))
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.supported.package", sty, 
+               isSwitch ? "--packages" : "packages"));
+         }
+         else
+         {
+            customPackages.add(sty);
+         }
+      }
+   }
+
    @Override
    protected void parseArg(ArrayDeque<String> deque, String arg)
     throws Bib2GlsSyntaxException
@@ -5478,19 +6287,7 @@ public class Bib2Gls extends BibGlsTeXApp
                getMessage("error.missing.value", arg));
          }
 
-         for (String sty : returnVals[0].listValue())
-         {
-            if (isKnownPackage(sty))
-            {
-               packages.add(sty);
-            }
-            else
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.unsupported.package", sty, 
-                  "--custom-packages"));
-            }
-         }
+         addKnownPackages(returnVals[0].listValue(), true);
       }
       else if (isListArg(deque, arg, "--custom-packages", returnVals))
       {
@@ -5500,24 +6297,7 @@ public class Bib2Gls extends BibGlsTeXApp
                getMessage("error.missing.value", arg));
          }
 
-         if (customPackages == null)
-         {
-            customPackages = new Vector<String>();
-         }
-
-         for (String sty : returnVals[0].listValue())
-         {
-            if (isKnownPackage(sty))
-            {
-               throw new Bib2GlsSyntaxException(
-                  getMessage("error.supported.package", sty, 
-                  "--packages"));
-            }
-            else
-            {
-               customPackages.add(sty);
-            }
-         }
+         addCustomPackages(returnVals[0].listValue(), true);
       }
       else if (isListArg(deque, arg, "-k", "--ignore-packages", returnVals))
       {
@@ -6013,11 +6793,11 @@ public class Bib2Gls extends BibGlsTeXApp
       }
       else if (arg.equals("--provide-glossaries"))
       {
-         provideknownGlossaries=true;
+         provideknownGlossaries = true;
       }
       else if (arg.equals("--no-provide-glossaries"))
       {
-         provideknownGlossaries=false;
+         provideknownGlossaries = false;
       }
       else
       {
@@ -6031,11 +6811,6 @@ public class Bib2Gls extends BibGlsTeXApp
    protected void postSettings()
     throws Bib2GlsSyntaxException,IOException
    {
-      if (provideknownGlossaries)
-      {
-         knownGlossaries = new Vector<String>();
-      }
-
       if (auxFileName == null)
       {
          throw new Bib2GlsSyntaxException(getMessage("error.no.aux",
@@ -6067,6 +6842,8 @@ public class Bib2Gls extends BibGlsTeXApp
             System.err.println(getMessage("error.not.dir", dirName));
             System.exit(1);
          }
+
+         dirPath = basePath.toAbsolutePath().normalize();
 
          if (auxFile.getParentFile() == null)
          {
@@ -6189,6 +6966,7 @@ public class Bib2Gls extends BibGlsTeXApp
    private char openin_any='a';
    private Path cwd;
    private Path texmfoutput = null;
+   private Path dirPath;
    private Path basePath;
 
    private File auxFile;
