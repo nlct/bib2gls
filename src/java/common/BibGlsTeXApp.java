@@ -1122,6 +1122,10 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
         "Bundled with {0} version {1} ({2})",
         "texparserlib.jar", TeXParser.VERSION, TeXParser.VERSION_DATE));
       System.out.println("https://github.com/nlct/texparser");
+
+      System.out.println();
+      System.out.println(getMessageWithFallback("about.library.java_info",
+        "Running on Java {0}", System.getProperty("java.version")));
    }
 
    @Override
@@ -1654,7 +1658,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "3.9.20241111";
-   public static final String DATE = "2024-11-11";
+   public static final String VERSION = "3.9.20241119";
+   public static final String DATE = "2024-11-19";
 
 }
