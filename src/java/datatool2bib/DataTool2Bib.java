@@ -53,10 +53,9 @@ import com.dickimawbooks.bibgls.common.*;
 
 public class DataTool2Bib extends BibGlsConverter
 {
-   @Override
-   protected void addPredefinedCommands(TeXParser parser)
+   protected void addCustomCommands()
    {
-      super.addPredefinedCommands(parser);
+      parser.putControlSequence(new GobbleOpt("DTLwrite", 1, 1));
 
       parser.putControlSequence(new DTLgidxSetDefaultDB());
       parser.putControlSequence(new NewGidx(this));
@@ -175,7 +174,8 @@ public class DataTool2Bib extends BibGlsConverter
      boolean loadParentOptions, TeXObjectList stack)
    throws IOException
    {
-      if (styName.equals("datatool") || styName.equals("datatool-base"))
+      if (styName.equals("datatool") || styName.equals("datatool-base")
+          || styName.equals("datagidx"))
       {
          if (options != null)
          {
@@ -202,8 +202,9 @@ public class DataTool2Bib extends BibGlsConverter
    public void process() throws IOException,Bib2GlsException
    {
       datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
+      datagidxSty = (DataGidxSty)listener.requirepackage("datagidx", null);
 
-      parser.putControlSequence(new GobbleOpt("DTLwrite", 1, 1));
+      addCustomCommands();
 
       if (setup != null && !setup.isEmpty())
       {
@@ -275,6 +276,12 @@ public class DataTool2Bib extends BibGlsConverter
          while (nameEnum != null && nameEnum.hasMoreElements())
          {
             String dbName = nameEnum.nextElement();
+
+            if (skipDataGidx && dbName.equals("datagidx"))
+            {
+               message(getMessage("datatool2bib.skipping.database", dbName));
+               continue;
+            }
 
             File file = new File(parentFile, base+"-"+dbName+".bib");
 
@@ -356,6 +363,12 @@ public class DataTool2Bib extends BibGlsConverter
             while (nameEnum != null && nameEnum.hasMoreElements())
             {
                String dbName = nameEnum.nextElement();
+
+               if (dbName.equals("datagidx"))
+               {
+                  message(getMessage("datatool2bib.skipping.database", dbName));
+                  continue;
+               }
 
                writeEntries(datatoolSty.getDataBase(dbName), out);
             }
@@ -449,9 +462,11 @@ public class DataTool2Bib extends BibGlsConverter
 
       if (!autoLabel && labelColIdx < 1)
       {
-         throw new Bib2GlsException(
+         warning(
            getMessage("datatool2bib.missing.label.column",
-            db.getName(), labelColumn));
+            db.getName(), labelColumn, "--label", "--auto-label"));
+
+         return;
       }
 
       for (DataToolEntryRow row : data)
@@ -745,10 +760,10 @@ public class DataTool2Bib extends BibGlsConverter
                }
                else if (field.equals("see") || field.equals("seealso"))
                {
-                  String[] split = valStr.split(" *, *");
+                  String[] xrlist = valStr.split(" *, *");
                   StringBuilder builder = new StringBuilder();
 
-                  for (String xr : split)
+                  for (String xr : xrlist)
                   {
                      String mapLabel = labelMap.get(xr);
 
@@ -929,6 +944,75 @@ public class DataTool2Bib extends BibGlsConverter
    }
 
    @Override
+   protected void ioHelp()
+   {
+      super.ioHelp();
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.split",
+        "--[no-]split"));
+
+   }
+
+   @Override
+   protected void filterHelp()
+   {
+      super.filterHelp();
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.skip-datagidx",
+        "--[no-]skip-datagidx"));
+   }
+
+   @Override
+   protected void adjustHelp()
+   {
+      super.adjustHelp();
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.label",
+        "--label", "-L", "--label "+labelColumn));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.auto-label",
+        "--[no-]auto-label", "-a"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.auto-label-prefix",
+        "--auto-label-prefix"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip-glsadd",
+        "--[no-]strip-glsadd"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip-acronym-font",
+        "--[no-]strip-acronym-font"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip-acronym-text",
+        "--[no-]strip-acronym-text"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip-acronym-name",
+        "--[no-]strip-acronym-name"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip-case-change",
+        "--[no-]strip-case-change"));
+   }
+
+   @Override
+   protected void otherHelp()
+   {
+      printSyntaxItem(getMessage("datatool2bib.syntax.other"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.setup",
+        "--setup"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.read",
+        "--[no-]read", "-r"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.save-datum",
+        "--[no-]save-datum", "--save-value '-value' --save-currency '-currency'"));
+      printSyntaxItem(getMessage("datatool2bib.syntax.save-value",
+        "--[no-]save-value"));
+      printSyntaxItem(getMessage("datatool2bib.syntax.save-currency",
+        "--[no-]save-currency"));
+
+   }
+
+   @Override
    protected int argCount(String arg)
    {
       if ( arg.equals("--label") || arg.equals("-L")
@@ -996,7 +1080,12 @@ public class DataTool2Bib extends BibGlsConverter
                arg));
          }
 
-         readOpts = returnVals[0].toString();
+         readOpts = returnVals[0].toString().trim();
+
+         if (readOpts.isEmpty())
+         {
+            readOpts = null;
+         }
       }
       else if (arg.equals("--no-read"))
       {
@@ -1101,6 +1190,14 @@ public class DataTool2Bib extends BibGlsConverter
       {
          stripCaseChange = false;
       }
+      else if (arg.equals("--skip-datagidx"))
+      {
+         skipDataGidx = true;
+      }
+      else if (arg.equals("--no-skip-datagidx"))
+      {
+         skipDataGidx = false;
+      }
       else
       {
          return super.parseArg(deque, arg, returnVals);
@@ -1143,11 +1240,13 @@ public class DataTool2Bib extends BibGlsConverter
    private boolean stripAcronymText = true;
    private boolean stripAcronymName = true;
    private boolean stripCaseChange = false;
+   private boolean skipDataGidx = true;
 
    private String dataValueSuffix = null;
    private String dataCurrencySuffix = null;
 
    private DataToolSty datatoolSty;
+   private DataGidxSty datagidxSty;
 
    private HashMap<String,Vector<GidxData>> gidxdata;
 

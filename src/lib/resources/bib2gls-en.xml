@@ -32,12 +32,14 @@ file is in or in a location that can be found by kpsewhich.</entry>
 <entry key="syntax.options.bib">Bib file options:</entry>
 <entry key="syntax.options.fields">Field options:</entry>
 <entry key="syntax.options.other">Other options:</entry>
-<entry key="syntax.version">{1}, {0}	Display version and exit.</entry>
-<entry key="syntax.help">{1}, {0}	Display this help message and exit.</entry>
-<entry key="syntax.debug">{0} [&lt;n&gt;]	Debug mode.</entry>
-<entry key="syntax.debug-mode">{0} &lt;setting&gt;	TeX Parser debug mode.</entry>
-<entry key="syntax.verbose">{0}	Verbose mode.</entry>
-<entry key="syntax.silent">{1}, {2}, {0}	Only display error messages.</entry>
+
+<entry key="common.syntax.help">{1}, {0}	Display this help message and exit.</entry>
+<entry key="common.syntax.version">{1}, {0}	Display version information and exit.</entry>
+<entry key="common.syntax.silent">{1}, {2}, {0}	Only display error messages.</entry>
+<entry key="common.syntax.verbose">{0}	Verbose mode.</entry>
+<entry key="common.syntax.debug">{0} [&lt;n&gt;]	Debug mode.</entry>
+<entry key="common.syntax.debug-mode">{0} &lt;setting&gt;	TeX Parser debug mode.</entry>
+
 <entry key="syntax.group">{1}, {0}	Add ''group'' field to entries.</entry>
 <entry key="syntax.locale">{1}, {0} &lt;lang&gt;	Use language resource file for &lt;lang&gt; and identify this as the default document language.</entry>
 <entry key="syntax.log">{1}, {0} &lt;file&gt;	Set transcript file name.</entry>
@@ -561,29 +563,26 @@ Use {1} for help.</entry>
 Use {1} for help.</entry>
 <entry key="common.syntax">Usage: {0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
 
-<entry key="gls2bib.syntax.info">Parse LaTeX source code and convert glossary entry definitions (provided by glossaries.sty and glossaries-extra.sty) to bib format suitable for {0}.</entry>
-
-<entry key="datatool2bib.syntax.info">Parse LaTeX source code and convert datatool.sty databases to bib format suitable for {0}.</entry>
-
 <entry key="common.syntax.options.general">General options:</entry>
 <entry key="common.syntax.options.locale">Encoding and localisation options:</entry>
 <entry key="common.syntax.options.filter">Filtering options:</entry>
 <entry key="common.syntax.options.io">Output file options:</entry>
 <entry key="common.syntax.options.adjust">Adjustment options:</entry>
 
-<entry key="common.syntax.help">{1}, {0}	Display help.</entry>
-<entry key="common.syntax.version">{1}, {0}	Display version information.</entry>
-<entry key="common.syntax.silent">{1}, {2}, {0}	Suppress messages.</entry>
-<entry key="common.syntax.verbose">{0}	Normal messages.</entry>
-<entry key="common.syntax.debug">{0}	Debug mode.</entry>
+<entry key="common.syntax.log-file">{0} &lt;filename&gt;	Log file (for debugging).</entry>
 
 <entry key="common.syntax.texenc">{0} &lt;encoding&gt;	.tex file encoding.</entry>
 <entry key="common.syntax.bibenc">{0} &lt;encoding&gt;	.bib file encoding.</entry>
 <entry key="common.syntax.locale">{0} &lt;iso tag&gt;	Use language resource file given by &lt;iso tag&gt; for messages.</entry>
 <entry key="common.syntax.preamble-only">{1}, {0}	Only parse the document preamble.</entry>
 <entry key="common.syntax.ignore-fields">{1}, {0} &lt;list&gt;	Ignore the fields contained in the comma-separated &lt;list&gt;.</entry>
+<entry key="common.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
 <entry key="common.syntax.space-sub">{1}, {0} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;.</entry>
 <entry key="common.syntax.overwrite">{0}	Overwrite existing files.</entry>
+
+<!-- convertgls2bib specific syntax help messages -->
+
+<entry key="gls2bib.syntax.info">Parse LaTeX source code and convert glossary entry definitions (provided by glossaries.sty and glossaries-extra.sty) to bib format suitable for {0}.</entry>
 
 <entry key="gls2bib.syntax.ignore-category">{0}	Omit category field.</entry>
 <entry key="gls2bib.syntax.ignore-type">{0}	Omit type field.</entry>
@@ -592,11 +591,32 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.split-on-type">{1}, {0}	Split entries into separate files according to type field.</entry>
 <entry key="gls2bib.syntax.split-on-category">{1}, {0}	Split entries into separate files according to category field.</entry>
 
-<entry key="common.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
 <entry key="gls2bib.syntax.absorb-see">{0}	Absorb \glssee and \glsxtrindexseealso into the data.</entry> 
+
+<!-- datatool2bib specific syntax help messages -->
+
+<entry key="datatool2bib.syntax.info">Parse LaTeX source code and convert datatool.sty databases to bib format suitable for {0}.</entry>
+<entry key="datatool2bib.syntax.other">General Datatool Settings.</entry>
+
+<entry key="datatool2bib.syntax.label">{1}, {0} &lt;col-key&gt;	Use column identified by &lt;col-key&gt; for the entry label. (Default {2})</entry>
+<entry key="datatool2bib.syntax.auto-label">{1}, {0}	auto-generate entry label instead of using a column.</entry>
+<entry key="datatool2bib.syntax.auto-label-prefix">{0} &lt;prefix&gt;	prefix to use for auto-generate entry labels.</entry>
+<entry key="datatool2bib.syntax.setup">{0} &lt;options&gt;	Implement \DTLsetup'{'&lt;options&gt;'}'.</entry>
+<entry key="datatool2bib.syntax.read">{0} &lt;options&gt;	Set default \DTLread options.</entry>
+<entry key="datatool2bib.syntax.save-datum">{0}	Equivalent to {1}</entry>
+<entry key="datatool2bib.syntax.save-value">{0} &lt;suffix&gt;	Save datum value in separate field with given suffix.</entry>
+<entry key="datatool2bib.syntax.save-currency">{0} &lt;suffix&gt;	Save datum currency symbol in separate field with given suffix.</entry>
+<entry key="datatool2bib.syntax.split">{0}	Split entries into separate files according to database.</entry>
+<entry key="datatool2bib.syntax.strip-glsadd">{0}	Strip \glsadd from field values.</entry>
+<entry key="datatool2bib.syntax.strip-acronym-font">{0}	Strip \acronymfont from field values.</entry>
+<entry key="datatool2bib.syntax.strip-acronym-text">{0}	Strip text field for acronyms.</entry>
+<entry key="datatool2bib.syntax.strip-acronym-name">{0}	Strip name field for acronyms.</entry>
+<entry key="datatool2bib.syntax.strip-case-change">{0}	Strip known case-changing commands from field values.</entry>
+<entry key="datatool2bib.syntax.skip-datagidx">{0}	Skip the special "datagidx" internal database.</entry>
 
 <entry key="datatool2bib.syntax.invalid_map">Invalid mapping ''{0}'' for ''{1}''. Syntax requires element pairs &lt;key=&gt;=&lt;field=&gt;</entry>
 
+<!-- convertgls2bib messages -->
 
 <entry key="gls2bib.override.newdualentry">Overriding default definition of \newdualentry with custom 
 definition. (Change \newcommand to \providecommand if you want 
@@ -610,13 +630,16 @@ converted to @dualabbreviationentry.)</entry>
 
 <entry key="gls2bib.no.entries">No entries found</entry>
 
+<!-- datatool2bib messages -->
+
 <entry key="datatool2bib.no.databases">No databases found</entry>
 <entry key="datatool2bib.databases.found">{0} {0,choice,0#databases|1#database|1&lt;databases} (datatool) found</entry>
 <entry key="datatool2bib.gidxdata.found">{0} {0,choice,0#databases|1#database|1&lt;databases} (datagidx) found</entry>
 <entry key="datatool2bib.database">Database (datatool) ''{0}''</entry>
 <entry key="datatool2bib.datagidx">Database (datagidx) ''{0}''</entry>
 <entry key="datatool2bib.database.empty">Database ''{0}'' is empty</entry>
-<entry key="datatool2bib.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''</entry>
+<entry key="datatool2bib.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''. Skipping content. (Use {2} for a different column or {3} to auto-generate the label.)</entry>
+<entry key="datatool2bib.skipping.database">Skipping database ''{0}''</entry>
 
 
 <!--

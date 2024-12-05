@@ -57,11 +57,15 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       parser = new TeXParser(listener);
       parser.setDebugMode(debugLevel);
 
-      if (transcriptFile != null)
+      if (debugLevel > 0 && logName == null)
       {
-         logWriter = new PrintWriter(
-           createBufferedWriter(transcriptFile.toPath(), defaultCharset));
+         logName = getApplicationName()+".log";
+      }
 
+      initTranscript();
+
+      if (logWriter != null)
+      {
          parser.setLogWriter(logWriter);
          parser.setLogging(true);
       }
@@ -172,7 +176,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
        || arg.equals("--bibenc")
        || arg.equals("--space-sub") || arg.equals("-s")
        || arg.equals("--ignore-fields") || arg.equals("-f")
-       || arg.equals("--log-file") || arg.equals("-t")
+       || arg.equals("--log-file")
        || arg.equals("--key-map") || arg.equals("-m")
        )
       {
@@ -210,6 +214,21 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          }
 
          bibCharsetName = returnVals[0].toString();
+      }
+      else if (isArg(deque, arg, "--log-file", returnVals))
+      { 
+         if (returnVals[0] == null)
+         { 
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.error.missing.value", arg));
+         } 
+        
+         logName = returnVals[0].toString().trim();
+
+         if (logName.isEmpty())
+         {
+            logName = null;
+         }
       }
       else if (isArg(deque, arg, "-s", "--space-sub", returnVals))
       {
@@ -252,10 +271,6 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          {
             addCustomIgnoreField(returnVals[0].listValue());
          }
-      }
-      else if (arg.equals("--no-ignore-fields"))
-      {
-         customIgnoreFields = null;
       }
       else if (arg.equals("--no-key-map"))
       {
@@ -304,17 +319,6 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       else if (arg.equals("--no-index-conversion"))
       {
          noDescEntryToIndex = false;
-      }
-      else if (isArg(deque, arg, "-t", "--log-file", returnVals))
-      {
-         if (returnVals[0] == null)
-         {
-            throw new Bib2GlsSyntaxException(
-               getMessage("common.missing.arg.value",
-               arg));
-         }
-
-         transcriptFile = new File(returnVals[0].toString());
       }
       else
       {
@@ -391,7 +395,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       {
          if (!f.isEmpty())
          {
-            customIgnoreFields.add(f);
+            customIgnoreFields.add(f.toLowerCase());
          }
       }
    }
@@ -403,7 +407,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          return false;
       }
 
-      return customIgnoreFields.contains(field);
+      return customIgnoreFields.contains(field.toLowerCase());
    }
 
    /**
@@ -470,6 +474,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected abstract void syntaxInfo();
 
+   @Override
    public void help()
    {
       System.out.println(getMessage("common.syntax", getApplicationName()));
@@ -481,15 +486,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       System.out.println(getMessage("common.syntax.options.general"));
       System.out.println();
 
-      printSyntaxItem(getMessage("common.syntax.version", "--version",
-       "-v"));
-      printSyntaxItem(getMessage("common.syntax.help", "--help", "-h"));
-      printSyntaxItem(getMessage("common.syntax.silent",
-        "--silent", "-q", "--quiet"));
-      printSyntaxItem(getMessage("common.syntax.verbose",
-        "--verbose"));
-      printSyntaxItem(getMessage("common.syntax.debug",
-        "--debug"));
+      commonHelp();
+
+      printSyntaxItem(getMessage("common.syntax.log-file", "--log-file"));
+
       System.out.println();
 
       printSyntaxItem(getMessage("common.syntax.options.locale"));

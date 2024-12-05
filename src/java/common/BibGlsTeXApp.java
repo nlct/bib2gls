@@ -166,6 +166,52 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       }
    }
 
+   protected File newTranscriptFile() throws IOException
+   {
+      return logName == null ? null : new File(logName);
+   }
+
+   protected void initTranscript()
+   {
+      try
+      {
+         transcriptFile = newTranscriptFile();
+      }
+      catch (IOException e)
+      {
+         // Don't throw exception, report error and carry on without
+         // transcript file.
+
+         transcriptFile = null;
+         error(e);
+      }
+
+      if (transcriptFile != null)
+      {
+         try
+         {
+            logWriter = new PrintWriter(createBufferedWriter(transcriptFile.toPath(),
+              getDefaultCharset()));
+         }
+         catch (IOException e)
+         {
+            logWriter = null;
+            System.err.println(getMessage("error.cant.open.log",
+               transcriptFile.toString()));
+            error(e);
+         }
+
+         logMessage(getMessage("about.version", getApplicationName(), VERSION, DATE));
+
+         if (isDebuggingOn())
+         {
+            logMessage("Java "+System.getProperty("java.version"));
+            logMessage(String.format("texparserlib.jar %s (%s)",
+               TeXParser.VERSION, TeXParser.VERSION_DATE));
+         }
+      }
+   }
+
    public void exit()
    {
       if (logWriter != null)
@@ -1555,7 +1601,32 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       return 1;
    }
 
-   protected abstract void help();
+   protected void help()
+   {
+      System.out.println(getMessage("syntax.usage", getApplicationName()));
+      System.out.println();
+
+      commonHelp();
+
+      System.out.println();
+      System.out.println(getMessage("syntax.furtherinfo"));
+      System.out.println();
+      
+      furtherInfo();
+      
+      System.exit(0);
+   }
+
+   protected void commonHelp()
+   {
+      printSyntaxItem(getMessage("common.syntax.help", "--help", "-h"));
+      printSyntaxItem(getMessage("common.syntax.version", "--version", "-v"));
+      printSyntaxItem(getMessage("common.syntax.debug", "--[no-]debug"));
+      printSyntaxItem(getMessage("common.syntax.debug-mode", "--debug-mode"));
+      printSyntaxItem(getMessage("common.syntax.verbose", "--[no-]verbose"));
+      printSyntaxItem(getMessage("common.syntax.silent",
+        "--silent", "-q", "--quiet"));
+   }
 
    protected void parseArgs(ArrayDeque<String> deque)
     throws Bib2GlsSyntaxException,IOException
@@ -1650,6 +1721,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    protected boolean shownVersion = false;
    protected String docLocale = null;
 
+   protected String logName = null;
    protected File transcriptFile = null;
    protected PrintWriter logWriter = null;
 
@@ -1658,7 +1730,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "3.9.20241119";
-   public static final String DATE = "2024-11-19";
+   public static final String VERSION = "3.9.20241205";
+   public static final String DATE = "2024-12-05";
 
 }

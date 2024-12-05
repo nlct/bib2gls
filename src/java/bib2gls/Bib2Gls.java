@@ -5082,6 +5082,7 @@ public class Bib2Gls extends BibGlsTeXApp
       return "2017";
    }
 
+   @Override
    public void help()
    {
       System.out.println(getMessage("syntax.usage", NAME));
@@ -5093,12 +5094,7 @@ public class Bib2Gls extends BibGlsTeXApp
       System.out.println(getMessage("syntax.options.common"));
       System.out.println();
 
-      printSyntaxItem(getMessage("syntax.help", "--help", "-h"));
-      printSyntaxItem(getMessage("syntax.version", "--version", "-v"));
-      printSyntaxItem(getMessage("syntax.debug", "--[no-]debug"));
-      printSyntaxItem(getMessage("syntax.debug-mode", "--debug-mode"));
-      printSyntaxItem(getMessage("syntax.verbose", "--[no-]verbose"));
-      printSyntaxItem(getMessage("syntax.silent", "--silent", "-q", "--quiet"));
+      commonHelp();
 
       printSyntaxItem(getMessage("syntax.group",
          "--[no-]group", "-g"));
@@ -6278,6 +6274,11 @@ public class Bib2Gls extends BibGlsTeXApp
          }
 
          logName = returnVals[0].toString();
+
+         if (logName.isEmpty())
+         {
+            logName = null;
+         }
       }
       else if (isListArg(deque, arg, "-p", "--packages", returnVals))
       {
@@ -6822,22 +6823,20 @@ public class Bib2Gls extends BibGlsTeXApp
          auxFileName = auxFileName+".aux";
       }
 
-      File dir = null;
-
       auxFile = new File(auxFileName);
 
       if (dirName != null)
       {
-         dir = new File(dirName);
-         basePath = dir.toPath();
+         dirFile = new File(dirName);
+         basePath = dirFile.toPath();
 
-         if (!dir.exists())
+         if (!dirFile.exists())
          {
             System.err.println(getMessage("error.dir.not.found", dirName));
             System.exit(1);
          }
 
-         if (!dir.isDirectory())
+         if (!dirFile.isDirectory())
          {
             System.err.println(getMessage("error.not.dir", dirName));
             System.exit(1);
@@ -6847,16 +6846,16 @@ public class Bib2Gls extends BibGlsTeXApp
 
          if (auxFile.getParentFile() == null)
          {
-            auxFile = new File(dir, auxFileName);
+            auxFile = new File(dirFile, auxFileName);
          }
          else
          {
-            auxFile = dir.toPath().resolve(auxFile.toPath()).toFile();
+            auxFile = dirFile.toPath().resolve(auxFile.toPath()).toFile();
          }
       }
       else
       {
-         dir = auxFile.getParentFile();
+         dirFile = auxFile.getParentFile();
          basePath = cwd;
       }
 
@@ -6866,45 +6865,9 @@ public class Bib2Gls extends BibGlsTeXApp
          System.exit(0);
       }
 
-      transcriptFile = null;
+      initTranscript();
 
-      if (logName == null)
-      {
-         String base = auxFile.getName();
-
-         transcriptFile = new File(dir,
-            base.substring(0,base.lastIndexOf("."))+".glg");
-      }
-      else
-      {
-         transcriptFile = resolveFile(logName);
-      }
-
-      transcriptFile = getWritableFile(transcriptFile);
-
-      try
-      {
-         logWriter = new PrintWriter(createBufferedWriter(transcriptFile.toPath(),
-           defaultCharset));
-      }
-      catch (IOException e)
-      {
-         logWriter = null;
-         System.err.println(getMessage("error.cant.open.log", 
-            transcriptFile.toString()));
-         error(e);
-      }
-
-      logMessage(getMessage("about.version", NAME, VERSION, DATE));
-
-      if (isDebuggingOn())
-      {
-         logMessage("Java "+System.getProperty("java.version"));
-         logMessage(String.format("texparserlib.jar %s (%s)",
-            TeXParser.VERSION, TeXParser.VERSION_DATE));
-      }
-
-      logDefaultEncoding(defaultCharset);
+      logDefaultEncoding(getDefaultCharset());
 
       if (logWriter != null)
       {
@@ -6924,6 +6887,26 @@ public class Bib2Gls extends BibGlsTeXApp
              texmfoutput == null ? "" : texmfoutput,
              cwd));
       }
+   }
+
+   @Override
+   protected File newTranscriptFile() throws IOException
+   {
+      File file;
+
+      if (logName == null)
+      {
+         String base = auxFile.getName();
+
+         file = new File(dirFile,
+            base.substring(0,base.lastIndexOf("."))+".glg");
+      }
+      else
+      {
+         file = resolveFile(logName);
+      }
+
+      return getWritableFile(file);
    }
 
    protected void run(String[] args)
@@ -6959,7 +6942,6 @@ public class Bib2Gls extends BibGlsTeXApp
 
    String dirName = null;
    String auxFileName = null;
-   String logName = null;
    boolean provideknownGlossaries=false;
 
    private char openout_any='p';
@@ -6967,6 +6949,7 @@ public class Bib2Gls extends BibGlsTeXApp
    private Path cwd;
    private Path texmfoutput = null;
    private Path dirPath;
+   private File dirFile = null;
    private Path basePath;
 
    private File auxFile;
