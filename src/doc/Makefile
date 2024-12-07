@@ -1,4 +1,4 @@
-all	: bib2gls.1 convertgls2bib.1 bib2gls.pdf bib2gls-begin.pdf 
+all	: bib2gls.1 convertgls2bib.1 datatool2bib.1 bib2gls.pdf bib2gls-begin.pdf 
 	@grep -E '(Package glossaries-extra Warning:|unreferenced destination)' bib2gls*.log || true
 	@grep -E '(Warning|Exception)' *.glg ../examples/*.glg || true
 
@@ -33,6 +33,9 @@ bib2gls.1	: bib2gls.pod
 
 convertgls2bib.1	: convertgls2bib.pod
 		pod2man -c convertgls2bib convertgls2bib.pod convertgls2bib.1
+
+datatool2bib.1	: datatool2bib.pod
+		pod2man -c datatool2bib datatool2bib.pod datatool2bib.1
 
 clean	:
 	\rm -f bib2gls*.{aux,log,toc,lot,lof,ilg,ind,idx,out,pdf,1,glstex,glg,blg,bbl}

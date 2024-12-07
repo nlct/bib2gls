@@ -279,7 +279,7 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (skipDataGidx && dbName.equals("datagidx"))
             {
-               message(getMessage("datatool2bib.skipping.database", dbName));
+               verboseMessage("datatool2bib.skipping.database", dbName);
                continue;
             }
 
@@ -915,7 +915,7 @@ public class DataTool2Bib extends BibGlsConverter
              "capitalisewords", "xcapitalisewords", "ecapitalisewords",
              "capitalisefmtwords", "xcapitalisefmtwords", "ecapitalisefmtwords",
              "makefirstuc", "xmakefirstuc", "emakefirstuc", "glsmakefirstuc",
-             "uppercase", "lowercase",
+             "uppercase", "lowercase", "glsuppercase", "glslowercase",
              "MakeTextUppercase", "MakeTextLowercase",
              "MakeUppercase", "MakeLowercase", "mfirstucMakeUppercase"
            ))
@@ -996,6 +996,7 @@ public class DataTool2Bib extends BibGlsConverter
    protected void otherHelp()
    {
       printSyntaxItem(getMessage("datatool2bib.syntax.other"));
+      System.out.println();
 
       printSyntaxItem(getMessage("datatool2bib.syntax.setup",
         "--setup"));

@@ -516,8 +516,6 @@ public class Gls2Bib extends BibGlsConverter
         "--[no-]ignore-type"));
       printSyntaxItem(getMessage("gls2bib.syntax.ignore-sort",
         "--[no-]ignore-sort"));
-      printSyntaxItem(getMessage("gls2bib.syntax.ignore-fields",
-        "--ignore-fields", "-f"));
    }
 
    @Override

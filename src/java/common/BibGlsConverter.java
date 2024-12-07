@@ -452,6 +452,9 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    {
       printSyntaxItem(getMessage("common.syntax.preamble-only",
         "--[no-]preamble-only", "-p"));
+
+      printSyntaxItem(getMessage("common.syntax.ignore-fields",
+        "--ignore-fields", "-f"));
    }
 
    protected void ioHelp()

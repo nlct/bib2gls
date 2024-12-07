@@ -6,7 +6,7 @@ B<datatool2bib> [I<option>]+ I<in-file> I<bibfile>
 
 Converts a F<.tex> file containing F<datatool.sty> databases to 
 a F<.bib> file in the format required for B<bib2gls>. 
-Distributed with C<bib2gls>.
+Distributed with F<bib2gls>.
 
 The TeX Parser Library is used to parse the input, which may be 
 a DTLTEX or DBTEX file or a file that contains

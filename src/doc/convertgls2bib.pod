@@ -1,14 +1,17 @@
 =head1 SYNOPSIS
 
-B<convertgls2bib> [I<option>]+ I<auxfile>
+B<convertgls2bib> [I<option>]+ I<texfile> I<bibfile>
 
 =head1 DESCRIPTION
 
 Converts a B<.tex> file containing glossary definitions using
 commands like C<\newglossaryentry> and C<\newacronym> to 
 a B<.bib> file in the format required for B<bib2gls>.
+Distributed with F<bib2gls>.
 
 =head1 OPTIONS
+
+=head2 GENERAL OPTIONS
 
 =over 4
 
@@ -20,17 +23,43 @@ Display help message and exit.
 
 Display version information and exit.
 
-=item B<--silent>
+=item B<--silent> or B<--quiet> or B<-q>
 
 Suppress all messages except for errors.
 
 =item B<--verbose>
 
-Display messages.
+Switch on verbose mode.
 
-=item B<--debug>
+=item B<--no-verbose>
+
+Switch off verbose mode.
+
+=item B<--debug> [I<n>]
 
 Display debugging messages.
+
+=item B<--debug-mode> I<setting>
+
+May be used instead of B<--debug> where the level number is
+difficult to remember. Value same as for B<bib2gls>'s
+B<--debug-mode> option.
+
+=item B<--no-debug>
+
+Switch off debugging mode. Equivalent to B<--debug> B<0>.
+
+=item B<--log-file> I<filename>
+
+Log messages to given file. Intended primarily for debugging messages so
+enabling debug mode will automatically create a transcript file, but otherwise
+a file won't be created unless this option is used.
+
+=back
+
+=head2 ENCOSING AND LOCALISATION OPTIONS
+
+=over 4
 
 =item B<--texenc> I<name>
 
@@ -40,13 +69,44 @@ Set the character encoding to I<name> for the input B<.tex> files.
 
 Set the character encoding to I<name> for the output B<.bib> files.
 
-=item B<--ignore-sort>
+=item B<--locale> I<lang tag>
 
-Ignore the B<sort> field (default).
+Use the language resource files associated with the given language
+tag I<lang tag>. If there isn't an appropriate file, the B<en>
+(English) file will be used.
 
-=item B<--no-ignore-sort>
+=back
 
-Don't ignore the B<sort> field.
+=head2 FILTERING OPTIONS
+
+=over 4
+
+=item B<--preamble-only> or B<-p>
+
+Only parse the document preamble. That is, stop parsing if
+C<\begin{document}> encountered.
+
+=item B<--no-preamble-only>
+
+Parse the entire document (default).
+
+=item B<--ignore-fields> I<list> or B<-f> I<list>
+
+Ignore all the fields in the comma-separated I<list>. If the
+list includes B<sort>, B<type> or B<category> it will automatically
+implement the corresponding B<--ignore-sort>, B<--ignore-type> or
+B<--ignore-category> option.
+
+This option isn't cumulative. An empty list will clear a previously
+set list but won't undo the sort, type or category ignore options.
+
+=item B<--ignore-category>
+
+Omit the B<category> field. Default if B<--split-on-category>.
+
+=item B<--no-ignore-category>
+
+Don't omit the B<category> field. Default unless B<--split-on-category>.
 
 =item B<--ignore-type>
 
@@ -55,6 +115,30 @@ Omit the B<type> field. Default if B<--split-on-type>.
 =item B<--no-ignore-type>
 
 Don't omit the B<type> field. Default unless B<--split-on-type>.
+
+=item B<--ignore-sort>
+
+Ignore the B<sort> field (default).
+
+=item B<--no-ignore-sort>
+
+Don't ignore the B<sort> field.
+
+=back
+
+=head2 OUTPUT FILE OPTIONS
+
+=over 4
+
+=item B<--overwrite>
+
+Overwrite existing .bib files. Default unless B<--split-on-type>
+used.
+
+=item B<--no-overwrite>
+
+Don't overwrite existing .bib files. Default if B<--split-on-type>
+used.
 
 =item B<--split-on-type> or B<-t>
 
@@ -67,15 +151,7 @@ B<--no-overwrite>.
 Don't split the entries into separate files according to the B<type>
 field (default).
 
-=item B<--ignore-category>
-
-Omit the B<category> field. Default if B<--split-on-category>.
-
-=item B<--no-ignore-category>
-
-Don't omit the B<category> field. Default unless B<--split-on-category>.
-
-=item B<--split-on-category> or B<-t>
+=item B<--split-on-category> or B<-c>
 
 Split the entries into separate files according to the B<category> field.
 This option automatically implements B<--ignore-category> and
@@ -86,25 +162,19 @@ B<--no-overwrite>.
 Don't split the entries into separate files according to the B<category>
 field (default).
 
-=item B<--ignore-fields> I<list> or B<-f> I<list>
+=back
 
-Ignore all the fields in the comma-separated I<list>. If the
-list includes B<sort>, B<type> or B<category> it will automatically
-implement the corresponding B<--ignore-sort>, B<--ignore-type> or
-B<--ignore--category> option.
+=head2 ADJUSTMENT OPTIONS
 
-This option isn't cumulative. An empty list will clear a previously
-set list but won't undo the sort, type or category ignore options.
+=over 4
 
-=item B<--overwrite>
+=item B<--absorb-see> 
 
-Overwrite existing .bib files. Default unless B<--split-on-type>
-used.
+Absorb C<\glssee> and C<\glsxtrindexseealso> into the data (default).
 
-=item B<--no-overwrite>
+=item B<--no-absorb-see> 
 
-Don't overwrite existing .bib files. Default if B<--split-on-type>
-used.
+Don't absorb C<\glssee> and C<\glsxtrindexseealso> into the data.
 
 =item B<--index-conversion> or B<-i>
 
@@ -118,31 +188,9 @@ and the B<description> field will be omitted.
 Don't use C<@index> instead of C<@entry> if the description is empty or
 just C<\nopostdesc> or C<\glsxtrnopostpunc> (default).
 
-=item B<--absorb-see> 
-
-Absorb C<\glssee> and C<\glsxtrindexseealso> into the data (default).
-
-=item B<--no-absorb-see> 
-
-Don't absorb C<\glssee> and C<\glsxtrindexseealso> into the data.
-
-=item B<--preamble-only> or B<-p>
-
-Only parse the document preamble.
-
-=item B<--no-preamble-only>
-
-Parse the entire document (default).
-
 =item B<--space-sub> I<value> or B<-s> I<value>
 
 Substitute spaces in labels with I<value>.
-
-=item B<--locale> I<lang tag>
-
-Use the language resource files associated with the given language
-tag I<lang tag>. If there isn't an appropriate file, the B<en>
-(English) file will be used.
 
 =back
 
@@ -174,7 +222,7 @@ The glossaries manual:
 =head1 AUTHOR
 
 Nicola L. C. Talbot,
-L<http://www.dickimaw-books.com/>
+L<https://www.dickimaw-books.com/>
 
 =cut
 
