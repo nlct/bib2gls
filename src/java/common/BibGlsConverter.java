@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.latex3.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
+import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
 
 public abstract class BibGlsConverter extends BibGlsTeXApp
 {

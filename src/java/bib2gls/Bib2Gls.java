@@ -1339,8 +1339,10 @@ public class Bib2Gls extends BibGlsTeXApp
          listener.putControlSequence(listener.createSymbol("datatoolctrlboundary", 0x1F));
          listener.putControlSequence(listener.createSymbol("datatoolasciiend", 0x7F));
          listener.putControlSequence(new LaTeXGenericCommand(true,
-          "datatoolparen", "m", new TeXCsRef("datatoolctrlboundary")));
-         listener.putControlSequence(new AtSecondOfTwo("dtltexorsort"))
+          "datatoolparen", "m", 
+          TeXParserUtils.createStack(listener, 
+            new TeXCsRef("datatoolctrlboundary"))));
+         listener.putControlSequence(new AtSecondOfTwo("dtltexorsort"));
       }
 
       // Since the interpreter only has access to code fragments
