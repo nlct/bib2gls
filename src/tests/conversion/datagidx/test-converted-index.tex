@@ -1,0 +1,200 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% This document was adapted from sample-index.tex to make it work
+% with the file sample-index.bib obtained with datatool2bib
+
+\usepackage[debug,colorlinks]{hyperref}
+\usepackage[
+ numberedsection,
+ nostyles,stylemods=bookindex,style=bookindex,
+ record=nameref
+]{glossaries-extra}
+
+ % Define some convenient commands
+
+\newcommand*{\principleloc}[1]{\textbf{#1}}
+\newcommand*{\appname}[1]{\texttt{#1}}
+
+ % Later we'll switch to a fancy small caps Roman page numbering
+
+\newcommand*{\myscroman}[1]{%
+  \myscromannum{\value{#1}}%
+}
+
+\newcommand*{\myscromannum}[1]{%
+  \textsc{\romannumeral#1}%
+}
+
+\GlsXtrLoadResources[src=sample-index,wordify-math-greek]
+
+\title{Sample Document Using the glossaries-extra Package}
+\author{Nicola L. C. Talbot}
+
+\begin{document}
+\pagenumbering{roman}
+
+The datagidx package was developed to follow the word order indexing
+style described by the Oxford Style Manual. Many of the examples
+here are taken from that manual. This document was converted to use
+glossaries-extra instead of datagidx.
+
+With word ordering a word break (space or hyphen) comes before all
+other letters of the alphabet (\gls{sea-lion} comes before \gls{seal}). 
+With letter ordering word breaks are ignored (so \gls{seal} comes
+before \gls{sea-lion}).
+
+Use a few terms here: \gls{index}, \gls{group}, \gls{singular}, \gls{plural}.
+
+\newpage
+
+\Gls{singular}, \glspl{plural}. \gls{glossary}.
+\Gls{acronym}: \gls{reset}, \gls{firstuse}.
+
+\newpage
+\pagenumbering{arabic}
+
+Switched page numbering style. \Gls{singular}, \gls{kite},
+\gls{koala}, \gls{crocodile}, \gls{seal}.
+
+\Gls{sea},
+\gls{sea-anchor},
+\gls{sea-urchin}.
+
+Some characters: \gls{comma}, \gls{equals}, \gls{double-quote}, \gls{!}, \gls{|}
+\gls{amp}, \gls{underscore}, \gls{dollar}, \gls{circum},
+\gls{tilde}.
+
+Some numbers: \gls{0}, \gls{1}, \gls{2}, \gls{3}, \gls{20}, \gls{10}.
+
+\newpage
+
+Some numbers again: \gls{0}, \gls{1}, \gls{2}, \gls{3}, \gls{100},
+\gls{10}, \gls{20}.
+
+Case mixture: \gls{kite}, 
+\gls{Knuth} and 
+\gls[format=principleloc]{koala}.
+NB with glossaries-extra, \verb|\gls| has an optional argument, but
+datagidx incorporates the formatting within the single mandatory
+argument.
+
+\Gls{de-escalate}, \gls{deem}, \gls{demote}.
+
+We still don't need to use \gls{makeindex} or \gls{xindy} but we now
+need to use bib2gls.
+With datagidx, \TeX\ is used to sort and collate, which takes longer than 
+\gls{makeindex} or \gls{xindy} or bib2gls.
+
+\newpage
+
+\Gls{kite}, \gls{highwater}, \gls{koala}, \gls{caiman}, \gls{sea-lion}, \gls{high},
+\gls{highbrow}, \gls{high-chair}, \gls{highball}, \gls{reptile},
+\gls{highlights}, \gls{high-heels}, \gls{high-fliers}.
+\Gls{seam} and \gls{seam-bowler}.
+
+\gls{New-York-New-York}. \gls{New-York}. 
+\Gls{popNY}. \gls{New-York-USA}.
+\gls{Highclere-Castle}.
+
+\gls{High}. \gls{High-Smith}, \gls{Highsmith}, \gls{High-Water}
+as opposed to \gls{high-water}. \Gls{alphabet}. \Gls{alpine}.
+
+Some terms with Greek letters: \gls{alpha-iron}, 
+\gls{Lambda-calculus}, \gls{alpha-chain}, \gls{alpha-Centauri}.
+
+\newpage
+
+\renewcommand{\thepage}{\myscroman{page}}%
+Switching to small caps Roman page numbering.
+
+\Gls{kite}. \Glspl{alligator}. \Gls{highheight}.
+
+\gls{deWinter}.
+\gls{Winter}.
+\gls{Winters}.
+
+\gls{McCullers}.
+
+\gls{MFingal}.
+
+\gls{TomMacFarlane}.
+
+\gls{DickMacFarlane}.
+
+\gls{McNamee}.
+
+\gls{McCarthyism},
+\gls{McGuffin},
+\gls{McCoy}.
+
+\Gls{macadam},
+\gls{maam},
+\gls{ma},
+\gls{macabre},
+\gls{macramé},
+\gls{macédoine},
+\gls{manoeuvre}.
+
+\Gls{élite},
+\gls{deem},
+\gls{demote},
+\gls{deerstalker},
+\gls{deface},
+\gls{de-facto}.
+
+
+\gls{AliceMeynell}.
+\gls{AMeynell}.
+\gls{DrMeynell}.
+\gls{SirMeynell}.
+\gls{FMeynell}.
+\gls{WGMeynell}.
+\gls{WMeynell}.
+
+\gls{HenrySonJohn}. \gls{HenryBlois}.
+\gls{HenryBeaumont}. \gls{HenryBlund}.
+\gls{HenryLittle}. \gls{HenryEssex}. \gls{HenryMowbray}.
+\gls{HenryFitzRobert}.
+\gls{HenryKing}. \gls{HenryScribe}.
+
+\gls{James-V}.
+\gls{James-I}.
+\gls{James-IV}.
+\gls{James-III}.
+\gls{James-II}.
+
+\gls{JBSaint}.
+\gls{StAndrews}.
+\gls{StBenetsHall}.
+\gls{StJamesInfirmary}.
+\gls{QStJohnSmythe}.
+\gls{SaintJulian}.
+\gls{StJustinRoseland}.
+
+\gls{10-Downing-Street}.
+
+\newpage
+
+\renewcommand{\glsxtrbookindexcols}{3}
+
+\renewcommand*{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield{location}{#1}%
+  {\dotfill}%
+  {\glsxtrprelocation}%
+}
+
+\printunsrtglossary
+ [
+   title={Index},
+   preamble={Locations in bold indicate primary reference.
+   (Word sort.)}
+ ]
+
+\end{document}

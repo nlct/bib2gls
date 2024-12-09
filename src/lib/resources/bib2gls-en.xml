@@ -549,6 +549,7 @@ Use {1} {0} instead.</entry>
     The following messages are used by convertgls2bib and datatool2bib
 -->
 
+<entry key="common.label.processed">Processed label: ''{0}'' -&gt; ''{1}''</entry>
 <entry key="common.empty_field_name">Skipping empty field name</entry>
 <entry key="common.empty_field_name.changed">Skipping empty field name (original label ''{0}''). Adjust the mapping with {1} to map to a valid name.</entry>
 <entry key="common.empty_field_name.map_changed">Skipping empty field name (original label ''{0}'', mapped label ''{1}''). Adjust the mapping with {2} to map to a valid name.</entry>
@@ -581,6 +582,7 @@ Use {1} for help.</entry>
 <entry key="common.syntax.ignore-fields">{1}, {0} &lt;list&gt;	Ignore the fields identified by their source label in the comma-separated &lt;list&gt;.</entry>
 <entry key="common.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
 <entry key="common.syntax.space-sub">{1}, {0} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;.</entry>
+<entry key="common.syntax.auto-trim">{0}	Auto-trim labels before space substitution</entry>
 <entry key="common.syntax.overwrite">{0}	Overwrite existing files.</entry>
 <entry key="common.syntax.field-map">{1}, {0} &lt;mappings&gt;	Add source field identifiers to bib field name mappings (cumulative).</entry>
 <entry key="common.syntax.field-case">{0} &lt;setting&gt;	Specify the case-change to apply to field labels.</entry>
@@ -605,6 +607,7 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.other">General Datatool Settings.</entry>
 
 <entry key="datatool2bib.syntax.label">{1}, {0} &lt;col-key&gt;	Use column identified by &lt;col-key&gt; for the entry label. (Default {2})</entry>
+<entry key="datatool2bib.syntax.fallback-label">{1}, {0} &lt;col-key&gt;	Use column identified by &lt;col-key&gt; as a fallback for the entry label. (Default {2})</entry>
 <entry key="datatool2bib.syntax.auto-label">{1}, {0}	auto-generate entry label instead of using a column.</entry>
 <entry key="datatool2bib.syntax.auto-label-prefix">{0} &lt;prefix&gt;	prefix to use for auto-generate entry labels.</entry>
 <entry key="datatool2bib.syntax.setup">{0} &lt;options&gt;	Implement \DTLsetup'{'&lt;options&gt;'}'.</entry>
@@ -645,7 +648,12 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool2bib.datagidx">Database (datagidx) ''{0}''</entry>
 <entry key="datatool2bib.database.empty">Database ''{0}'' is empty</entry>
 <entry key="datatool2bib.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''. Skipping content. (Use {2} for a different column or {3} to auto-generate the label.)</entry>
+<entry key="datatool2bib.replace.missing.label.column">Database ''{0}'' does not have a column labelled ''{1}''. Falling back on column key ''{2}''</entry>
 <entry key="datatool2bib.skipping.database">Skipping database ''{0}''</entry>
+<entry key="datatool2bib.using.fallback">Label ''{0}'' unsuitable, using fallback field ''{1}''</entry>
+<entry key="datatool2bib.using.autolabel">Label ''{0}'' unsuitable, using auto label</entry>
+<entry key="datatool2bib.label.changed">Label changed ''{0}'' -&gt; ''{1}''</entry>
+<entry key="datatool2bib.processing.entry_label">Obtaining label from: {0}</entry>
 
 
 <!--

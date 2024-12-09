@@ -9,4 +9,240 @@
 
 <entry key="sentence.en.terminators">.?!</entry>
 
+<!--
+ Control sequence names of math symbols that may occur in phrases.
+ Key in the form mathsymbol.lang.csname where csname is a name from
+ recognised GreekSymbol, MathSymbol, BinarySymbol and BigOperator objects.
+ -->
+
+<!-- MathSymbol -->
+
+<entry key="mathsymbol.en.infty">infinity</entry>
+<entry key="mathsymbol.en.emptyset">empty set</entry>
+<entry key="mathsymbol.en.varnothing">null set</entry>
+<entry key="mathsymbol.en.varpartialdiff">partial</entry>
+<entry key="mathsymbol.en.nexists">not exists</entry>
+<entry key="mathsymbol.en.notin">not in</entry>
+<entry key="mathsymbol.en.ni">owns</entry>
+<entry key="mathsymbol.en.notni">not owns</entry>
+
+<entry key="mathsymbol.en.vdots">vertical ellipsis</entry>
+<entry key="mathsymbol.en.cdots">ellipsis</entry>
+<entry key="mathsymbol.en.ddots">diagonal ellipsis</entry>
+
+<entry key="mathsymbol.en.mathdollar">dollar</entry>
+<entry key="mathsymbol.en.mathellipsis">ellipsis</entry>
+<entry key="mathsymbol.en.mathparagraph">paragraph</entry>
+<entry key="mathsymbol.en.mathsection">section</entry>
+<entry key="mathsymbol.en.mathstirling">stirling</entry>
+<entry key="mathsymbol.en.mathunderscore">underscore</entry>
+<entry key="mathsymbol.en.mathring">Å</entry>
+
+<entry key="mathsymbol.en.ell">l</entry>
+<entry key="mathsymbol.en.hbar">h</entry>
+<entry key="mathsymbol.en.wp">p</entry>
+<entry key="mathsymbol.en.Bbbk">k</entry>
+<entry key="mathsymbol.en.imath">ı</entry>
+<entry key="mathsymbol.en.jmath">ȷ</entry>
+<entry key="mathsymbol.en.prime">prime</entry>
+<entry key="mathsymbol.en.ldotp">dot</entry>
+<entry key="mathsymbol.en.cdotp">dot</entry>
+<entry key="mathsymbol.en.colon">colon</entry>
+
+<entry key="mathsymbol.en.forall">for all</entry>
+<entry key="mathsymbol.en.rightangle">right angle</entry>
+<entry key="mathsymbol.en.measuredangle">measured angle</entry>
+<entry key="mathsymbol.en.sphericalangle">spherical angle</entry>
+<entry key="mathsymbol.en.bot">bottom</entry>
+<entry key="mathsymbol.en.Im">imaginary part</entry>
+<entry key="mathsymbol.en.Re">real part</entry>
+<entry key="mathsymbol.en.neg">not</entry>
+
+<entry key="mathsymbol.en.club">club</entry>
+<entry key="mathsymbol.en.diamond">diamond</entry>
+<entry key="mathsymbol.en.heart">heart</entry>
+<entry key="mathsymbol.en.spade">spade</entry>
+
+<entry key="mathsymbol.en.flat">flat</entry>
+<entry key="mathsymbol.en.natural">natural</entry>
+<entry key="mathsymbol.en.sharp">sharp</entry>
+
+<!-- BinarySymbol -->
+
+<entry key="mathsymbol.en.le">less than or equal to</entry>
+<entry key="mathsymbol.en.leq">less than or equal to</entry>
+<entry key="mathsymbol.en.ge">greater than or equal to</entry>
+<entry key="mathsymbol.en.geq">greater than or equal to</entry>
+<entry key="mathsymbol.en.ll">much less than</entry>
+<entry key="mathsymbol.en.gg">much greater than</entry>
+<entry key="mathsymbol.en.neq">not equal to</entry>
+<entry key="mathsymbol.en.amalg">coproduct</entry>
+<entry key="mathsymbol.en.approx">approximately</entry>
+<entry key="mathsymbol.en.approxeq">approximately equal to</entry>
+<entry key="mathsymbol.en.ast">asterisk</entry>
+<entry key="mathsymbol.en.asymp">equivalent to</entry>
+<entry key="mathsymbol.en.backsim">reversed tilde</entry>
+<entry key="mathsymbol.en.bigcirc">big circle</entry>
+<entry key="mathsymbol.en.bumpeq">difference between</entry>
+<entry key="mathsymbol.en.cap">intersection</entry>
+<entry key="mathsymbol.en.cdot">dot</entry>
+<entry key="mathsymbol.en.cong">congruent to</entry>
+<entry key="mathsymbol.en.circ">composite</entry>
+<entry key="mathsymbol.en.cup">union</entry>
+<entry key="mathsymbol.en.div">divide</entry>
+<entry key="mathsymbol.en.doteqdot">geometrically equal to</entry>
+<entry key="mathsymbol.en.fallingdotseq">nearly equals</entry>
+<entry key="mathsymbol.en.lhd">normal subgroup of</entry>
+<entry key="mathsymbol.en.mp">minus or plus</entry>
+<entry key="mathsymbol.en.ncong">not congruent to</entry>
+<entry key="mathsymbol.en.notcong">not congruent to</entry>
+<entry key="mathsymbol.en.nmid">does not divide</entry>
+<entry key="mathsymbol.en.notmid">does not divide</entry>
+<entry key="mathsymbol.en.nprec">does not precede</entry>
+<entry key="mathsymbol.en.notprec">does not precede</entry>
+<entry key="mathsymbol.en.npreceq">does not precede or equal</entry>
+<entry key="mathsymbol.en.notpreceq">does not precede or equal</entry>
+<entry key="mathsymbol.en.nsucc">does not succeed</entry>
+<entry key="mathsymbol.en.notsucc">does not succeed</entry>
+<entry key="mathsymbol.en.nsucceq">does not succeed or equal</entry>
+<entry key="mathsymbol.en.notsucceq">does not succeed or equal</entry>
+<entry key="mathsymbol.en.pm">plus or minus</entry>
+<entry key="mathsymbol.en.rhd">contains as normal subgroup</entry>
+<entry key="mathsymbol.en.setminus">set minus</entry>
+<entry key="mathsymbol.en.sqcap">square cap</entry>
+<entry key="mathsymbol.en.sqcup">square cup</entry>
+<entry key="mathsymbol.en.triangleleft">triangle left</entry>
+<entry key="mathsymbol.en.triangleright">triangle right</entry>
+<entry key="mathsymbol.en.unlhd">normal subgroup of or equal to</entry>
+<entry key="mathsymbol.en.unrhd">contains as normal subgroup or equal to</entry>
+<entry key="mathsymbol.en.uplus">multiset union</entry>
+<entry key="mathsymbol.en.vee">logical or</entry>
+<entry key="mathsymbol.en.wedge">logical and</entry>
+<entry key="mathsymbol.en.wr">wreath product</entry>
+<entry key="mathsymbol.en.boxdot">squared dot</entry>
+<entry key="mathsymbol.en.boxminus">squared minus</entry>
+<entry key="mathsymbol.en.boxplus">squared plus</entry>
+<entry key="mathsymbol.en.boxtimes">squared times</entry>
+<entry key="mathsymbol.en.Cap">double intersection</entry>
+<entry key="mathsymbol.en.centerdot">dot operator</entry>
+<entry key="mathsymbol.en.circledast">circled asterisk operator</entry>
+<entry key="mathsymbol.en.circlecirc">circled ring operator</entry>
+<entry key="mathsymbol.en.Cup">double union</entry>
+<entry key="mathsymbol.en.curlyvee">curly logical or</entry>
+<entry key="mathsymbol.en.curlywedge">curly logical and</entry>
+<entry key="mathsymbol.en.divideontimes">division times</entry>
+<entry key="mathsymbol.en.dotequal">approaches the limit</entry>
+<entry key="mathsymbol.en.dotplus">dot plus</entry>
+<entry key="mathsymbol.en.doublebarwedge">logical and with double overbar</entry>
+<entry key="mathsymbol.en.equiv">equivalent to</entry>
+<entry key="mathsymbol.en.intercal">intercalate</entry>
+<entry key="mathsymbol.en.Join">join</entry>
+<entry key="mathsymbol.en.leftthreetimes">left semidirect product</entry>
+<entry key="mathsymbol.en.ltimes">left normal factor semidirect product</entry>
+<entry key="mathsymbol.en.nparallel">not parallel to</entry>
+<entry key="mathsymbol.en.notparallel">not parallel to</entry>
+<entry key="mathsymbol.en.nvdash">does not prove</entry>
+<entry key="mathsymbol.en.notvdash">does not prove</entry>
+<entry key="mathsymbol.en.nvDash">not true</entry>
+<entry key="mathsymbol.en.notvDash">not true</entry>
+<entry key="mathsymbol.en.nVDash">negated double vertical bar double right turnstile</entry>
+<entry key="mathsymbol.en.notVDash">negated double vertical bar double right turnstile</entry>
+<entry key="mathsymbol.en.parallel">parallel to</entry>
+<entry key="mathsymbol.en.perp">perpendicular to</entry>
+<entry key="mathsymbol.en.prec">precedes</entry>
+<entry key="mathsymbol.en.preceq">precedes or equal to</entry>
+<entry key="mathsymbol.en.propto">proportional to</entry>
+<entry key="mathsymbol.en.sqsubseteq">image of or equal to</entry>
+<entry key="mathsymbol.en.sqsupseteq">original of or equal to</entry>
+<entry key="mathsymbol.en.rightthreetimes">right semidirect product</entry>
+<entry key="mathsymbol.en.rtimes">right normal factor semidirect product</entry>
+<entry key="mathsymbol.en.sim">tilde</entry>
+<entry key="mathsymbol.en.simeq">asymptotically equal to</entry>
+<entry key="mathsymbol.en.smallsetminus">set minus</entry>
+<entry key="mathsymbol.en.succ">succeeds</entry>
+<entry key="mathsymbol.en.succeq">succeeds or equal to</entry>
+<entry key="mathsymbol.en.veebar">vee underbar</entry>
+<entry key="mathsymbol.en.udtimes">hourglass</entry>
+<entry key="mathsymbol.en.vdash">right tack</entry>
+<entry key="mathsymbol.en.Vdash">forces</entry>
+<entry key="mathsymbol.en.vDash">true</entry>
+<entry key="mathsymbol.en.Vvdash">triple vertical bar right turnstile</entry>
+<entry key="mathsymbol.en.vcentcolon">ratio</entry>
+<entry key="mathsymbol.en.squaredots">proportion</entry>
+<entry key="mathsymbol.en.dotminus">dot minus</entry>
+<entry key="mathsymbol.en.eqcolon">excess</entry>
+<entry key="mathsymbol.en.risingdotseq">image of or approximately equal to</entry>
+<entry key="mathsymbol.en.eqqcolon">equals colon</entry>
+<entry key="mathsymbol.en.nearrow">north east arrow</entry>
+<entry key="mathsymbol.en.searrow">south east arrow</entry>
+<entry key="mathsymbol.en.nwarrow">north west arrow</entry>
+<entry key="mathsymbol.en.swarrow">south west arrow</entry>
+<entry key="mathsymbol.en.Leftrightarrow">left right double arrow</entry>
+<entry key="mathsymbol.en.leftrightarrow">left right arrow</entry>
+<entry key="mathsymbol.en.Leftarrow">leftwards double arrow</entry>
+<entry key="mathsymbol.en.leftarrow">leftwards arrow</entry>
+<entry key="mathsymbol.en.Rightarrow">rightwards double arrow</entry>
+<entry key="mathsymbol.en.rightarrow">rightwards arrow</entry>
+<entry key="mathsymbol.en.supset">superset of</entry>
+<entry key="mathsymbol.en.subset">subset of</entry>
+<entry key="mathsymbol.en.supseteq">superset of or equal to</entry>
+<entry key="mathsymbol.en.subseteq">subset of or equal to</entry>
+<entry key="mathsymbol.en.not">not</entry>
+<entry key="mathsymbol.en.mapsto">maps to</entry>
+<entry key="mathsymbol.en.longmapsto">long maps to</entry>
+<entry key="mathsymbol.en.leftharpoonup">left harpoon up</entry>
+<entry key="mathsymbol.en.leftharpoondown">left harpoon down</entry>
+<entry key="mathsymbol.en.rightharpoonup">right harpoon up</entry>
+<entry key="mathsymbol.en.rightharpoondown">right harpoon down</entry>
+<entry key="mathsymbol.en.rightleftharpoons">rightwards harpoon over leftwards harpoon</entry>
+<entry key="mathsymbol.en.doteq">approaches the limit</entry>
+<entry key="mathsymbol.en.hookrightarrow">rightwards arrow with hook</entry>
+<entry key="mathsymbol.en.hookleftarrow">leftwards arrow with hook</entry>
+<entry key="mathsymbol.en.Longrightarrow">long rightwards double arrow</entry>
+<entry key="mathsymbol.en.longrightarrow">long rightwards arrow</entry>
+<entry key="mathsymbol.en.Longleftarrow">long leftwards double arrow</entry>
+<entry key="mathsymbol.en.longleftarrow">long leftwards arrow</entry>
+<entry key="mathsymbol.en.Longleftrightarrow">long left right double arrow</entry>
+<entry key="mathsymbol.en.longleftrightarrow">long left right arrow</entry>
+
+<!-- BigOperator -->
+
+<entry key="mathsymbol.en.bigsqcap">square cap</entry>
+<entry key="mathsymbol.en.bigsqcup">square cup</entry>
+<entry key="mathsymbol.en.bigcap">intersection</entry>
+<entry key="mathsymbol.en.bigcup">union</entry>
+<entry key="mathsymbol.en.bigodot">circled dot operator</entry>
+<entry key="mathsymbol.en.bigoplus">circled plus</entry>
+<entry key="mathsymbol.en.bigotimes">circled times</entry>
+<entry key="mathsymbol.en.biguplus">multiset union</entry>
+<entry key="mathsymbol.en.bigvee">logical or</entry>
+<entry key="mathsymbol.en.bigwedge">logical and</entry>
+<entry key="mathsymbol.en.int">integral</entry>
+<entry key="mathsymbol.en.intop">integral</entry>
+<entry key="mathsymbol.en.smallint">integral</entry>
+<entry key="mathsymbol.en.varint">integral</entry>
+<entry key="mathsymbol.en.oint">contour integral</entry>
+<entry key="mathsymbol.en.ointop">contour integral</entry>
+<entry key="mathsymbol.en.varoint">contour integral</entry>
+<entry key="mathsymbol.en.coprod">coproduct</entry>
+<entry key="mathsymbol.en.bigcurlyvee">curly logical or</entry>
+<entry key="mathsymbol.en.bigcurlywedge">curly logical and</entry>
+<entry key="mathsymbol.en.iint">double integral</entry>
+<entry key="mathsymbol.en.iiint">triple integral</entry>
+<entry key="mathsymbol.en.oiint">surface integral</entry>
+<entry key="mathsymbol.en.oiiint">volume integral</entry>
+<entry key="mathsymbol.en.ointclockwise">clockwise contour integral</entry>
+<entry key="mathsymbol.en.ointctrclockwise">anticlockwise contour integral</entry>
+<entry key="mathsymbol.en.sumint">summation with integral</entry>
+<entry key="mathsymbol.en.sqint">quaternion integral</entry>
+<entry key="mathsymbol.en.fint">integral average</entry>
+<entry key="mathsymbol.en.landdownint">integral with union</entry>
+<entry key="mathsymbol.en.landupint">integral with intersection</entry>
+<entry key="mathsymbol.en.bigtimes">times</entry>
+<entry key="mathsymbol.en.prod">product</entry>
+<entry key="mathsymbol.en.bigtriangledown">big triangle down</entry>
+<entry key="mathsymbol.en.varbigtriangledown">big triangle down</entry>
+<entry key="mathsymbol.en.bigtriangleup">big triangle up</entry>
+<entry key="mathsymbol.en.varbigtriangleup">big triangle up</entry>
+
 </properties>

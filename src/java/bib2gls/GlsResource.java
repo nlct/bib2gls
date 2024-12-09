@@ -3236,6 +3236,14 @@ public class GlsResource
          {
             compoundTypeOverride = getBoolean(list, opt);
          }
+         else if (opt.equals("wordify-math-greek"))
+         {
+            wordifyMathGreek = getBoolean(list, opt);
+         }
+         else if (opt.equals("wordify-math-symbol"))
+         {
+            wordifyMathSymbol = getBoolean(list, opt);
+         }
          else
          {
             throw new IllegalArgumentException(
@@ -9036,6 +9044,16 @@ public class GlsResource
       }
 
       mergeSmallGroups(entries, entryGroupField);
+   }
+
+   public boolean isWordifyMathGreekOn()
+   {
+      return wordifyMathGreek;
+   }
+
+   public boolean isWordifyMathSymbolOn()
+   {
+      return wordifyMathSymbol;
    }
 
    public String getLocalisationText(String prefix, String suffix)
@@ -18502,5 +18520,8 @@ public class GlsResource
    private String[] stringWordExceptions = new String[] {};
 
    private Matcher lastMatcher = null;
+
+   private boolean wordifyMathGreek = false;
+   private boolean wordifyMathSymbol = false;
 }
 

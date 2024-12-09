@@ -8881,6 +8881,38 @@ the resource option list, if required. If not set, the default
 will be the \gls{document-locale}, if supplied, otherwise the 
 \gls{Java-locale} will be used.
 
+\optsection{wordify-math-greek}
+
+Instructs the interpreter to replace known math Greek commands with
+words instead of the applicable symbol. For example, if an entry has
+been defined as:
+\begin{codeenv}
+\atentry{index}\marg{a-Fe,
+ \field{name}=\marg{\cs{ensuremath}\marg{\ics{alpha}}-iron}
+}
+\end{codeenv}
+Then with \csopt[true]{wordify-math-greek} the interpreter will obtain 
+the sort value \qt{alpha-iron}. This only works for commands
+recognised by the \texparserlib\ as Math Greek commands.
+
+With the default \csopt[false]{wordify-math-greek}, the interpreter
+will convert \cs{alpha} into the nearest appropriate Unicode
+character.
+
+The textual replacement depends on whether or not a corresponding
+entry is available in the language file \metafilefmt{bib2gls-extra-}{lang}{.xml}
+for the current resource locale. If no entry is found, the control
+sequence name (or substring) will typically be used.
+
+\optsection{wordify-math-symbol}
+
+Similar to \csopt{wordify-math-greek}, this option will apply to
+other known math symbol commands. Again, this only works for a
+limited set of commands recognised by the \texparserlib. An
+alternative is to provide alternative definitions for \bibgls\ that
+aren't picked up by \LaTeX, or use \gls{IfNotBibGls}, or use a more
+appropriate field for sorting.
+
 \optsection{interpret-preamble}
 
 This is a boolean option that determines whether or not the

@@ -24,6 +24,11 @@ import java.io.IOException;
 import com.dickimawbooks.texparserlib.TeXObjectList;
 import com.dickimawbooks.texparserlib.UndefAction;
 
+import com.dickimawbooks.texparserlib.generic.BigOperator;
+import com.dickimawbooks.texparserlib.generic.BinarySymbol;
+import com.dickimawbooks.texparserlib.generic.GreekSymbol;
+import com.dickimawbooks.texparserlib.generic.MathSymbol;
+
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 
@@ -88,6 +93,36 @@ public class InterpreterListener extends L2HStringConverter
       {
          sty.parseFile(stack);
       }
+   }
+
+   @Override
+   public BigOperator createBigOperator(String name, int code1, int code2)
+   {
+      return new BibGlsBigOperator(name, code1, code2, bib2gls);
+   }
+
+   @Override
+   public BigOperator createBigOperator(String name, int code)
+   {
+      return new BibGlsBigOperator(name, code, bib2gls);
+   }
+
+   @Override
+   public MathSymbol createMathSymbol(String name, int code)
+   {
+      return new BibGlsMathSymbol(name, code, bib2gls);
+   }
+
+   @Override
+   public BinarySymbol createBinarySymbol(String name, int code)
+   {
+      return new BibGlsBinarySymbol(name, code, bib2gls);
+   }
+
+   @Override
+   public GreekSymbol createGreekSymbol(String name, int code)
+   {
+      return new BibGlsGreekSymbol(name, code, bib2gls);
    }
 
    Vector<String> customPackages;

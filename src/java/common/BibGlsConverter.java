@@ -129,7 +129,30 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    {
       StringBuilder builder = new StringBuilder();
 
-      for (int i = 0; i < label.length(); )
+      int n = label.length();
+
+      if (autoTrimLabel && spaceSub != null)
+      {
+         for (int i = label.length()-1; i > 0; i--)
+         {
+            char c = label.charAt(i);
+
+            if (Character.isWhitespace(c)
+             || Character.isSpaceChar(c)
+            )
+            {
+               n--;
+            }
+            else
+            {
+               break;
+            }
+         }
+      }
+
+      int lastSpaceIdx = -1;
+
+      for (int i = 0; i < n; )
       {
          int cp = label.codePointAt(i);
          i += Character.charCount(cp);
@@ -138,8 +161,10 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
           || Character.isSpaceChar(cp) // include nbsp
             )
          {
-            if (spaceSub != null)
+            if (spaceSub != null && !(autoTrimLabel && builder.length() == 0)
+                 && lastSpaceIdx < builder.length()-spaceSub.length())
             {
+               lastSpaceIdx = builder.length();
                builder.append(spaceSub);
             }
          }
@@ -157,6 +182,13 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
             builder.appendCodePoint(cp);
          }
       }
+
+      if (lastSpaceIdx >= 0 && lastSpaceIdx == builder.length()-spaceSub.length())
+      {
+         builder.setLength(lastSpaceIdx);
+      }
+
+      debugMessage("common.label.processed", label, builder);
 
       return builder.toString();
    }
@@ -247,6 +279,14 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
          {
             spaceSub = null;
          }
+      }
+      else if (arg.equals("--auto-trim"))
+      {
+         autoTrimLabel = true;
+      }
+      else if (arg.equals("--no-auto-trim"))
+      {
+         autoTrimLabel = false;
       }
       else if (arg.equals("--overwrite"))
       {
@@ -589,6 +629,8 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    {
       printSyntaxItem(getMessage("common.syntax.space-sub",
         "--space-sub", "-s"));
+      printSyntaxItem(getMessage("common.syntax.auto-trim",
+        "--[no-]auto-trim"));
       printSyntaxItem(getMessage("common.syntax.index-conversion",
         "--[no-]index-conversion", "-i"));
       printSyntaxItem(getMessage("common.syntax.field-map",
@@ -696,6 +738,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    protected boolean noDescEntryToIndex=false;
 
    protected String spaceSub = null;
+   protected boolean autoTrimLabel = true;
 
    protected Vector<String> customIgnoreFields = null;
    protected HashMap<String,String> keyToFieldMap = null;

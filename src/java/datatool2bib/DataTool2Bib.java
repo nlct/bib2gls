@@ -398,6 +398,12 @@ public class DataTool2Bib extends BibGlsConverter
    {
       TeXObject content = entry.getContents();
 
+      if (isDebuggingOn())
+      {
+         logAndPrintMessage(getMessage("datatool2bib.processing.entry_label",
+          content.toString(parser)));
+      }
+
       String label = parser.expandToString(content, null);
 
       return processLabel(label);
@@ -436,18 +442,26 @@ public class DataTool2Bib extends BibGlsConverter
 
       int labelColIdx = 0;
       int descFieldIdx = 0;
+      int fallbackLabelColIdx = 0;
 
       for (DataToolHeader header : headers)
       {
          int colIdx = header.getColumnIndex();
-         String label = header.getColumnLabel();
+         String colKey = header.getColumnLabel();
 
-         if (!autoLabel && label.equals(labelColumn))
+         if (!autoLabel)
          {
-            labelColIdx = colIdx;
+            if (colKey.equals(labelColumn))
+            {
+               labelColIdx = colIdx;
+            }
+            else if (colKey.equals(fallbackLabelColumn))
+            {
+               fallbackLabelColIdx = colIdx;
+            }
          }
 
-         String field = getFieldName(label);
+         String field = getFieldName(colKey);
 
          if (field != null)
          {
@@ -460,28 +474,42 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
-      if (!autoLabel && labelColIdx < 1)
+      if (!autoLabel)
       {
-         warning(
-           getMessage("datatool2bib.missing.label.column",
-            db.getName(), labelColumn, "--label", "--auto-label"));
+         if (labelColIdx < 1)
+         {
+            if (fallbackLabelColIdx > 0)
+            {
+               verboseMessage("datatool2bib.replace.missing.label.column",
+                 db.getName(), labelColumn, fallbackLabelColumn);
 
-         return;
+               labelColIdx = fallbackLabelColIdx;
+            }
+
+            if (labelColIdx < 1)
+            {
+               warning(
+                 getMessage("datatool2bib.missing.label.column",
+                  db.getName(), labelColumn, "--label", "--auto-label"));
+
+               return;
+            }
+         }
       }
 
       for (DataToolEntryRow row : data)
       {
          out.println();
 
+         String entryType = "entry";
+
          if (isIndexConversionOn()
               && (descFieldIdx == 0 || row.getEntry(descFieldIdx) == null))
          {
-            out.print("@index{");
+            entryType = "index";
          }
-         else
-         {
-            out.print("@entry{");
-         }
+
+         out.format("@%s{", applyFieldCase(entryType));
 
          DataToolEntry entry;
          String rowLabel = "";
@@ -493,6 +521,7 @@ public class DataTool2Bib extends BibGlsConverter
          else
          {
             entry = row.getEntry(labelColIdx);
+            String orgLabel = "";
 
             if (entry != null)
             {
@@ -501,7 +530,35 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (rowLabel.isEmpty())
             {
-               rowLabel = labelPrefix + (++autoLabelIdx);
+               if (entry != null)
+               {
+                  orgLabel = entry.toString(parser);
+               }
+
+               if (fallbackLabelColIdx > 0 && fallbackLabelColIdx != labelColIdx)
+               {
+                  verboseMessage("datatool2bib.using.fallback", orgLabel,
+                    fallbackLabelColumn);
+
+                  entry = row.getEntry(fallbackLabelColIdx);
+
+                  if (entry != null)
+                  {
+                     rowLabel = processLabel(entry);
+
+                     if (rowLabel.isEmpty())
+                     {
+                        orgLabel = entry.toString(parser);
+                     }
+                  }
+               }
+
+               if (rowLabel.isEmpty())
+               {
+                  verboseMessage("datatool2bib.using.autolabel", orgLabel);
+
+                  rowLabel = labelPrefix + (++autoLabelIdx);
+               }
             }
          }
 
@@ -580,7 +637,7 @@ public class DataTool2Bib extends BibGlsConverter
    protected void writeGidxPreamble(PrintWriter out)
     throws IOException
    {
-      out.println("@preamble{");
+      out.format("@%s{\"", applyFieldCase("preamble"));
       out.println("\\providecommand{\\IfNotBibGls}[2]{#1}");
       out.println("\\providecommand{\\DTLgidxName}[2]{\\IfNotBibGls{#1 #2}{#2\\datatoolpersoncomma #1}}");
       out.println("\\providecommand{\\DTLgidxOffice}[2]{\\IfNotBibGls{#2 (#1)}{#2\\datatoolpersoncomma #1}}");
@@ -588,12 +645,12 @@ public class DataTool2Bib extends BibGlsConverter
       out.println("\\providecommand{\\DTLgidxSubject}[2]{\\IfNotBibGls{#2}{#2\\datatoolsubjectcomm #1}}");
       out.println("\\providecommand{\\DTLgidxRank}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
       out.println("\\providecommand{\\DTLgidxParticle}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
-      out.println("\\providecommand{\\DTLgidxParen}[1]{\\IfNotBibGls{ (#1)}{\\datatoolparenstart #1}");
+      out.println("\\providecommand{\\DTLgidxParen}[1]{\\IfNotBibGls{ (#1)}{\\datatoolparenstart #1}}");
       out.println("\\providecommand{\\DTLgidxIgnore}[1]{\\IfNotBibGls{#1}{}}");
       out.println("\\providecommand{\\DTLgidxSaint}[1]{\\IfNotBibGls{#1}{Saint}}");
       out.println("\\providecommand{\\DTLgidxMac}[1]{\\IfNotBibGls{#1}{Mac}}");
       out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\IfNotBibGls{\\csuse{@Roman}{#1}}{\\csuse{two@digits}{#1}}}");
-      out.println("}");
+      out.println("\"}");
    }
 
    protected void writeEntries(String dbName,
@@ -620,6 +677,8 @@ public class DataTool2Bib extends BibGlsConverter
       String orgNameField = "name";
       String orgTextField = "text";
       String orgPluralField = "plural";
+
+      String fallbackField = fallbackLabelColumn.toLowerCase();
 
       if (keyToFieldMap != null)
       {
@@ -656,21 +715,44 @@ public class DataTool2Bib extends BibGlsConverter
 
       HashMap<String,String> labelMap = new HashMap<String,String>();
 
+
       for (GidxData data : datalist)
       {
-         String label = processLabel(data.getLabel());
+         String orgLabel = data.getLabel();
+         String label = processLabel(orgLabel);
+
+         KeyValList fields = data.getFields();
 
          if (label.isEmpty())
          {
-            label = labelPrefix + (++autoLabelIdx);
+            verboseMessage("datatool2bib.using.fallback", orgLabel, fallbackField);
+
+            label = fields.getString(fallbackField, parser, null);
+
+            if (label == null)
+            {
+               label = fields.getString(fallbackLabelColumn, parser, null);
+            }
+
+            if (label != null)
+            {
+               orgLabel = label;
+               label = processLabel(label);
+            }
+
+            if (label == null || label.isEmpty())
+            {
+               verboseMessage("datatool2bib.using.autolabel", orgLabel);
+               label = labelPrefix + (++autoLabelIdx);
+            }
          }
 
          if (!label.equals(data.getLabel()))
          {
             labelMap.put(data.getLabel(), label);
-         }
 
-         KeyValList fields = data.getFields();
+            verboseMessage("datatool2bib.label.changed", data.getLabel(), label);
+         }
 
          out.println();
 
@@ -698,7 +780,7 @@ public class DataTool2Bib extends BibGlsConverter
             entrytype = "index";
          }
 
-         out.format("@%s{%s", entrytype, label);
+         out.format("@%s{%s", applyFieldCase(entrytype), label);
          int fieldCount = 0;
 
          TeXObject nameVal = fields.get(orgNameField);
@@ -982,6 +1064,9 @@ public class DataTool2Bib extends BibGlsConverter
       printSyntaxItem(getMessage("datatool2bib.syntax.label",
         "--label", "-L", "--label "+labelColumn));
 
+      printSyntaxItem(getMessage("datatool2bib.syntax.fallback-label",
+        "--fallback-label", "-F", "--fallback-label "+fallbackLabelColumn));
+
       printSyntaxItem(getMessage("datatool2bib.syntax.auto-label",
         "--[no-]auto-label", "-a"));
 
@@ -1029,6 +1114,7 @@ public class DataTool2Bib extends BibGlsConverter
    protected int argCount(String arg)
    {
       if ( arg.equals("--label") || arg.equals("-L")
+        || arg.equals("--fallback-label") || arg.equals("-F")
         || arg.equals("--read") || arg.equals("-r")
         || arg.equals("--setup")
         || arg.equals("--auto-label-prefix")
@@ -1057,6 +1143,17 @@ public class DataTool2Bib extends BibGlsConverter
          }
 
          labelColumn = returnVals[0].toString();
+      }
+      else if (isArg(deque, arg, "-F", "--fallback-label", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         fallbackLabelColumn = returnVals[0].toString();
       }
       else if (arg.equals("--auto-label") || arg.equals("-a"))
       {
@@ -1242,6 +1339,7 @@ public class DataTool2Bib extends BibGlsConverter
    private boolean split = false;
 
    private String labelColumn="Label";
+   private String fallbackLabelColumn="Name";
    private boolean autoLabel = false;
    private String autoLabelPrefix = null;
    private String readOpts = null;
