@@ -1329,6 +1329,20 @@ public class Bib2Gls extends BibGlsTeXApp
          }
       }
 
+      if (datatoolSortMarkers)
+      {
+         listener.putControlSequence(listener.createSymbol("datatoolasciistart", 0));
+         listener.putControlSequence(listener.createSymbol("datatoolpersoncomma", 0x1C));
+         listener.putControlSequence(listener.createSymbol("datatoolplacecomma", 0x1D));
+         listener.putControlSequence(listener.createSymbol("datatoolsubjectcomma", 0x1E));
+         listener.putControlSequence(listener.createSymbol("datatoolparenstart", 0x1F));
+         listener.putControlSequence(listener.createSymbol("datatoolctrlboundary", 0x1F));
+         listener.putControlSequence(listener.createSymbol("datatoolasciiend", 0x7F));
+         listener.putControlSequence(new LaTeXGenericCommand(true,
+          "datatoolparen", "m", new TeXCsRef("datatoolctrlboundary")));
+         listener.putControlSequence(new AtSecondOfTwo("dtltexorsort"))
+      }
+
       // Since the interpreter only has access to code fragments
       // not the entire document, there's no way for it to know the
       // complete set of defined commands, so allow \renewcommand
@@ -1340,6 +1354,11 @@ public class Bib2Gls extends BibGlsTeXApp
 
       listener.putControlSequence(new NewCommand("glsxtrprovidecommand",
         Overwrite.ALLOW));
+
+      // The TeX Parser Library already provides \IfTeXParserLib but
+      // this command is specifically for the bib2gls interpreter:
+
+      listener.putControlSequence(new AtSecondOfTwo("IfNotBibGls"));
 
       listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
       listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
@@ -6175,6 +6194,30 @@ public class Bib2Gls extends BibGlsTeXApp
                   getMessage("error.invalid.opt.bool.value", key, val));
             }
          }
+         else if (key.equals("datatool-sort-markers"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               datatoolSortMarkers = true;
+            }
+            else if (val.equals("false"))
+            {
+               datatoolSortMarkers = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
          else if (key.startsWith("no-"))
          {
             throw new Bib2GlsSyntaxException(
@@ -6800,6 +6843,14 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          provideknownGlossaries = false;
       }
+      else if (arg.equals("--datatool-sort-markers"))
+      {
+         datatoolSortMarkers = true;
+      }
+      else if (arg.equals("--no-datatool-sort-markers"))
+      {
+         datatoolSortMarkers = false;
+      }
       else
       {
          return false;
@@ -7207,6 +7258,7 @@ public class Bib2Gls extends BibGlsTeXApp
    private RecordCountRule recordCountRule;
 
    private boolean replaceQuotes = false;
+   private boolean datatoolSortMarkers = false;
 
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",
