@@ -2999,6 +2999,11 @@ the \bibgls\ interpreter. Alternatively, you can use the
 \ics{dtlpadleadingzeros} which is also recognised by the
 \texparserlib\ and \sty{datatool-base} v3.0+).
 
+There is a similar command with reversed syntax \ics{IfNotBibGls},
+which is defined by \sty{glossaries-extra-bib2gls} to expand to its
+first argument. The \bibgls\ interpreter defines this command to
+expand to its second argument.
+
 \TeX\ syntax can be quite complicated and, in some cases, far too
 complicated for simple \idxpl!{regex}. The \texparserlib\ performs
 better than a simple pattern match, and that's the purpose of
@@ -3690,6 +3695,59 @@ Alternatively, within the document:
 \begin{codeenv}
 \gls{BibGlsOptions}\marg{custom-packages=\marg{pkg1,pkg2,pkg3}}
 \end{codeenv}
+
+\argsection{datatool-sort-markers}
+
+The \sty{datatool-base} package provides some marker commands
+designed for use with \ics{DTLsortwordlist}. These commands will
+only be recognised by the interpreter if \sty{datatool-base} (or
+\sty{datatool}) is requested with \longswitch{packages}. However,
+the definition of those marker commands will match their normal
+definition with \sty{datatool-base}.
+
+The \longswitch{datatool-sort-markers} will instead define those
+marker commands to match their localised definitions within
+\cs{DTLsortwordlist}. Additionally, \ics{dtltexorsort} will be
+redefined to expand to its second argument.
+
+Note that with this switch you don't need to
+request the \sty{datatool-base} package, unless you require support
+for other commands provided by that package.
+
+The marker commands are: \ics{datatoolasciistart},
+\ics{datatoolpersoncomma}, \ics{datatoolplacecomma},
+\ics{datatoolsubjectcomma}, \ics{datatoolparenstart},
+\ics{datatoolctrlboundary}, \ics{datatoolasciiend}, and
+\ics{datatoolparen} (see the \sty{datatool} documentation for
+further details). With \longswitch{datatool-sort-markers}, these
+commands will expand to content that includes special control codes.
+Note that language-sensitive sort methods typically ignore control
+codes, so these would either need to be used with a character-code
+comparator or a custom sort method would need to be used.
+For example:
+\begin{codeenv}
+\csopt[\ics{glsxtrcontrolIrules}
+ ;\cs{glshex} 0
+ ;\cs{glsxtrspacerules}
+ ;\cs{glsxtrnonprintablerules}
+ ;\cs{glsxtrcombiningdiacriticrules}
+ ,\cs{glsxtrhyphenrules}
+ <\ics{glsxtrcontrolIIrules}
+ <\cs{glsxtrgeneralpuncrules}
+ <\cs{glsxtrdigitrules}
+ <\cs{glsxtrfractionrules}
+ <\ics{glsxtrGeneralLatinIrules}
+ <\cs{glshex} 7F
+}
+]{sort-rule}
+\end{codeenv}
+
+\argsection{no-datatool-sort-markers}
+
+Don't provide definitions of the \sty{datatool-base} marker commands 
+that match their behaviour within \cs{DTLsortwordlist}. These
+commands (including \cs{dtltexorsort}) will only be defined if the
+\sty{datatool-base} package is requested with \longswitch{packages}.
 
 \argsection{ignore-packages}
 
@@ -4529,7 +4587,7 @@ before the entries are defined (that is, before using
 
 If you have \isty{mfirstuc} v2.08+, \isty{glossaries} v4.50+
 and \isty{glossaries-extra} v1.49+ then this setting shouldn't be
-required any more as there's now better sentence-case handling.
+required any more as there's now better \idx{sentencecase} handling.
 If these versions are detected in the \ext{log} file then the
 default will switch to \longarg{no-mfirstuc-protection}
 otherwise the default is \longarg{mfirstuc-protection}. If this causes any
@@ -4584,7 +4642,7 @@ If used in \gls{BibGlsOptions}, this option should be specified as
 
 If you have \isty{mfirstuc} v2.08+, \isty{glossaries} v4.50+ and
 \isty{glossaries-extra} v1.49+ then this setting shouldn't be
-required any more as there's now better sentence-case handling.  If
+required any more as there's now better \idx{sentencecase} handling.  If
 these versions are detected in the \ext{log} file then the default
 will switch to \longarg{no-mfirstuc-math-protection}. If this causes
 any problems, use \longarg{mfirstuc-math-protection} to re-enable
@@ -8258,7 +8316,7 @@ Now suppose instead that the resource options include:
 \end{codeenv}
 This first interprets the value of the \field{name} field and substitutes the special
 characters (so \code{\csfmt{relax}} becomes the string \qtt{\csfmt{glsbackslash} relax}). 
-The resulting string is then converted to sentence case, which results in
+The resulting string is then converted to \idx{sentencecase}, which results in
 \qtt{\csfmt{Glsbackslash} relax} because the initial backslash is now a literal character,
 and since it's a non-letter character it's skipped by the case-conversion.
 So now the code written to the \ext{glstex} file is:
@@ -17453,7 +17511,8 @@ and \textsuperscript{2} (\hex{00B2}).
 As with the letter sort methods, letters are compared using a
 character code comparison not by a locale alphabet. The closest
 locale-sensitive equivalent is to use \csopt{sort-number-pad} with a
-locale sort method. Alternatively, use \ics{IfTeXParserLib} and
+locale sort method. Alternatively, use \ics{IfTeXParserLib} or
+\ics{IfNotBibGls} and
 \ics{bibglspaddigits} to pad the number for the interpreter but
 not in the \TeX\ document.
 
@@ -23186,16 +23245,47 @@ have their specific switches, which are described in the relevant
 section.
 
 \begin{important}
+It's likely that you will need to post-process the \ext{bib} files
+or at least double-check that the conversion has been performed
+adequately.
+\end{important}
+
 The \ext{bib} format has case-insensitive field names. However, the
 source files input by the converter tool typically have
 case-sensitive labels that correspond to the destination \ext{bib}
 field. The converter tools will convert the fields to
 \idx{lowercase} after any mappings have been applied.
-\end{important}
+Use \converterlongarg{field-case} to change this.
+Additionally, the \ext{bib} format prohibits certain characters in
+field names and entry labels (such as spaces), so these will be
+stripped. The resulting field names must be non-empty.
 
-It's likely that you will need to post-process the \ext{bib} files
-or at least double-check that the conversion has been performed
-adequately.
+The \texparserlib\ is used to parse the input files. The conversion
+tool may automatically implement the relevant packages (such as
+\sty{datatool} and \sty{datagidx} for \idx{datatool2bib}). 
+However, the behaviour of some commands may be
+modified to better suit the conversion process. 
+
+Note that \ics{IfTeXParserLib} will expand to its first argument,
+but \ics{IfNotBibGls} will also expand to its first argument, since
+it's only defined to expand to its second argument by the \bibgls\
+interpreter not by the \texparserlib\ core code.
+
+Avoid any overly complicated code within the \ext{tex} file. The
+\texparserlib\ isn't a \TeX\ engine! The input \ext{tex} file
+doesn't need to be a complete document, but if you want certain
+commands recognised from packages that the \texparserlib\ supports,
+you'll need to include \ics{usepackage} in the \ext{tex} file. If
+you want to quit parsing the \ext{tex} file at the start of the
+document, use the \converterlongarg{preamble-only} switch.
+
+\begin{warning}
+The \texparserlib\ recognises
+\ics{input} and \ics{include} and so will also parse the referenced
+file if either command is encountered.
+If you have multiple files, it's better to pass just the relevant
+file to the conversion tool rather than the main document file.
+\end{warning}
 
 \section{Shared Conversion Tool Switches}
 \label{sec:shared2bibswitches}
@@ -23203,8 +23293,8 @@ adequately.
 \converterarg{texenc}
 
 The character \igls{encoding} of the source \ext{tex} file. If omitted, the
-operating system's default \gls{encoding} is assumed (or the
-\idx{JVM}['s]).
+\idx{JVM}['s] default \gls{encoding} is assumed (which may or
+may not be the same as the operating system's default).
 
 \converterarg{bibenc}
 
@@ -23219,13 +23309,15 @@ replace spaces in labels. Each space will be substituted with
 \meta{replacement}. Where applicable, the cross-referencing fields, \field{see},
 \field{seealso} and \field{alias}, will also be adjusted, but any
 references using \ics{gls} etc will have to be substituted manually 
-(or use a global search and replace in your text editor).
+(or use a global search and replace action in your text editor).
 If you want to strip the spaces, use an empty string for
 \meta{replacement}. You'll need to delimit this according to your
 operating system. For example:
 \begin{verbatim}
 convertgls2bib --space-sub '' entries.tex entries.bib
 \end{verbatim}
+Alternatively, use \converterlongarg{field-map} to supply an
+alternative field name.
 
 \begin{important}
 Note that all forbidden punctuation characters
@@ -23239,7 +23331,7 @@ Stop parsing if the start of the \env{document} environment is found.
 \converterarg{no-preamble-only}
 
 Parse the entire file (default). Be prepared for a lot of
-unknown command warnings if you make the conversion tool parse an
+\qt{unknown command} warnings if you make the conversion tool parse an
 entire document.
 
 \converterarg{overwrite}
@@ -23259,21 +23351,40 @@ Note that in earlier versions of \idx{convertgls2bib} an empty list
 cancelled the list of ignored fields. As from version 4.0, you will
 need to use \converterlongarg{no-ignore-fields} to clear the list.
 
+Each item in the list should identify
+the field by its original case-sensitive key.
+
 \converterarg{no-ignore-fields}
 
 Cancels the effect of \converterlongarg{ignore-fields}.
 
-\converterarg{key-map}
+\converterarg{field-map}
 
-Provides a mapping from source field names to the field names used in
+Provides a mapping from source labels to the field names used in
 the destination \ext{bib} file. The argument should be a
-comma-separated list of \code{\meta{src-field}=\meta{dest-field}}
+comma-separated list of \code{\meta{src-label}=\meta{dest-field}}
 pairs.
 This option is cumulative.
 
-\converterarg{no-key-map}
+For \idx{convertgls2bib}, the source labels are the keys used in
+commands such as \gls{newglossaryentry}. These should ordinarily not
+need any mappings. However, you may, for example, want to convert
+the user keys to something more appropriate.
+For \idx{datatool2bib}, the source labels are the column keys.
+
+\converterarg{no-field-map}
 
 Cancels all field mappings.
+
+\converterarg{field-case}
+
+Specifies whether or not to change the case of the field name when
+writing to the \ext{bib} file. Valid \meta{setting}:
+\optfmt{none} (no case-change), \optfmt{lc} (to \idx{lowercase}, default),
+\optfmt{uc} (to \idx{uppercase}), \optfmt{title} (to \idx{titlecase}),
+or \optfmt{sentence} (to \idx{sentencecase}). Note that since spaces
+aren't permitted in field names, the last two are equivalent.
+The case-change is applied after mapping.
 
 \converterarg{index-conversion}
 
@@ -23293,7 +23404,17 @@ Don't convert \atentry{entry} to \atentry{index} (default).
 The log file is optional for the converter applications. It's
 provided for use with the \texparserlib\ debugging modes 
 (\commonlongarg{debug-mode}) which writes
-logging information to this file (which can be sizable).
+logging information to this file (which can be sizeable).
+A log file will automatically be created if debugging is enabled,
+otherwise it will need to be explicitly created with
+\converterlongarg{log-file} if required. The default name, if
+automatically created, is the name of the converter application with
+the \ext{log} file extension.
+
+\begin{important}
+Unlike \bibgls's \longarg{log-file} switch, the conversion
+tools don't have a corresponding short switch.
+\end{important}
 
 \section{\glsfmttext{idx.convertgls2bib}: Conversion from \styfmt{glossaries} or
 \styfmt{glossaries-extra}}
@@ -23332,8 +23453,7 @@ Omit the \field{sort} field.  This is the default since \bibgls\ can
 work out a more intuitive sort value than either \idx!{makeindex} or
 \idx!{xindy}.
 This option is automatically set if the \field{sort} field is
-included in \converterlongarg{ignore-fields} (but it won't be
-switched off automatically if it's not included in the list).
+included in \converterlongarg{ignore-fields}.
 
 \convertglsbibarg{no-ignore-sort}
 
@@ -23345,13 +23465,23 @@ Omit the \field{type} field in the \ext{bib} file.  You may find it
 more flexible not to be locked into a specific glossary type if you
 have a large database of entries.
 This option is automatically set if the \field{type} field is
-included in \converterlongarg{ignore-fields} (but it won't be
-switched off automatically if it's not included in the list).
+included in \converterlongarg{ignore-fields}.
 
 \convertglsbibarg{no-ignore-type}
 
- Don't omit the \field{type} field (default unless
+Don't omit the \field{type} field (default unless
 \convertglsbiblongarg{split-on-type}).
+
+\convertglsbibarg{ignore-category}
+
+Omit the \field{category} field in the \ext{bib} file.
+This option is automatically set if the \field{category} field is
+included in \converterlongarg{ignore-fields}.
+
+\convertglsbibarg{no-ignore-category}
+
+Don't omit the \field{category} field (default unless
+\convertglsbiblongarg{split-on-category}).
 
 \convertglsbibarg{split-on-type}
 
@@ -23387,18 +23517,6 @@ This option automatically implements \convertglsbiblongarg{ignore-type} and
 
 Don't split the entries into separate files according to their type
 (default).
-
-\convertglsbibarg{ignore-category}
-
-Omit the \field{category} field in the \ext{bib} file.
-This option is automatically set if the \field{category} field is
-included in \converterlongarg{ignore-fields} (but it won't be
-switched off automatically if it's not included in the list).
-
-\convertglsbibarg{no-ignore-category}
-
-Don't omit the \field{category} field (default unless
-\convertglsbiblongarg{split-on-category}).
 
 \convertglsbibarg{split-on-category}
 
@@ -23454,17 +23572,23 @@ the corresponding entry (default).
 Don't absorb any cross-referencing information identified with \ics{glssee} 
 or \ics{glsxtrindexseealso} commands.
 
+\convertglsbibarg{internal-field-map}
+
+Appends the given internal field to key mappings to the predefined
+list. This action is cumulative. The mappings are needed for
+\gls{glssetexpandfield} and \gls{glssetnoexpandfield}, which use
+\idx{internalfields} for their arguments.
+Note that this is different from \converterlongarg{field-map} which
+maps the key used in commands like \gls{newglossaryentry} to
+the corresponding field label written the \ext{bib} file.
+
 \subsection{Recognised Commands}
 
 The \idx{convertgls2bib} application recognises the commands listed below as well as
-some standard commands such as \ics{newcommand}. Avoid any overly
-complicated code within the \ext{tex} file. The \texparserlib\ 
-isn't a \TeX\ engine! The
-\ext{tex} file doesn't need to be a complete document, but if you want certain
-commands recognised from packages that the \texparserlib\ supports,
-you'll need to include \ics{usepackage} in the \ext{tex} file. If
-you want to quit parsing the \ext{tex} file at the start of the
-document, use the \converterlongarg{preamble-only} switch.
+some standard commands such as \ics{newcommand}. The \texparserlib\
+is instructed to skip its usual implementation of the
+\sty{glossaries} and \sty{glossaries-extra} packages as only a
+limited set of commands need to be defined.
 
 In all cases below, if \meta{\keyvallist} contains:
 \begin{codeenv*}
@@ -23525,6 +23649,10 @@ The base \styfmt{glossaries} package provides:
 \formatdef{glssetexpandfield}
 If present, this instructs \idx{convertgls2bib} to expand the
 given field, even if \gls{glsnoexpandfields} has been used.
+Note that the argument should be the internal field label.
+The default set of mappings are recognised. Any additional mappings
+will need to be added with
+\convertglsbiblongarg{internal-field-map}.
 
 \cssection{glssetnoexpandfield}
 The base \styfmt{glossaries} package provides:
@@ -23539,7 +23667,11 @@ The base \styfmt{glossaries} package provides:
 \formatdef{loadglsentries}
 This locally redefines \ics{glsdefaulttype} to \meta{type} (if the optional argument is supplied)
 and inputs \meta{file}. If the \meta{file} doesn't have an extension, \ext{tex} is assumed.
-(The \TeX\ Parser Library also recognises \ics{input}.)
+(The \texparserlib\ also recognises \ics{input}.)
+
+In general, it's better to simply use \meta{file} as the source file
+when running \idx{convertgls2bib} instead of using the main document
+file as the source.
 
 \cssection{newglossaryentry}
 The base \styfmt{glossaries} package provides:

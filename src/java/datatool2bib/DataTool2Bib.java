@@ -366,7 +366,7 @@ public class DataTool2Bib extends BibGlsConverter
 
                if (dbName.equals("datagidx"))
                {
-                  message(getMessage("datatool2bib.skipping.database", dbName));
+                  verboseMessage("datatool2bib.skipping.database", dbName);
                   continue;
                }
 
@@ -453,7 +453,7 @@ public class DataTool2Bib extends BibGlsConverter
          {
             idxFieldMap.put(Integer.valueOf(colIdx), field);
 
-            if (isIndexConversionOn() && field.equals("description"))
+            if (isIndexConversionOn() && field.equalsIgnoreCase("description"))
             {
                descFieldIdx = colIdx;
             }
@@ -581,16 +581,18 @@ public class DataTool2Bib extends BibGlsConverter
     throws IOException
    {
       out.println("@preamble{");
-      out.println("\\providecommand{\\DTLgidxName}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxOffice}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxPlace}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxSubject}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxRank}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxParticle}[2]{#2, #1}");
-      out.println("\\providecommand{\\DTLgidxParen}[1]{ (#1)}");
-      out.println("\\providecommand{\\DTLgidxSaint}[1]{Saint}");
-      out.println("\\providecommand{\\DTLgidxMac}[1]{Mac}");
-      out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\csuse{two@digits}{#1}}");
+      out.println("\\providecommand{\\IfNotBibGls}[2]{#1}");
+      out.println("\\providecommand{\\DTLgidxName}[2]{\\IfNotBibGls{#1 #2}{#2\\datatoolpersoncomma #1}}");
+      out.println("\\providecommand{\\DTLgidxOffice}[2]{\\IfNotBibGls{#2 (#1)}{#2\\datatoolpersoncomma #1}}");
+      out.println("\\providecommand{\\DTLgidxPlace}[2]{\\IfNotBibGls{#2}{#2\\datatoolplacecomma #1}}");
+      out.println("\\providecommand{\\DTLgidxSubject}[2]{\\IfNotBibGls{#2}{#2\\datatoolsubjectcomm #1}}");
+      out.println("\\providecommand{\\DTLgidxRank}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
+      out.println("\\providecommand{\\DTLgidxParticle}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
+      out.println("\\providecommand{\\DTLgidxParen}[1]{\\IfNotBibGls{ (#1)}{\\datatoolparenstart #1}");
+      out.println("\\providecommand{\\DTLgidxIgnore}[1]{\\IfNotBibGls{#1}{}}");
+      out.println("\\providecommand{\\DTLgidxSaint}[1]{\\IfNotBibGls{#1}{Saint}}");
+      out.println("\\providecommand{\\DTLgidxMac}[1]{\\IfNotBibGls{#1}{Mac}}");
+      out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\IfNotBibGls{\\csuse{@Roman}{#1}}{\\csuse{two@digits}{#1}}}");
       out.println("}");
    }
 
@@ -623,7 +625,7 @@ public class DataTool2Bib extends BibGlsConverter
       {
          for (String field : keyToFieldMap.keySet())
          {
-            String map = keyToFieldMap.get(field);
+            String map = keyToFieldMap.get(field).toLowerCase();
 
             if (map.equals("description"))
             {
@@ -712,13 +714,21 @@ public class DataTool2Bib extends BibGlsConverter
          {
             TeXObject value = fields.get(field);
 
-            field = getFieldName(field);
+            if (value == null) continue;
 
-            if (field != null && !field.equals("label") && value != null)
+            String bibfield = getFieldName(field);
+
+            /**
+             * It's possible to map the "label" field to a valid
+             * field name, so only ignore specifically "label"
+             * rather than labelColumn.
+             */
+
+            if (bibfield != null && !bibfield.equalsIgnoreCase("label"))
             {
                String valStr = value.toString(parser);
 
-               if (field.equals("name"))
+               if (bibfield.equalsIgnoreCase("name"))
                {
                   if (entrytype.equals("index") && valStr.equals(label))
                   {
@@ -734,7 +744,7 @@ public class DataTool2Bib extends BibGlsConverter
 
                fieldCount++;
 
-               if (field.equals("parent"))
+               if (bibfield.equalsIgnoreCase("parent"))
                {
                   String parentLabel = valStr;
                   String mapLabel = labelMap.get(parentLabel);
@@ -758,7 +768,9 @@ public class DataTool2Bib extends BibGlsConverter
                      labelMap.put(parentLabel, valStr);
                   }
                }
-               else if (field.equals("see") || field.equals("seealso"))
+               else if (bibfield.equalsIgnoreCase("see")
+                     || bibfield.equalsIgnoreCase("seealso")
+                     || bibfield.equalsIgnoreCase("alias"))
                {
                   String[] xrlist = valStr.split(" *, *");
                   StringBuilder builder = new StringBuilder();
@@ -795,7 +807,7 @@ public class DataTool2Bib extends BibGlsConverter
 
                out.println(",");
 
-               out.format("  %s = {%s}", field, valStr);
+               out.format("  %s = {%s}", bibfield, valStr);
             }
          }
 
@@ -940,7 +952,7 @@ public class DataTool2Bib extends BibGlsConverter
    @Override
    protected void syntaxInfo()
    {
-      printSyntaxItem(getMessage("datatool2bib.syntax.info", "bib2gls"));
+      printSyntaxItem(getMessage("datatool2bib.syntax.info", "datatool2bib"));
    }
 
    @Override

@@ -87,24 +87,28 @@ public class Gls2Bib extends BibGlsConverter
          }
       }
 
-      initKeyToFieldMap();
+      initInternalFieldMap();
    }
 
-   private void initKeyToFieldMap()
+   private void initInternalFieldMap()
    {
-      keyToFieldMap = new HashMap<String,String>();
-      keyToFieldMap.put("sortvalue", "sort");
-      keyToFieldMap.put("firstpl", "firstplural");
-      keyToFieldMap.put("desc", "description");
-      keyToFieldMap.put("descplural", "descriptionplural");
-      keyToFieldMap.put("useri", "user1");
-      keyToFieldMap.put("userii", "user2");
-      keyToFieldMap.put("useriii", "user3");
-      keyToFieldMap.put("useriv", "user4");
-      keyToFieldMap.put("userv", "user5");
-      keyToFieldMap.put("uservi", "user6");
-      keyToFieldMap.put("longpl", "longplural");
-      keyToFieldMap.put("shortpl", "shortplural");
+      if (internalFieldMap == null)
+      {
+         internalFieldMap = new HashMap<String,String>();
+      }
+
+      internalFieldMap.put("sortvalue", "sort");
+      internalFieldMap.put("firstpl", "firstplural");
+      internalFieldMap.put("desc", "description");
+      internalFieldMap.put("descplural", "descriptionplural");
+      internalFieldMap.put("useri", "user1");
+      internalFieldMap.put("userii", "user2");
+      internalFieldMap.put("useriii", "user3");
+      internalFieldMap.put("useriv", "user4");
+      internalFieldMap.put("userv", "user5");
+      internalFieldMap.put("uservi", "user6");
+      internalFieldMap.put("longpl", "longplural");
+      internalFieldMap.put("shortpl", "shortplural");
    }
 
    @Override
@@ -545,6 +549,19 @@ public class Gls2Bib extends BibGlsConverter
    }
 
    @Override
+   protected int argCount(String arg)
+   {
+      if (arg.equals("--internal-field-map"))
+      {
+         return 1;
+      }
+      else
+      {
+         return super.argCount(arg);
+      }
+   }
+
+   @Override
    protected boolean parseArg(ArrayDeque<String> deque, String arg, 
       BibGlsArgValue[] returnVals)
     throws Bib2GlsSyntaxException
@@ -601,6 +618,34 @@ public class Gls2Bib extends BibGlsConverter
       {
          absorbSee = false;
       }
+      else if (isListArg(deque, arg, "--internal-field-map", returnVals))
+      {
+         if (returnVals[0] == null)
+         {  
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         if (internalFieldMap == null)
+         {
+            internalFieldMap = new HashMap<String,String>();
+         }
+
+         for (String s : returnVals[0].listValue())
+         {
+            String[] map = s.split(" *= *");
+
+            if (map.length != 2)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("datatool2bib.syntax.invalid_map",
+                  s, arg));
+            }
+
+            internalFieldMap.put(map[0], map[1]);
+         }
+      }
       else
       {
          return super.parseArg(deque, arg, returnVals);
@@ -631,7 +676,7 @@ public class Gls2Bib extends BibGlsConverter
 
    public void setFieldExpansion(String field, boolean on)
    {
-      String val = keyToFieldMap.get(field);
+      String val = internalFieldMap.get(field);
 
       if (val != null)
       {
@@ -677,9 +722,9 @@ public class Gls2Bib extends BibGlsConverter
 
    private boolean expandFields = false;
 
-   private HashMap<String,Boolean> expandFieldMap;
+   private HashMap<String,String> internalFieldMap;
 
-   private HashMap<String,String> keyToFieldMap;
+   private HashMap<String,Boolean> expandFieldMap;
 
    public static final String[] KNOWN_FIELDS = new String[]
    {"name", "text", "plural", "first", "firstplural", "symbol",

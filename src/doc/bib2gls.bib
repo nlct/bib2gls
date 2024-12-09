@@ -2066,7 +2066,8 @@ name},
 @mainglscommand{glssetexpandfield,
   name={\csfmt{gls\-set\-expand\-field}},
   user1={\margm{field}},
-  description={switches on field expansion for the given field},
+  description={switches on field expansion for the given field,
+identified by its internal label},
   topics={assigncommands,definingterms},
   note={\styfmt{glossaries}},
   category={command}
@@ -4450,6 +4451,26 @@ placed at the start of a rule in the \qt{ignored characters} section
 (although there typically won't be any control codes in sort fields)},
   topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.27+},
+  category={command}
+}
+
+@glscommand{glsxtrcontrolIrules,
+  name={\csfmt{gls\-xtr\-control\-I\-rules}},
+  user1={},
+  description={as \cs{glsxtrcontrolrules} but omits control codes
+   \hex{0}, \hex{1C}, \hex{1D}, \hex{1E}, \hex{1F} and \hex{7F}}},
+  topics={collationsubrules},
+  note={\styfmt{glossaries-extra-bib2gls} v1.54+},
+  category={command}
+}
+
+@glscommand{glsxtrcontrolIIrules,
+  name={\csfmt{gls\-xtr\-control\-II\-rules}},
+  user1={},
+  description={expands to the ordered set of \qt{information separator} control codes
+   \hex{1C}, \hex{1D}, \hex{1E}, and \hex{1F}}},
+  topics={collationsubrules},
+  note={\styfmt{glossaries-extra-bib2gls} v1.54+},
   category={command}
 }
 
@@ -10891,18 +10912,32 @@ primary formats, if enabled.},
   parent={commandlineoptionsconverter}
 }
 
-@switch{switch.converter.key-map,
-  name={\longargfmt{key\dhyphen map}},
+@switch{switch.converter.field-map,
+  name={\longargfmt{field\dhyphen map}},
   symbol={\shortargfmt{m}},
   user1={\meta{src=dest list}},
   category={switch},
   parent={commandlineoptionsconverter}
 }
 
-@switch{switch.converter.no-key-map,
-  name={\longargfmt{no\dhyphen key\dhyphen map}},
+@switch{switch.converter.no-field-map,
+  name={\longargfmt{no\dhyphen field\dhyphen map}},
   category={switch},
   parent={commandlineoptionsconverter}
+}
+
+@switch{switch.converter.field-case,
+  name={\longargfmt{field\dhyphen case}},
+  user1={\meta{setting}},
+  category={switch},
+  parent={commandlineoptionsconverter}
+}
+
+@switch{switch.gls2bib.internal-field-map,
+  name={\longargfmt{internal\dhyphen field\dhyphen map}},
+  user1={\meta{src=dest list}},
+  category={switch},
+  parent={commandlineoptionsgls2bib}
 }
 
 @switch{switch.gls2bib.split-on-category,
@@ -14745,6 +14780,15 @@ usual delay},
   name={\csfmt{input}},
   user1={\margm{file}},
   description={input the given file},
+  note={kernel command\texparserdefnote},
+  category={command}
+}
+
+@command{include,
+  name={\csfmt{include}},
+  user1={\margm{file}},
+  description={clears the page, creates a supplementary \ext{aux}
+  file, and selectively inputs the given file},
   note={kernel command\texparserdefnote},
   category={command}
 }
@@ -19271,11 +19315,25 @@ sectioning commands to write to it},
 
 @command{IfTeXParserLib,
   name={\csfmt{If\-TeX\-Parser\-Lib}},
-  user1={\margm{interpreter}\margm{\TeX}},
+  user1={\margm{parser code}\margm{\TeX\ code}},
   description={defined by the \TeX\ parser library to expand to
-  \meta{interpreter} and by \sty{glossaries-extra-bib2gls} to expand
-  to \meta{\TeX}},
+  \meta{parser code} and by \sty{glossaries-extra-bib2gls} to expand
+  to \meta{\TeX\ code}},
   note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote},
+  seealso={IfNotBibGls},
+  category={command}
+}
+
+@command{IfNotBibGls,
+  name={\csfmt{If\-Not\-Bib\-Gls}},
+  user1={\margm{not bib2gls}\margm{bib2gls}},
+  description={defined by the \bibgls\ interpreter to expand to
+  \meta{bib2gls} and by \sty{glossaries-extra-bib2gls} to expand
+  to \meta{not bib2gls}. The command either won't be recognised by other
+applications that use the \texparserlib\ or it will expand to its
+first argument},
+  note={\styfmt{glossaries-extra-bib2gls}\texparserdefnote},
+  seealso={IfTeXParserLib},
   category={command}
 }
 
@@ -19284,6 +19342,84 @@ sectioning commands to write to it},
   user1={\margm{num digits}\margm{number}},
   description={expands to \meta{number} zero-padded to ensure at
    least \meta{num digits} digits},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{DTLsortwordlist,
+  name={\csfmt{DTL\-sort\-word\-list}},
+  user1={\margm{clist-var}\margm{handler-cs}},
+  description={sorts the given comma-separated list variable, where the values
+     are preprocessed by the given sort handler function},
+  note={\styfmt{datatool-base} v3.0+},
+  category={command}
+}
+
+@command{datatoolasciistart,
+  name={\csfmt{data\-tool\-ascii\-start}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{datatoolpersoncomma,
+  name={\csfmt{data\-tool\-person\-comma}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote},
+  category={command}
+}
+
+@command{datatoolplacecomma,
+  name={\csfmt{data\-tool\-place\-comma}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote},
+  category={command}
+}
+
+@command{datatoolsubjectcomma,
+  name={\csfmt{data\-tool\-subject\-comma}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote},
+  category={command}
+}
+
+@command{datatoolparenstart,
+  name={\csfmt{data\-tool\-paren\-start}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{datatoolctrlboundary,
+  name={\csfmt{data\-tool\-ctrl\-boundary}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{datatoolasciiend,
+  name={\csfmt{data\-tool\-ascii\-end}},
+  description={marker used with \cs{DTLsortwordlist}},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{datatoolparen,
+  name={\csfmt{data\-tool\-paren}},
+  user1={\margm{text}},
+  description={marker used with \cs{DTLsortwordlist} for parenthetical
+content},
+  note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
+  category={command}
+}
+
+@command{dtltexorsort,
+  name={\csfmt{dtl\-tex\-or\-sort}},
+  user1={\margm{normal}\margm{sorting}},
+  description={provided for use with \cs{DTLsortwordlist}, this
+normally expands to its first argument. Within \cs{DTLsortwordlist}
+or when used by the interpreter with \longswitch{datatool-sort-markers}
+this command will expand to its second argument instead},
   note={\styfmt{datatool-base}\texparserdefnote\ v3.0+},
   category={command}
 }

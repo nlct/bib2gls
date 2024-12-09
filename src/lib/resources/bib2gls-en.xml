@@ -549,6 +549,9 @@ Use {1} {0} instead.</entry>
     The following messages are used by convertgls2bib and datatool2bib
 -->
 
+<entry key="common.empty_field_name">Skipping empty field name</entry>
+<entry key="common.empty_field_name.changed">Skipping empty field name (original label ''{0}''). Adjust the mapping with {1} to map to a valid name.</entry>
+<entry key="common.empty_field_name.map_changed">Skipping empty field name (original label ''{0}'', mapped label ''{1}''). Adjust the mapping with {2} to map to a valid name.</entry>
 <entry key="common.missing.encoding.value">Missing &lt;encoding&gt; after {0}</entry>
 <entry key="common.missing.arg.value">Missing &lt;value&gt; after {0}</entry>
 <entry key="common.unknown.arg">Unknown option: {0}
@@ -561,7 +564,7 @@ Use {1} for help.</entry>
 <entry key="common.missing.bib.arg">Missing &lt;bib file&gt;
 {0}
 Use {1} for help.</entry>
-<entry key="common.syntax">Usage: {0} [&lt;options&gt;] &lt;tex file&gt; &lt;bib file&gt;</entry>
+<entry key="common.syntax">Usage: {0} [&lt;options&gt;] &lt;in-file&gt; &lt;bib-file&gt;</entry>
 
 <entry key="common.syntax.options.general">General options:</entry>
 <entry key="common.syntax.options.locale">Encoding and localisation options:</entry>
@@ -575,10 +578,12 @@ Use {1} for help.</entry>
 <entry key="common.syntax.bibenc">{0} &lt;encoding&gt;	.bib file encoding.</entry>
 <entry key="common.syntax.locale">{0} &lt;iso tag&gt;	Use language resource file given by &lt;iso tag&gt; for messages.</entry>
 <entry key="common.syntax.preamble-only">{1}, {0}	Only parse the document preamble.</entry>
-<entry key="common.syntax.ignore-fields">{1}, {0} &lt;list&gt;	Ignore the fields contained in the comma-separated &lt;list&gt;.</entry>
+<entry key="common.syntax.ignore-fields">{1}, {0} &lt;list&gt;	Ignore the fields identified by their source label in the comma-separated &lt;list&gt;.</entry>
 <entry key="common.syntax.index-conversion">{1}, {0}	Convert @entry to @index if no description.</entry>
 <entry key="common.syntax.space-sub">{1}, {0} &lt;val&gt;	Substitute spaces in labels with &lt;val&gt;.</entry>
 <entry key="common.syntax.overwrite">{0}	Overwrite existing files.</entry>
+<entry key="common.syntax.field-map">{1}, {0} &lt;mappings&gt;	Add source field identifiers to bib field name mappings (cumulative).</entry>
+<entry key="common.syntax.field-case">{0} &lt;setting&gt;	Specify the case-change to apply to field labels.</entry>
 
 <!-- convertgls2bib specific syntax help messages -->
 
@@ -592,6 +597,7 @@ Use {1} for help.</entry>
 <entry key="gls2bib.syntax.split-on-category">{1}, {0}	Split entries into separate files according to category field.</entry>
 
 <entry key="gls2bib.syntax.absorb-see">{0}	Absorb \glssee and \glsxtrindexseealso into the data.</entry> 
+<entry key="gls2bib.syntax.internal-field-map">{0} &lt;mappings&gt;	Add internal field label to key mappings (cumulative).</entry>
 
 <!-- datatool2bib specific syntax help messages -->
 

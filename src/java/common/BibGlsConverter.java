@@ -106,6 +106,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       parser.putControlSequence(new NewDocumentCommand(
       "RenewDocumentCommand", Overwrite.ALLOW));
 
+      parser.putControlSequence(new AtFirstOfTwo("IfNotBibGls"));
    }
 
    public boolean newcommandOverride(boolean isRobust, Overwrite overwrite,
@@ -177,7 +178,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
        || arg.equals("--space-sub") || arg.equals("-s")
        || arg.equals("--ignore-fields") || arg.equals("-f")
        || arg.equals("--log-file")
-       || arg.equals("--key-map") || arg.equals("-m")
+       || arg.equals("--field-map") || arg.equals("--key-map") || arg.equals("-m")
        )
       {
          return 1;
@@ -272,12 +273,14 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
             addCustomIgnoreField(returnVals[0].listValue());
          }
       }
-      else if (arg.equals("--no-key-map"))
+      else if (arg.equals("--no-field-map") || arg.equals("--no-key-map"))
       {
          keyToFieldMap = null;
       }
-      else if (isListArg(deque, arg, "-m", "--key-map", returnVals))
-      {     
+      // --key-map deprecated synonym
+      else if (isArg(deque, arg, "-m", "--field-map", "--key-map", returnVals,
+               BibGlsArgValueType.LIST))
+      {
          if (returnVals[0] == null)
          {  
             throw new Bib2GlsSyntaxException(
@@ -302,6 +305,44 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
             }
 
             keyToFieldMap.put(map[0], map[1]);
+         }
+      }
+      else if (isArg(deque, arg, "--field-case", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         String val = returnVals[0].toString().trim();
+
+         if (val.equals("none"))
+         {
+            fieldCaseChange = CaseChange.NO_CHANGE;
+         }
+         else if (val.equals("lc"))
+         {
+            fieldCaseChange = CaseChange.TO_LOWER;
+         }
+         else if (val.equals("uc"))
+         {
+            fieldCaseChange = CaseChange.TO_UPPER;
+         }
+         else if (val.equals("title"))
+         {
+            fieldCaseChange = CaseChange.TITLE;
+         }
+         else if (val.equals("sentence"))
+         {
+            fieldCaseChange = CaseChange.SENTENCE;
+         }
+         else
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.invalid.choice.value",
+               arg, val, "none, lc, uc, title, sentence"));
          }
       }
       else if (arg.equals("--preamble-only") || arg.equals("-p"))
@@ -410,6 +451,26 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return customIgnoreFields.contains(field.toLowerCase());
    }
 
+   public void addKeyToFieldMap(String key, String field)
+   {
+      if (keyToFieldMap == null)
+      {
+         keyToFieldMap = new HashMap<String,String>();
+      }
+
+      keyToFieldMap.put(key, field);
+   }
+
+   public String getFieldMap(String key)
+   {
+      if (keyToFieldMap == null)
+      {
+         return null;
+      }
+
+      return keyToFieldMap.get(key);
+   } 
+
    /**
     * Gets the bib field name from the input source label.
     * This will first apply any mapping and then convert to
@@ -434,9 +495,69 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
                field = val;
             }
          }
+
+         if (field.isEmpty())
+         {
+            if (originalLabel.isEmpty())
+            {
+               warningMessage("common.empty_field_name");
+            }
+            else
+            {
+               warningMessage("common.empty_field_name.changed",
+                 originalLabel, "field-map");
+            }
+
+            field = null;
+         }
       }
-   
-      return field == null ? null : processLabel(field.toLowerCase());
+
+      if (field == null)
+      {
+         return null;
+      }
+      else
+      {
+         String mapped = processLabel(applyFieldCase(field));
+
+         if (mapped.isEmpty())
+         {
+            if (field.equals(originalLabel))
+            {
+               warningMessage("common.empty_field_name.changed",
+                 originalLabel, "--field-map");
+            }
+            else
+            {
+               warningMessage("common.empty_field_name.mapped_changed",
+                 originalLabel, field, "--field-map");
+            }
+
+            return null;
+         }
+
+         return mapped;
+      }
+   }
+
+   protected String applyFieldCase(String field)
+   {
+      switch (fieldCaseChange)
+      {
+         case TO_LOWER: return field.toLowerCase();
+         case TO_UPPER: return field.toUpperCase();
+         case TITLE:
+           // spaces not permitted so equivalent
+         case SENTENCE:
+           // no leading punctuation to worry about
+           StringBuilder builder = new StringBuilder(field.length());
+           int cp = field.codePointAt(0);
+           builder.appendCodePoint(Character.toTitleCase(cp));
+           builder.append(field, Character.charCount(cp), field.length());
+         return builder.toString();
+      }
+
+      return field;
    }
 
    protected void localeHelp()
@@ -454,7 +575,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
         "--[no-]preamble-only", "-p"));
 
       printSyntaxItem(getMessage("common.syntax.ignore-fields",
-        "--ignore-fields", "-f"));
+        "--[no-]ignore-fields", "-f"));
    }
 
    protected void ioHelp()
@@ -469,6 +590,9 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
         "--space-sub", "-s"));
       printSyntaxItem(getMessage("common.syntax.index-conversion",
         "--[no-]index-conversion", "-i"));
+      printSyntaxItem(getMessage("common.syntax.field-map",
+        "--[no-]field-map", "-m"));
+      printSyntaxItem(getMessage("common.syntax.field-case", "--field-case"));
    }
 
    protected void otherHelp()
@@ -574,6 +698,7 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected Vector<String> customIgnoreFields = null;
    protected HashMap<String,String> keyToFieldMap = null;
+   protected CaseChange fieldCaseChange = CaseChange.TO_LOWER;
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;

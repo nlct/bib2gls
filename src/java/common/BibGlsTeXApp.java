@@ -1420,14 +1420,23 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
      BibGlsArgValueType type)
     throws Bib2GlsSyntaxException
    {
+      return isArg(deque, arg, shortName, longName, null, returnVals, type);
+   }
+
+   protected boolean isArg(ArrayDeque<String> deque, String arg,
+     String shortName, String longName, String altLongName,
+     BibGlsArgValue[] returnVals,
+     BibGlsArgValueType type)
+    throws Bib2GlsSyntaxException
+   {
       String[] split = arg.split("=", 2);
       String argName = split[0];
 
       int n = 0;
 
-      if (split[0].equals(longName))
+      if (argName.equals(longName) || argName.equals(altLongName))
       {
-         n = argCount(longName);
+         n = argCount(argName);
 
          if (n == 0)
          {
@@ -1730,7 +1739,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "3.9.20241207";
-   public static final String DATE = "2024-12-07";
+   public static final String VERSION = "3.9.20241208";
+   public static final String DATE = "2024-12-08";
 
 }
