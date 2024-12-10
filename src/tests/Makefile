@@ -44,8 +44,11 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
 	  test-nl.pdf test-match-action.pdf test-assign-fields2.pdf \
 	  test-see-entries.pdf
-	@grep Exception *.glg || true
-	@grep -E 'glossaries(-extra)? Warning' *.log || true
+	make -C conversion/gls2bib
+	make -C conversion/datagidx
+	make -C conversion/datatool
+	@grep Exception *.glg conversion/data*/datatool2bib*.log conversion/gls2bib/convertgls2bib*.log || true
+	@grep -E 'glossaries(-extra)? Warning' *.log conversion/*/*.log || true
 
 ../lib/bib2gls.jar:	../java/bib2gls/*.java
 		make -C ..
