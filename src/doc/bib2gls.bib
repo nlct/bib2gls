@@ -4472,7 +4472,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-control\-I\-rules}},
   user1={},
   description={as \cs{glsxtrcontrolrules} but omits control codes
-   \hex{0}, \hex{1C}, \hex{1D}, \hex{1E}, \hex{1F} and \hex{7F}}},
+   \hex{0}, \hex{1C}, \hex{1D}, \hex{1E}, \hex{1F} and \hex{7F}},
   topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.54+},
   category={command}
@@ -4482,7 +4482,7 @@ placed at the start of a rule in the \qt{ignored characters} section
   name={\csfmt{gls\-xtr\-control\-II\-rules}},
   user1={},
   description={expands to the ordered set of \qt{information separator} control codes
-   \hex{1C}, \hex{1D}, \hex{1E}, and \hex{1F}}},
+   \hex{1C}, \hex{1D}, \hex{1E}, and \hex{1F}},
   topics={collationsubrules},
   note={\styfmt{glossaries-extra-bib2gls} v1.54+},
   category={command}
@@ -10516,6 +10516,18 @@ primary formats, if enabled.},
   parent={commandlineoptions}
 }
 
+@switch{switch.datatool-sort-markers,
+  name={\longargfmt{datatool\dhyphen sort\dhyphen markers}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.no-datatool-sort-markers,
+  name={\longargfmt{no\dhyphen datatool\dhyphen sort\dhyphen markers}},
+  category={switch},
+  parent={commandlineoptions}
+}
+
 @switch{switch.force-cross-resource-refs,
   name={\longargfmt{force\dhyphen cross\dhyphen resource\dhyphen refs}},
   symbol={\shortargfmt{x}},
@@ -11093,6 +11105,18 @@ primary formats, if enabled.},
 
 @switch{switch.datatool2bib.no-split,
   name={\longargfmt{no\dhyphen split}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.adjust-gls,
+  name={\longargfmt{adjust\dhyphen gls}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-adjust-gls,
+  name={\longargfmt{no\dhyphen adjust\dhyphen gls}},
   category={switch},
   parent={commandlineoptionsdatatool2bib}
 }
@@ -19190,6 +19214,28 @@ displays the given entry's \field{text} field},
   text={\csfmt{gls\-add}},
   user1={\marg{\oargm{format}\meta{label}}},
   description={indexes the term identified by the given label},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{datagidx.gls,
+  name={\csfmt{gls}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{gls}},
+  user1={\marg{\oargm{format}\meta{label}}},
+  description={indexes and displays the term identified by the given
+label with a hyperlink, if supported},
+  topics={convertercommands},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@glscommand{datagidx.glsnl,
+  name={\csfmt{glsnl}\nameparen{\styfmt{datagidx}}},
+  text={\csfmt{glsnl}},
+  user1={\marg{\oargm{format}\meta{label}}},
+  description={indexes and displays the term identified by the given label
+without a hyperlink},
   topics={convertercommands},
   note={\styfmt{datagidx}},
   category={command}

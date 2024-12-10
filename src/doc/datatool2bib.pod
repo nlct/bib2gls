@@ -195,9 +195,19 @@ B<--label> for the entry label. (Default.)
 Use I<prefix> when auto-generating entry labels. Ignored with
 B<--no-auto-label>.
 
+=item B<--adjust-gls>
+
+Adjust labels in commands like C<\gls> in field values. (Default.)
+This will also replace the F<datagidx.sty> commands like C<\glsnl>
+with the closest F<glossaries.sty> equivalent.
+
+=item B<--no-adjust-gls>
+
+Don't adjust labels in commands like C<\gls> in field values.
+
 =item B<--strip-glsadd>
 
-Strip C<\glsadd> from field values. (Default.)
+Strip C<\glsadd> and its argument from field values. (Default.)
 
 =item B<--no-strip-glsadd>
 

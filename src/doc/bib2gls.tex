@@ -3738,7 +3738,6 @@ For example:
  <\cs{glsxtrfractionrules}
  <\ics{glsxtrGeneralLatinIrules}
  <\cs{glshex} 7F
-}
 ]{sort-rule}
 \end{codeenv}
 
@@ -8910,7 +8909,7 @@ Similar to \csopt{wordify-math-greek}, this option will apply to
 other known math symbol commands. Again, this only works for a
 limited set of commands recognised by the \texparserlib. An
 alternative is to provide alternative definitions for \bibgls\ that
-aren't picked up by \LaTeX, or use \gls{IfNotBibGls}, or use a more
+aren't picked up by \LaTeX, or use \ics{IfNotBibGls}, or use a more
 appropriate field for sorting.
 
 \optsection{interpret-preamble}
@@ -23311,13 +23310,13 @@ you'll need to include \ics{usepackage} in the \ext{tex} file. If
 you want to quit parsing the \ext{tex} file at the start of the
 document, use the \converterlongarg{preamble-only} switch.
 
-\begin{warning}
+\begin{important}
 The \texparserlib\ recognises
 \ics{input} and \ics{include} and so will also parse the referenced
 file if either command is encountered.
 If you have multiple files, it's better to pass just the relevant
 file to the conversion tool rather than the main document file.
-\end{warning}
+\end{important}
 
 \section{Shared Conversion Tool Switches}
 \label{sec:shared2bibswitches}
@@ -23976,6 +23975,12 @@ it doesn't use \idx{kpsewhich} to check \texmfcnf{openinany} and
 existing \ext{bib} files as there's no check to determine if
 \meta{bib file} already exists with the default \converterlongarg{overwrite}. 
 
+This tool is primarily intended to convert \sty{datagidx} databases,
+so it will automatically assume that \sty{datagidx} is loaded.
+It can, however, be used for general databases, but you will need to
+choose an appropriate column with unique values for the entry label (with
+\datatoolbiblongarg{label} or use \datatoolbiblongarg{auto-label}).
+
 The \meta{tex file} may be a complete document (in which case, you
 may want to use \converterlongarg{preamble-only} if the database
 commands are all in the preamble) or may be a file that just
@@ -24039,14 +24044,6 @@ datatool2bib \datatoolbiblongarg{read} format=csv,content=literal mydata.csv myd
 \end{codeenv}
 This is equivalent to creating a stub file with just the
 \gls{DTLread} line.
-
-The \texparserlib\ does not support the \isty{datagidx} package.
-There are two ways of converting the special \sty{datagidx}
-databases: either save the required database using \ics{DTLwrite} to
-a file that can then be input by \idx{datatool2bib} or instruct
-\idx{datatool2bib} to parse a \LaTeX\ file that contains the
-\gls{datagidx.newterm} and \gls{datagidx.newacro} commands. The \idx{datatool2bib}
-tool has its own implementation of those commands.
 
 In general, better results are obtained if \idx{datatool2bib} parses
 \gls{datagidx.newterm} and \gls{datagidx.newacro} instead of the
@@ -24229,6 +24226,26 @@ database \meta{dbname} will be saved in the file
 
 All data found from parsing the input file will be saved in the
 single output \meta{bib file} (default).
+
+\datatoolbibarg{adjust-gls}
+
+This setting is the default.
+Any instance of commands like \ics{datagidx.gls} found in field
+values will have their labels adjusted, if they have been modified
+due to stripping spaces etc. Also, the syntax of \sty{datagidx}['s]
+\ics{datagidx.gls} is slightly different from \sty{glossaries}['s]
+\ics{gls} as the format is incorporated at the start of the label.
+If this is detected, the format will be added as an optional
+argument, matching the \sty{glossaries} syntax.
+
+Additionally, commands that have different names from those provided
+by \sty{glossaries} will be replaced with the closest match. For
+example, \ics{datagidx.glsnl} will be replaced with \code{\ics{gls}*}
+(no hyperlink).
+
+\datatoolbibarg{no-adjust-gls}
+
+Don't adjust commands like \ics{datagidx.gls} in field values.
 
 \datatoolbibarg{strip-glsadd}
 
