@@ -1160,7 +1160,7 @@ public class DataTool2Bib extends BibGlsConverter
              "capitalisefmtwords", "xcapitalisefmtwords", "ecapitalisefmtwords",
              "makefirstuc", "xmakefirstuc", "emakefirstuc", "glsmakefirstuc",
              "uppercase", "lowercase", "glsuppercase", "glslowercase",
-             "MakeTextUppercase", "MakeTextLowercase",
+             "MakeTextUppercase", "MakeTextLowercase", "MFUsentencecase",
              "MakeUppercase", "MakeLowercase", "mfirstucMakeUppercase"
            ))
          {
