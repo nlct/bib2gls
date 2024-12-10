@@ -550,6 +550,21 @@ Use {1} {0} instead.</entry>
 -->
 
 <entry key="common.label.processed">Processed label: ''{0}'' -&gt; ''{1}''</entry>
+<entry key="common.label.clash">Label clash ''{0}''</entry>
+<entry key="common.no_label_mapping">Unexpected missing label mapping for ''{0}''</entry>
+<entry key="common.unknown.parent">Unknown parent label ''{0}''</entry>
+<entry key="common.unknown.parent.sub">Replacing unknown parent label ''{0}'' with ''{1}''</entry>
+<entry key="common.unknown.xrlabel">Unknown cross-reference label ''{0}''</entry>
+<entry key="common.unknown.xrlabel.sub">Replacing unknown cross-reference label ''{0}'' with ''{1}''</entry>
+<entry key="common.unknown.reflabel">Unknown referenced label ''{0}''</entry>
+<entry key="common.unknown.reflabel.sub">Replacing unknown referenced label ''{0}'' with ''{1}''</entry>
+
+<entry key="common.added_label_map">Added label mapping: ''{0}'' -&gt; ''{1}''</entry>
+<entry key="common.removed_label_reverse_mapping_found">Removed found reversed map ''{0}'' -&gt; ''{1}''</entry>
+<entry key="common.removed_label_mapping_found">Removed found map ''{0}'' -&gt; ''{1}''</entry>
+<entry key="common.removed_label_map">Removed map for label ''{0}''</entry>
+<entry key="common.removed_reverse_label_map">Removed reversed map for value ''{0}''</entry>
+
 <entry key="common.empty_field_name">Skipping empty field name</entry>
 <entry key="common.empty_field_name.changed">Skipping empty field name (original label ''{0}''). Adjust the mapping with {1} to map to a valid name.</entry>
 <entry key="common.empty_field_name.map_changed">Skipping empty field name (original label ''{0}'', mapped label ''{1}''). Adjust the mapping with {2} to map to a valid name.</entry>
@@ -616,6 +631,7 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.save-value">{0} &lt;suffix&gt;	Save datum value in separate field with given suffix.</entry>
 <entry key="datatool2bib.syntax.save-currency">{0} &lt;suffix&gt;	Save datum currency symbol in separate field with given suffix.</entry>
 <entry key="datatool2bib.syntax.split">{0}	Split entries into separate files according to database.</entry>
+<entry key="datatool2bib.syntax.adjust-gls">{0}	Adjust labels in commands like \gls from field values.</entry>
 <entry key="datatool2bib.syntax.strip-glsadd">{0}	Strip \glsadd from field values.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-font">{0}	Strip \acronymfont from field values.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-text">{0}	Strip text field for acronyms.</entry>
@@ -653,6 +669,7 @@ converted to @dualabbreviationentry.)</entry>
 <entry key="datatool2bib.using.fallback">Label ''{0}'' unsuitable, using fallback field ''{1}''</entry>
 <entry key="datatool2bib.using.autolabel">Label ''{0}'' unsuitable, using auto label</entry>
 <entry key="datatool2bib.label.changed">Label changed ''{0}'' -&gt; ''{1}''</entry>
+<entry key="datatool2bib.fallback_value">Fallback value: ''{0}''</entry>
 <entry key="datatool2bib.processing.entry_label">Obtaining label from: {0}</entry>
 
 

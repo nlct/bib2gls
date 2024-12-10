@@ -18,6 +18,9 @@
 */
 package com.dickimawbooks.bibgls.datatool2bib;
 
+import java.io.IOException;
+
+import com.dickimawbooks.texparserlib.TeXParser;
 import com.dickimawbooks.texparserlib.latex.KeyValList;
 
 public class GidxData
@@ -36,6 +39,36 @@ public class GidxData
    public KeyValList getFields()
    {
       return fields;
+   }
+
+   public String getFieldString(String field, TeXParser parser)
+   {
+      if (fields == null) return null;
+
+      String val = null;
+
+      try
+      {
+         val = fields.getString(field, parser, null);
+      }
+      catch (IOException e)
+      {
+         parser.getListener().getTeXApp().error(e);
+      }
+
+      if (val == null)
+      {
+         try
+         {
+            val = fields.getString(field.toLowerCase(), parser, null);
+         }
+         catch (IOException e)
+         {
+            parser.getListener().getTeXApp().error(e);
+         }
+      }
+
+      return val;
    }
 
    protected String label;

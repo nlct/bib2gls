@@ -517,28 +517,31 @@ public class DataTool2Bib extends BibGlsConverter
 
          DataToolEntry entry;
          String rowLabel = "";
+         String orgLabel = "";
 
          if (autoLabel)
          {
             rowLabel = labelPrefix + (++autoLabelIdx);
+            orgLabel = rowLabel;
          }
          else
          {
             entry = row.getEntry(labelColIdx);
-            String orgLabel = "";
 
             if (entry != null)
             {
+               orgLabel = entry.toString(parser);
                rowLabel = processLabel(entry);
+
+               if (isMappedLabel(rowLabel))
+               {
+                  warningMessage("common.label_clash", rowLabel);
+                  rowLabel = "";
+               }
             }
 
             if (rowLabel.isEmpty())
             {
-               if (entry != null)
-               {
-                  orgLabel = entry.toString(parser);
-               }
-
                if (fallbackLabelColIdx > 0 && fallbackLabelColIdx != labelColIdx)
                {
                   verboseMessage("datatool2bib.using.fallback", orgLabel,
@@ -550,9 +553,10 @@ public class DataTool2Bib extends BibGlsConverter
                   {
                      rowLabel = processLabel(entry);
 
-                     if (rowLabel.isEmpty())
+                     if (isMappedLabel(rowLabel))
                      {
-                        orgLabel = entry.toString(parser);
+                        warningMessage("common.label_clash", rowLabel);
+                        rowLabel = "";
                      }
                   }
                }
@@ -562,9 +566,12 @@ public class DataTool2Bib extends BibGlsConverter
                   verboseMessage("datatool2bib.using.autolabel", orgLabel);
 
                   rowLabel = labelPrefix + (++autoLabelIdx);
+                  orgLabel = rowLabel;
                }
             }
          }
+
+         addLabelMapping(orgLabel, rowLabel);
 
          out.print(rowLabel);
 
@@ -682,8 +689,6 @@ public class DataTool2Bib extends BibGlsConverter
       String orgTextField = "text";
       String orgPluralField = "plural";
 
-      String fallbackField = fallbackLabelColumn.toLowerCase();
-
       if (keyToFieldMap != null)
       {
          for (String field : keyToFieldMap.keySet())
@@ -717,32 +722,18 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
-      HashMap<String,String> labelMap = new HashMap<String,String>();
-
 
       for (GidxData data : datalist)
       {
          String orgLabel = data.getLabel();
-         String label = processLabel(orgLabel);
+         String label = getMappedLabel(orgLabel);
 
-         KeyValList fields = data.getFields();
+         if (label == null)
+         {// shouldn't happen
 
-         if (label.isEmpty())
-         {
-            verboseMessage("datatool2bib.using.fallback", orgLabel, fallbackField);
+            error(getMessage("common.no_label_mapping", orgLabel));
 
-            label = fields.getString(fallbackField, parser, null);
-
-            if (label == null)
-            {
-               label = fields.getString(fallbackLabelColumn, parser, null);
-            }
-
-            if (label != null)
-            {
-               orgLabel = label;
-               label = processLabel(label);
-            }
+            label = processLabel(orgLabel);
 
             if (label == null || label.isEmpty())
             {
@@ -751,12 +742,7 @@ public class DataTool2Bib extends BibGlsConverter
             }
          }
 
-         if (!label.equals(data.getLabel()))
-         {
-            labelMap.put(data.getLabel(), label);
-
-            verboseMessage("datatool2bib.label.changed", data.getLabel(), label);
-         }
+         KeyValList fields = data.getFields();
 
          out.println();
 
@@ -802,10 +788,12 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (value == null) continue;
 
+            value = processValue(value);
+
             String bibfield = getFieldName(field);
 
             /**
-             * It's possible to map the "label" field to a valid
+             * It's possible to map the datagidx "Label" field to a valid
              * field name, so only ignore specifically "label"
              * rather than labelColumn.
              */
@@ -833,37 +821,64 @@ public class DataTool2Bib extends BibGlsConverter
                if (bibfield.equalsIgnoreCase("parent"))
                {
                   String parentLabel = valStr;
-                  String mapLabel = labelMap.get(parentLabel);
+                  String mapLabel = getMappedLabel(parentLabel);
 
                   if (mapLabel == null)
                   {
+                     error(getMessage("common.unknown.parent", parentLabel));
                      valStr = processLabel(parentLabel);
 
                      if (valStr.isEmpty())
                      {
-                        valStr = labelPrefix + (++autoLabelIdx);
+                        continue;
                      }
+
+                     verboseMessage("common.unknown.parent.sub", parentLabel, valStr);
                   }
                   else
                   {
                      valStr = mapLabel;
-                  }
-
-                  if (!valStr.equals(parentLabel))
-                  {
-                     labelMap.put(parentLabel, valStr);
                   }
                }
                else if (bibfield.equalsIgnoreCase("see")
                      || bibfield.equalsIgnoreCase("seealso")
                      || bibfield.equalsIgnoreCase("alias"))
                {
+                  valStr = valStr.trim();
+
+                  String prefix = "";
+
+                  if (valStr.startsWith("["))
+                  {
+                     if (parser.isStack(value))
+                     {
+                        TeXObject tag = ((TeXObjectList)value).popArg(parser, '[', ']');
+
+                        if (tag != null)
+                        {
+                           prefix = "[" + tag.toString(parser)+"]";
+                           valStr = value.toString(parser);
+                        }
+                     }
+                     else
+                     {
+                        int idx = valStr.indexOf(']');
+
+                        if (idx > 0)
+                        {
+                           prefix = valStr.substring(0, idx);
+                           valStr = valStr.substring(idx+1);
+                        }
+                     }
+                  }
+
                   String[] xrlist = valStr.split(" *, *");
                   StringBuilder builder = new StringBuilder();
+                  builder.append(prefix);
 
                   for (String xr : xrlist)
                   {
-                     String mapLabel = labelMap.get(xr);
+                     String mapLabel = getMappedLabel(xr);
 
                      if (builder.length() > 0)
                      {
@@ -876,8 +891,16 @@ public class DataTool2Bib extends BibGlsConverter
 
                         if (xrLabel.isEmpty())
                         {
-                           xrLabel = labelPrefix + (++autoLabelIdx);
-                           labelMap.put(xrLabel, xr);
+                           xrLabel = xr;
+                        }
+
+                        if (xr.equals(xrLabel))
+                        {
+                           warningMessage("common.unknown.xrlabel", xr);
+                        }
+                        else
+                        {
+                           warningMessage("common.unknown.xrlabel.sub", xr, xrLabel);
                         }
 
                         builder.append(xrLabel);
@@ -931,6 +954,19 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
+   public GidxData getGidxData(String orgLabel, Vector<GidxData> datalist)
+   {
+      for (GidxData data : datalist)
+      {
+         if (data.getLabel().equals(orgLabel))
+         {
+            return data;
+         }
+      }
+
+      return null;
+   }
+
    public void addTerm(String dbname, GidxData data)
     throws IOException
    {
@@ -949,12 +985,122 @@ public class DataTool2Bib extends BibGlsConverter
 
       KeyValList fields = data.getFields();
 
-      for (String field : fields.keySet())
-      {
-         TeXObject value = fields.get(field);
+      String labelPrefix;
 
-         fields.put(field, processValue(value));
+      if (autoLabelPrefix == null)
+      {
+         labelPrefix = processLabel(dbname);
+         autoLabelIdx = 0;
       }
+      else
+      {
+         labelPrefix = autoLabelPrefix;
+      }
+
+      String orgLabel = data.getLabel();
+      String label = processLabel(orgLabel);
+      boolean fallbackUsed = false;
+
+      if (label.isEmpty())
+      {
+         verboseMessage("datatool2bib.using.fallback",
+           orgLabel, fallbackLabelColumn);
+
+         label = data.getFieldString(fallbackLabelColumn, parser);
+         fallbackUsed = false;
+
+         if (label != null)
+         {
+            verboseMessage("datatool2bib.fallback_value", label);
+            label = processLabel(label);
+         }
+
+         if (label == null || label.isEmpty())
+         {
+            verboseMessage("datatool2bib.using.autolabel", orgLabel);
+            label = labelPrefix + (++autoLabelIdx);
+         }
+      }
+
+      String reversedMap = getOriginalLabel(label);
+
+      if (reversedMap != null)
+      {
+         warningMessage("common.label_clash", label);
+
+         if (label.equals(orgLabel))
+         {// this label should take precedence if in same database
+
+            String label2 = null;
+            GidxData conflict = getGidxData(reversedMap, datalist);
+
+            if (conflict != null)
+            {
+               removeLabelMapping(reversedMap);
+
+               label2 = conflict.getFieldString(fallbackLabelColumn, parser);
+
+               if (label2 != null)
+               {
+                  label2 = processLabel(label2);
+
+                  if (isMappedLabel(label2))
+                  {
+                     label2 = null;
+                  }
+               }
+
+               if (label2 == null || label2.isEmpty())
+               {
+                  label2 = labelPrefix + (++autoLabelIdx);
+                  verboseMessage("datatool2bib.using.autolabel", reversedMap);
+               }
+
+               verboseMessage("datatool2bib.label.changed", reversedMap, label2);
+
+               addLabelMapping(reversedMap, label2);
+            }
+            else
+            {
+               label = null;
+            }
+         }
+         else
+         {
+            label = null;
+         }
+
+         if (label == null)
+         {
+            if (!fallbackUsed)
+            {
+               label = data.getFieldString(fallbackLabelColumn, parser);
+
+               if (label != null)
+               {
+                  label = processLabel(label);
+
+                  if (isMappedLabel(label))
+                  {
+                     label = null;
+                  }
+               }
+            }
+
+            if (label == null || label.isEmpty())
+            {
+               verboseMessage("datatool2bib.using.autolabel", orgLabel);
+               label = labelPrefix + (++autoLabelIdx);
+            }
+         }
+      }
+
+      if (!label.equals(orgLabel))
+      {
+         verboseMessage("datatool2bib.label.changed", orgLabel, label);
+      }
+
+      addLabelMapping(orgLabel, label);
 
       datalist.add(data);
    }
@@ -962,7 +1108,7 @@ public class DataTool2Bib extends BibGlsConverter
    protected TeXObject processValue(TeXObject value)
    {
       if (parser.isStack(value)
-        && ( stripGlsAdd || stripAcronymFont || stripCaseChange ) )
+        && ( stripGlsAdd || stripAcronymFont || stripCaseChange || adjustGls ) )
       {
          TeXObjectList stack = (TeXObjectList)value;
 
@@ -1021,6 +1167,88 @@ public class DataTool2Bib extends BibGlsConverter
             obj = stack.popArg(parser);
             stack.push(obj, true);
          }
+         else if (adjustGls
+            && TeXParserUtils.isControlSequence(obj,
+                "gls", "Gls", "glsnl", "Glsnl",
+                "glspl", "Glspl", "glsplnl", "Glsplnl",
+                "glssym", "Glssym",
+                "glsadd",// if not skipped, requires adjustment
+                "glslink", "glsdispentry", "Glsdispentry"))
+         {
+            String csname = ((ControlSequence)obj).getName();
+            TeXObject arg = stack.popArg(parser);
+
+            String format = null;
+
+            if (parser.isStack(arg))
+            {
+               format = TeXParserUtils.popOptLabelString(parser, (TeXObjectList)arg);
+            }
+
+            String orgLabel = parser.expandToString(arg, null);
+            String label = getMappedLabel(orgLabel);
+
+            if (label == null)
+            {
+               label = processLabel(orgLabel);
+
+               if (label.isEmpty())
+               {
+                  label = orgLabel;
+               }
+
+               if (label.equals(orgLabel))
+               {
+                  error(getMessage("common.unknown.reflabel", orgLabel));
+               }
+               else
+               {
+                  error(getMessage("common.unknown.reflabel.sub", orgLabel, label));
+               }
+            }
+
+            boolean addStar = false;
+
+            if (csname.equals("glsdispentry"))
+            {
+               csname = "glsxtrusefield";
+            }
+            else if (csname.equals("Glsdispentry"))
+            {
+               csname = "Glsxtrusefield";
+            }
+            else if (csname.equals("glssym"))
+            {
+               csname = "glssymbol";
+            }
+            else if (csname.equals("Glssym"))
+            {
+               csname = "Glssymbol";
+            }
+            else if (csname.endsWith("nl"))
+            {
+               csname = csname.substring(0, csname.length()-2);
+               addStar = true;
+            }
+
+            list.add(new TeXCsRef(csname));
+
+            if (addStar)
+            {
+               list.add(parser.getListener().getOther('*'));
+            }
+
+            if (format != null && !format.isEmpty())
+            {
+               list.add(parser.getListener().getOther('['));
+               list.addAll(parser.getListener().createString("format"));
+               list.add(parser.getListener().getOther('='));
+               list.addAll(parser.getListener().createString(format));
+               list.add(parser.getListener().getOther(']'));
+            }
+
+            list.add(parser.getListener().createGroup(label));
+         }
          else if (obj instanceof TeXObjectList)
          {
             TeXObjectList subList = ((TeXObjectList)obj).createList();
@@ -1076,6 +1304,9 @@ public class DataTool2Bib extends BibGlsConverter
 
       printSyntaxItem(getMessage("datatool2bib.syntax.auto-label-prefix",
         "--auto-label-prefix"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.adjust-gls",
+        "--[no-]adjust-gls"));
 
       printSyntaxItem(getMessage("datatool2bib.syntax.strip-glsadd",
         "--[no-]strip-glsadd"));
@@ -1264,6 +1495,14 @@ public class DataTool2Bib extends BibGlsConverter
       {
          split = false;
       }
+      else if (arg.equals("--adjust-gls"))
+      {
+         adjustGls = true;
+      }
+      else if (arg.equals("--no-adjust-gls"))
+      {
+         adjustGls = false;
+      }
       else if (arg.equals("--strip-glsadd"))
       {
          stripGlsAdd = true;
@@ -1355,6 +1594,7 @@ public class DataTool2Bib extends BibGlsConverter
    private boolean stripAcronymText = true;
    private boolean stripAcronymName = true;
    private boolean stripCaseChange = false;
+   private boolean adjustGls = true;
    private boolean skipDataGidx = true;
 
    private String dataValueSuffix = null;

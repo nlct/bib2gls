@@ -125,6 +125,96 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       return false;
    }
 
+   public void removeLabelMapping(String orgLabel)
+   {
+      String orgMap = labelMap.get(orgLabel);
+
+      if (orgMap != null)
+      {
+         labelMap.remove(orgLabel);
+         reverseLabelMap.remove(orgMap);
+      }
+   }
+
+   public void removeLabelMapping(String orgLabel, String newLabel)
+   {
+      String orgMap = labelMap.get(orgLabel);
+      String orgRevMap = reverseLabelMap.get(newLabel);
+
+      if (orgMap != null)
+      {
+         debugMessage("common.removed_label_reverse_mapping_found", orgLabel, orgMap);
+         reverseLabelMap.remove(orgMap);
+      }
+
+      if (orgRevMap != null)
+      {
+         debugMessage("common.removed_label_mapping_found", newLabel, orgRevMap);
+         labelMap.remove(orgRevMap);
+      }
+
+      if (labelMap.remove(orgLabel) != null)
+      {
+         debugMessage("common.removed_label_map", orgLabel);
+      }
+
+      if (reverseLabelMap.remove(newLabel) != null)
+      {
+         debugMessage("common.removed_reverse_label_map", newLabel);
+      }
+   }
+
+   public void addLabelMapping(String orgLabel, String newLabel)
+   throws NullPointerException,IllegalArgumentException
+   {
+      if (orgLabel == null)
+      {
+         throw new NullPointerException("Null original label");
+      }
+
+      if (newLabel == null)
+      {
+         throw new NullPointerException("Null new label");
+      }
+
+      if (orgLabel.isEmpty())
+      {
+         throw new IllegalArgumentException("Empty label not permitted");
+      }
+
+      if (newLabel.isEmpty())
+      {
+         throw new IllegalArgumentException("Empty label mapping not permitted");
+      }
+
+      removeLabelMapping(orgLabel, newLabel);
+
+      debugMessage("common.added_label_map", orgLabel, newLabel);
+
+      labelMap.put(orgLabel, newLabel);
+      reverseLabelMap.put(newLabel, orgLabel);
+   }
+
+   public boolean hasLabelMapping(String label)
+   {
+      return labelMap.containsKey(label);
+   }
+
+   public boolean isMappedLabel(String label)
+   {
+      return reverseLabelMap.containsKey(label);
+   }
+
+   public String getMappedLabel(String orgLabel)
+   {
+      return labelMap.get(orgLabel);
+   }
+
+   public String getOriginalLabel(String mappedLabel)
+   {
+      return reverseLabelMap.get(mappedLabel);
+   }
+
    public String processLabel(String label)
    {
       StringBuilder builder = new StringBuilder();
@@ -743,6 +833,9 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
    protected Vector<String> customIgnoreFields = null;
    protected HashMap<String,String> keyToFieldMap = null;
    protected CaseChange fieldCaseChange = CaseChange.TO_LOWER;
+
+   private HashMap<String,String> labelMap = new HashMap<String,String>();
+   private HashMap<String,String> reverseLabelMap = new HashMap<String,String>();
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;
