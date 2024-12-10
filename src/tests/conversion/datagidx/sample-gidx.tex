@@ -1,3 +1,6 @@
+% arara: pdflatex
+% arara: pdflatex
+% arara: pdflatex
 \documentclass{book}
 
 \usepackage
@@ -82,11 +85,12 @@
 \newterm{group}
 \newterm[see=group]{scope}
 
-\newterm[label={ind-glossary}]{glossary}
+\newterm[label={ind-glossary},plural=glossaries]{glossary}
 
 \newterm
  [%
    label={ind-index},
+   altplural={indexes},
    seealso={ind-glossary},
  ]
  {index}
@@ -390,7 +394,7 @@
 \newterm
  [%
    symbol={\ensuremath{|\mathcal{S}|}},
-   description={the number of elements in the set \ensuremath{\mathcal{S}}}
+   description={the number of elements in the \gls{[emph]set} \ensuremath{\mathcal{S}}}
  ]%
  {cardinality}
 
