@@ -227,6 +227,16 @@ public class DataTool2Bib extends BibGlsConverter
          parser.parse(reader);
       }
 
+      if (skipDataGidx)
+      {
+         DataBase db = datatoolSty.removeDataBase("datagidx");
+
+         if (db != null)
+         {
+            verboseMessage("datatool2bib.skipping.database", "datagidx");
+         }
+      }
+
       int numDatabases = datatoolSty.getDataBaseCount();
       int numGidxDataBases = (gidxdata == null ? 0 : gidxdata.size());
 
@@ -276,12 +286,6 @@ public class DataTool2Bib extends BibGlsConverter
          while (nameEnum != null && nameEnum.hasMoreElements())
          {
             String dbName = nameEnum.nextElement();
-
-            if (skipDataGidx && dbName.equals("datagidx"))
-            {
-               verboseMessage("datatool2bib.skipping.database", dbName);
-               continue;
-            }
 
             File file = new File(parentFile, base+"-"+dbName+".bib");
 
