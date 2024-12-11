@@ -1,0 +1,340 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{book}
+
+\usepackage[colorlinks]{hyperref}
+
+\usepackage
+ [
+   shortcuts,% provide shortcut commands like \ac
+   section,% use section headings
+   subentrycounter,% enable numbered sub-entries
+   nostyles,stylemods={tree,long,bookindex},% only need these styles
+   style=tree,
+   abbreviations,index,
+   record=nameref
+ ]
+ {glossaries-extra}
+
+
+ % Define some convenient commands
+
+\newcommand*{\principleloc}[1]{\textbf{#1}}
+\newcommand*{\glossaryloc}[1]{\textit{#1}}
+\newcommand*{\appname}[1]{\texttt{#1}}
+
+ % Add custom fields
+
+\glsaddkey{ed}% key
+ {}% default value assigned with assign-fields resource option
+ {\entryed}% no link cs
+ {\Entryed}% no link Cs
+ {\glsed}% link cs
+ {\Glsed}% link Cs
+ {\GLSed}% link CS
+
+\glsaddkey{ing}% key
+ {}%
+ {\entrying}% no link cs
+ {\Entrying}% no link Cs
+ {\glsing}% link cs
+ {\Glsing}% link Cs
+ {\GLSing}% link CS
+
+\glsaddkey{altplural}% key
+ {}% 
+ {\entryaltpl}% no link cs
+ {\Entryaltpl}% no link Cs
+ {\glsaltpl}% link cs
+ {\Glsaltpl}% link Cs
+ {\GLSaltpl}% link CS
+
+ % Make a notation glossary labelled 'notation' with given title
+
+\newglossary*{notation}{Notation}
+
+\glsxtrprovidestoragekey{identifier}{}{}
+
+\setabbreviationstyle{long-short-sc}
+
+\renewcommand*{\glsxtrresourceinit}{%
+\GlsXtrResourceInitEscSequences
+}
+
+\GlsXtrLoadResources[
+ src={sample-gidx},
+ post-description-dot=check,
+ assign-fields =
+  {
+     type = "main" [ identifier = "glossary" ],
+     type = "\glsxtrabbrvtype" [ identifier = "acronyms"],
+     type = identifier,
+     ed = text + "ed" [ identifier =/index|glossary/ ],
+     ing = text + "ing" [ identifier =/index|glossary/ ]
+  },
+ copy-to-glossary =
+  {
+    "index" [ identifier =/acronyms|notation|glossary/ ]
+  },
+ identical-sort-action=def, % order entries with identical sort values according to their definition
+ set-widest, % needed for alttree style
+]
+
+\title{Sample Document Using the glossaries-extra Package}
+\author{Nicola L. C. Talbot}
+
+\begin{document}
+\pagenumbering{alph}% Stop hyperref complaining about duplicate page identifiers
+\maketitle
+\thispagestyle{empty}%
+
+\frontmatter
+
+\tableofcontents
+
+\chapter{Summary}
+
+This is a modification sample document illustrating the use of the
+\texttt{datagidx} package to create document \glspl{index},
+\glspl{glossarylist} and \glspl{acronymlist} without the use of
+external \glsing{index} % custom command defined earlier
+applications, such as \gls{makeindex} or
+\gls{xindy}. Please read the user guide (datatool-user.pdf) for
+further guidance. This modified document has been adapted to use
+\texttt{glossaries-extra} and \appname{bib2gls} instead of using
+\texttt{datagidx}. The definitions were converted with the aid of
+\appname{datatool2bib}.
+
+\mainmatter
+
+\chapter{Introduction}
+%\renewcommand{\thepage}{\numberstring{page}}
+
+Words can be \glsed{index}. % custom command defined earlier.
+
+A \gls{glossarylist}\glsadd[format=principleloc]{glossary} is a useful addition to any technical document,
+although a \gls{glossarycol} can also simply be a collection of
+glosses, which is another thing entirely. Some documents have
+multiple \glspl{glossarylist}.
+
+A \gls{bravocry} is a cry of approval (plural \glspl{bravocry}) but a 
+\gls{bravokiller} can also be a hired ruffian or killer (plural
+\glspl{bravokiller}).
+
+\section{Characters}
+
+When defining entries be careful of \glspl{comma} and \glspl{equals}
+so they don't interfere with the key=value mechanism. The sort and
+label keys get expanded so be careful of special characters, such as
+\gls{amp}, \gls{underscore}, \gls{circum}, \gls{dollar} and \gls{tilde}.
+
+Since we're not using \gls{makeindex}, we don't need to worry about
+\gls{makeindex}'s special characters, such as \gls{double-quote}, \gls{!} and
+\gls{|}. (Unless they've been made active by packages such as
+\texttt{ngerman} or \texttt{babel}.)
+
+Non-alphabetical characters are usually grouped at the start of an
+index, and are usually followed by the number group. That is, the
+group of entries that are numerical, such as \gls{0}, \gls{1},
+\gls{2} and \gls{3}.
+
+\section{Custom Fields}
+
+You can add custom fields. For example, this document has added
+three custom fields to the `index' database.
+
+\section{Plurals}
+
+The \gls{plural} of \gls{glossarylist} is
+\glspl{glossarylist}. The \gls{plural} of \gls{index} is
+\glspl{index}. Some words have an \gls{altplural}. For example,
+an alternative to \glspl{index} is 
+\glsaltpl{index}.% custom command defined earlier
+
+\section{Sorting}
+
+There are lots of different types of sorting available. 
+Word sorting is the default with \appname{bib2gls} as well as with
+\gls{makeindex} and \gls{xindy}.
+The difference between letter sorting and word sorting can
+be demonstrated by the ordering of ``\gls{sea-lion}'' and ``\gls{seal}''.
+
+The default sort is case-insensitive so \gls{kite} before
+\gls{knuth} and \gls{knuth} before \gls{koala}.
+
+\section{Using without indexing}
+
+Here's a defined entry that won't get into the glossary.
+Name: \glsentryname{pglist}.
+Description: \glsentrydesc{pglist}.
+(Unless I~later reference it using a command like \verb|\gls|.)
+However, if it isn't indexed it won't be selected by default and so
+won't be defined. This means that the above commands will expand to
+nothing. An alternative is to index it with an ignored location or
+select all entries and apply filtering to \verb|\printunsrtglossary|
+to omit entries without locations.
+
+\section{Links to Entries}
+
+You can reference and index entries using \verb|\gls|, \verb|\Gls|,
+\verb|\glspl|, \verb|\Glspl|, \verb|\glssymbol| and \verb|\Glssymbol|.
+(Note, the \texttt{datagidx} and \texttt{glossaries} packages have
+different syntax for these type of commands.)
+
+Or you can reference a particular field using the corresponding
+command, such as \verb|\glsdesc| or
+\verb|\Glsdesc|. So here's the description for \gls{seal}:
+\glsdesc{seal}.
+
+If the \texttt{hyperref} package has been loaded, commands like
+\verb|\gls| will link to the relevant entry in the glossary or
+index. Referencing using commands like \verb|\glsentrytext| and
+\verb|\Glsentrytext| won't have hyperlinks.
+
+\subsection{Enabling and Disabling Hyperlinks}
+
+If the \texttt{hyperref} package has been loaded, hyperlinks can be
+enabled and disabled. Either globally
+\glsdisablehyper
+(here's a reference to \gls{seal} without a hyperlink 
+\glsenablehyper
+ and here's a reference to \gls{seal} with a hyperlink)
+or locally
+({%
+  \glsdisablehyper
+  here's a reference to \gls{seal} without a hyperlink
+}%
+and here's a reference to \gls{seal} with a hyperlink).
+
+\section{Acronyms}
+
+\glsadd{firstuse}Here's an \gls{acronym} referenced using \verb|\ac|: \ac{html}. And here
+it is again: \ac{html}. That command requires the \texttt{shortcuts}
+package option. Unlike \texttt{datagidx}, this is the same as using
+\verb|\gls|: \gls[prereset]{html}.  And again: \gls{html}.
+
+In order to display abbreviations with a footnote, it's necessary to
+set a footnote style prior to
+defining all abbreviations with the associated category.
+
+Some more examples
+First use: \gls{xml}. Next use: \gls{xml}.
+First use: \gls{css}. Next use: \gls{css}.
+
+\glsadd{reset}Reset: \glsresetall[\glsxtrabbrvtype]% just the abbreviations
+Here are the acronyms again:
+\gls{html}, \gls{xml} and \gls{css}.
+Next use:
+\gls{html}, \gls{xml} and \gls{css}.
+Full form:
+\gls{html}, \gls{xml} and \gls{css}.
+
+Reset again. \glsresetall[\glsxtrabbrvtype]
+Start with a capital. \Gls{html}.
+Next: \Gls{html}. Full: \Glsxtrfull{html}.
+
+\Gls{css}. Next: \gls{css}. Full: \glsxtrfull{css}.
+
+\Gls{xml}. Next: \gls{xml}. Full: \glsxtrfull{xml}.
+
+\section{Conditionals}
+
+You can test if a term has been defined using \verb|\ifglsentryexists|.
+For example: \ifglsentryexists{seal}{seal exists}{seal doesn't exist}.
+Another example: \ifglsentryexists{jabberwocky}{jabberwocky
+exists}{jabberwocky doesn't exist}.
+
+You can test if a term has been used via \verb|\ifglsused|.
+For example: \ifglsused{seal}{seal has been used}{seal hasn't been
+used}.
+Another example: \ifglsused{cardinality}{cardinality has been
+used}{cardinality
+hasn't been used}.
+
+Example of a term that isn't selected (because it hasn't
+been indexed) and so
+won't be defined: \ifglsused{pglist}{pglist has been used}{pglist
+hasn't been used}.
+
+With \appname{bib2gls}, a more reliable command is
+\verb|\GlsXtrIfUnusedOrUndefined|
+For example, \GlsXtrIfUnusedOrUndefined{pglist}{pglist
+has either not been used or is undefined}{pglist is defined
+and has been used}.
+Another example, \GlsXtrIfUnusedOrUndefined{seal}{seal
+has either not been used or is undefined}{seal is defined
+and has been used}.
+Another example, \GlsXtrIfUnusedOrUndefined{jabberwocky}{jabberwocky
+has either not been used or is undefined}{jabberwocky is defined
+and has been used}.
+
+\section{Symbols}
+
+Terms may have an associated symbol. The symbol can be accessed
+using \verb|\glssymbol| or if you don't want to add information to the
+location list you can use \verb|\glsentrysymbol|. Here's the symbol
+associated with the \gls{cardinality} entry:
+\glsentrysymbol{cardinality}.
+
+A \gls{set} (denoted \glssymbol{set}) is a collection of objects.
+The \gls{universal} is the set of everything.
+The \gls{empty} contains no elements.
+The \gls{cardinality} of a set (denoted \glssymbol{cardinality}) is the
+number of elements in the set.
+
+\section{Location Ranges}
+
+A range is formed if a location sequence contains more than 2
+locations. Here's \gls{seal} again.
+
+\backmatter
+ % suppress section numbering
+\setcounter{secnumdepth}{-1}
+
+\chapter{Glossaries}
+
+\printunsrtglossary
+ [% the default glossary
+   style=treenoname,% use 'treenoname' style (don't print sub item names)
+%   nonumberlist% hide the location list
+ ]
+
+\printunsrtglossary
+ [
+   type=\glsxtrabbrvtype,% 'abbreviations' list
+   style=long,% use the 'long' style
+   subentrycounter=false,
+%   nonumberlist% hide the location list
+ ]
+
+\printunsrtglossary
+ [
+   type=notation,% 'notation' list
+   subentrycounter=false,
+   style=alttree
+ ]
+
+\renewcommand{\glsxtrbookindexprelocation}[1]{%
+  \glsxtrifhasfield{location}{#1}%
+  {\dotfill}%
+  {\glsxtrprelocation}%
+}
+
+% don't balance columns:
+%\renewcommand*{\glsxtrbookindexmulticolsenv}{multicols*}
+
+\setglossarysection{chapter}
+
+\printunsrtglossary
+ [
+   type=index,% 'index' list
+   subentrycounter=false,
+   style=bookindex,
+   preamble={Locations in bold indicate primary reference.
+    Locations in italic indicate definitions in the
+    glossaries.}
+ ]
+
+
+\end{document}

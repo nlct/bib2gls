@@ -71,6 +71,17 @@ public class GidxData
       return val;
    }
 
+   public String getEntryType()
+   {
+      return entryType;
+   }
+
+   public void setEntryType(String entryType)
+   {
+      this.entryType = entryType;
+   }
+
+   protected String entryType = "entry";
    protected String label;
    protected KeyValList fields;
 }

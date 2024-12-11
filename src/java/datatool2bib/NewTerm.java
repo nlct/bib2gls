@@ -132,7 +132,70 @@ public class NewTerm extends ControlSequence
          }
       }
 
-      datatool2bib.addTerm(dbName, new GidxData(label, options));
+      GidxData data = new GidxData(label, options);
+
+      boolean abbreviation = false;
+
+      if (options.get("short") != null)
+      {
+         TeXObject longArg = options.getValue("long");
+
+         if (longArg != null)
+         {
+            abbreviation = true;
+            data.setEntryType("abbreviation");
+
+            // Strip case changing commands from description field at this
+            // point to allow comparison with long value.
+
+            if (!datatool2bib.isCustomIgnoreField("description"))
+            {
+               TeXObject desc = options.getValue("description");
+
+               if (desc != null)
+               {
+                  if (datatool2bib.isStripCaseChangeOn() && parser.isStack(desc))
+                  {
+                     TeXObjectList list = new TeXObjectList();
+                     datatool2bib.stripCaseChangers((TeXObjectList)desc, parser, list);
+                     desc = list;
+                  }
+
+                  if (desc.toString(parser).equals(longArg.toString(parser)))
+                  {
+                     options.remove("description");
+                  }
+               }
+            }
+         }
+      }
+
+      if (!abbreviation && datatool2bib.isDetectSymbolsOn())
+      {
+         parser.startGroup();
+
+         parser.putControlSequence(true, new AtGobble("DTLgidxParen"));
+         parser.putControlSequence(true, new AtGobble("DTLgidxIgnore"));
+
+         String nameStr = parser.expandToString((TeXObject)name.clone(), stack).trim();
+
+         parser.endGroup();
+
+         if (nameStr.isEmpty() || !Character.isAlphabetic(nameStr.codePointAt(0)))
+         {
+            try
+            {
+               Integer.parseInt(nameStr);
+               data.setEntryType("number");
+            }
+            catch (NumberFormatException e)
+            {
+               data.setEntryType("symbol");
+            }
+         }
+      }
+
+      datatool2bib.addTerm(dbName, data);
    }
 
    public void process(TeXParser parser) throws IOException

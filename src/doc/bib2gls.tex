@@ -24229,6 +24229,29 @@ database \meta{dbname} will be saved in the file
 All data found from parsing the input file will be saved in the
 single output \meta{bib file} (default).
 
+\datatoolbibarg{detect-symbols}
+
+Attempt to detect entries that should be \atentrytype{symbol} or 
+\atentrytype{number} based on the value of the \field{name} field.
+This tries to expand the value of the name field with
+\gls{DTLgidxParen} and \gls{DTLgidxIgnore} locally defined to
+discard their argument. If the result is empty or if the first
+character of the result is not alphabetic, then \atentrytype{number}
+will be assumed if the result parses as an integer otherwise
+\atentrytype{symbol} will be assumed.
+
+This setting is only applicable for entries defined with 
+\sty{datagidx}['s] \cs{newterm} command, not with general
+\sty{datatool} databases. Note that if this
+results in a change to the entry type from its default
+\atentrytype{entry} then \converterlongarg{index-conversion} won't
+convert the type to \atentrytype{index}, regardless of whether or
+not the \field{description} field is set.
+
+\datatoolbibarg{no-detect-symbols}
+
+Don't attempt to detect symbols (default).
+
 \datatoolbibarg{adjust-gls}
 
 This setting is the default.

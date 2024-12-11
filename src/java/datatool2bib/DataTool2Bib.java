@@ -26,19 +26,16 @@ package com.dickimawbooks.bibgls.datatool2bib;
 
 import java.util.Vector;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.Locale;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.HashMap;
 import java.util.Enumeration;
 import java.util.ArrayDeque;
-import java.text.MessageFormat;
-import java.text.BreakIterator;
+
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+
 import java.io.*;
-
-import java.net.URL;
-
 import java.nio.charset.Charset;
 
 import com.dickimawbooks.texparserlib.*;
@@ -211,6 +208,16 @@ public class DataTool2Bib extends BibGlsConverter
          if (dependencyField.isEmpty())
          {
             dependencyField = null;
+         }
+      }
+
+      if (databaseField != null)
+      {
+         databaseField = processLabel(applyFieldCase(databaseField)).trim();
+
+         if (databaseField.isEmpty())
+         {
+            databaseField = null;
          }
       }
 
@@ -679,6 +686,11 @@ public class DataTool2Bib extends BibGlsConverter
             out.print("}");
          }
 
+         if (databaseField != null)
+         {
+            out.format(",%n  %s = {%s}", databaseField, db.getName());
+         }
+
          out.println();
 
          out.println("}");
@@ -797,13 +809,10 @@ public class DataTool2Bib extends BibGlsConverter
 
          out.println();
 
-         String entrytype = "entry";
+         String entrytype = data.getEntryType();
 
-         if (fields.get(orgShortField) != null
-           && fields.get(orgLongField) != null)
+         if (entrytype.equals("abbreviation"))
          {
-            entrytype = "abbreviation";
-
             if (stripAcronymText)
             {
                fields.remove(orgTextField);
@@ -816,6 +825,7 @@ public class DataTool2Bib extends BibGlsConverter
             }
          }
          else if (isIndexConversionOn()
+                    && entrytype.equals("entry")
                     && fields.get(orgDescriptionField) == null)
          {
             entrytype = "index";
@@ -989,6 +999,12 @@ public class DataTool2Bib extends BibGlsConverter
             fieldCount++;
          }
 
+         if (databaseField != null)
+         {
+            out.format(",%n  %s = {%s}", databaseField, dbName);
+            fieldCount++;
+         }
+
          if (fieldCount > 0)
          {
             out.println();
@@ -1051,8 +1067,6 @@ public class DataTool2Bib extends BibGlsConverter
          datalist = new Vector<GidxData>();
          gidxdata.put(dbname, datalist);
       }
-
-      KeyValList fields = data.getFields();
 
       String labelPrefix;
 
@@ -1263,15 +1277,7 @@ public class DataTool2Bib extends BibGlsConverter
             obj = stack.popArg(parser);
             stack.push(obj, true);
          }
-         else if (stripCaseChange
-            && TeXParserUtils.isControlSequence(obj,
-             "capitalisewords", "xcapitalisewords", "ecapitalisewords",
-             "capitalisefmtwords", "xcapitalisefmtwords", "ecapitalisefmtwords",
-             "makefirstuc", "xmakefirstuc", "emakefirstuc", "glsmakefirstuc",
-             "uppercase", "lowercase", "glsuppercase", "glslowercase",
-             "MakeTextUppercase", "MakeTextLowercase", "MFUsentencecase",
-             "MakeUppercase", "MakeLowercase", "mfirstucMakeUppercase"
-           ))
+         else if (stripCaseChange && isCaseChanger(obj))
          {
             obj = stack.popArg(parser);
             stack.push(obj, true);
@@ -1372,6 +1378,58 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
+   protected void stripCaseChangers(TeXObjectList stack, TeXParser parser,
+     TeXObjectList list)
+   throws IOException
+   {
+      while (!stack.isEmpty())
+      {
+         TeXObject obj = stack.pop();
+
+         if (isCaseChanger(obj))
+         {
+            stack.push(stack.popArg(parser), true);
+         }
+         else if (obj instanceof TeXObjectList)
+         {
+            TeXObjectList subList = ((TeXObjectList)obj).createList();
+            list.add(subList);
+
+            stripCaseChangers((TeXObjectList)obj, parser, subList);
+         }
+         else
+         {
+            list.add(obj);
+         }
+      }
+   }
+
+   public boolean isStripCaseChangeOn()
+   {
+      return stripCaseChange;
+   }
+
+   public boolean isDetectSymbolsOn()
+   {
+      return detectSymbols;
+   }
+
+   public boolean isNumber(String str)
+   {
+      if (str.isEmpty()) return false;
+
+      if (numberFormat == null)
+      {
+         numberFormat = NumberFormat.getInstance(
+           numericLocale == null ? Locale.getDefault() : numericLocale);
+      }
+
+      ParsePosition position = new ParsePosition(0);
+      Number num = numberFormat.parse(str, position);
+
+      return (position.getIndex() == str.length());
+   }
+
    @Override
    protected void syntaxInfo()
    {
@@ -1417,8 +1475,14 @@ public class DataTool2Bib extends BibGlsConverter
       printSyntaxItem(getMessage("datatool2bib.syntax.adjust-gls",
         "--[no-]adjust-gls"));
 
+      printSyntaxItem(getMessage("datatool2bib.syntax.database-field",
+        "--[no-]database-field"));
+
       printSyntaxItem(getMessage("datatool2bib.syntax.dependency-field",
         "--[no-]dependency-field", "strip-glsadd"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.detect-symbols",
+        "--[no-]detect-symbols"));
 
       printSyntaxItem(getMessage("datatool2bib.syntax.strip-glsadd",
         "--[no-]strip-glsadd"));
@@ -1458,6 +1522,8 @@ public class DataTool2Bib extends BibGlsConverter
       printSyntaxItem(getMessage("datatool2bib.syntax.save-currency",
         "--[no-]save-currency"));
 
+      printSyntaxItem(getMessage("datatool2bib.syntax.numeric-locale",
+        "--numeric-locale"));
    }
 
    @Override
@@ -1471,6 +1537,8 @@ public class DataTool2Bib extends BibGlsConverter
         || arg.equals("--save-value")
         || arg.equals("--save-currency")
         || arg.equals("--dependency-field")
+        || arg.equals("--database-field")
+        || arg.equals("--numeric-locale")
          )
       {
          return 1;
@@ -1603,6 +1671,21 @@ public class DataTool2Bib extends BibGlsConverter
       {
          dataCurrencySuffix = null;
       }
+      else if (isArg(deque, arg, "--database-field", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         databaseField = returnVals[0].toString();
+      }
+      else if (arg.equals("--no-database-field"))
+      {
+         databaseField = null;
+      }
       else if (isArg(deque, arg, "--dependency-field", returnVals))
       {
          if (returnVals[0] == null)
@@ -1698,6 +1781,25 @@ public class DataTool2Bib extends BibGlsConverter
       {
          skipDataGidx = false;
       }
+      else if (arg.equals("--detect-symbols"))
+      {
+         detectSymbols = true;
+      }
+      else if (arg.equals("--no-detect-symbols"))
+      {
+         detectSymbols = false;
+      }
+      else if (isArg(deque, arg, "--numeric-locale", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         numericLocale = Locale.forLanguageTag(returnVals[0].toString());
+      }
       else
       {
          return super.parseArg(deque, arg, returnVals);
@@ -1736,6 +1838,7 @@ public class DataTool2Bib extends BibGlsConverter
    private int autoLabelIdx = 0;
    private String setup = null;
    private String dependencyField = "dependency";
+   private String databaseField = null;
 
    private boolean stripGlsAdd = true;
    private boolean stripAcronymFont = true;
@@ -1744,9 +1847,13 @@ public class DataTool2Bib extends BibGlsConverter
    private boolean stripCaseChange = false;
    private boolean adjustGls = true;
    private boolean skipDataGidx = true;
+   private boolean detectSymbols = false;
 
    private String dataValueSuffix = null;
    private String dataCurrencySuffix = null;
+
+   private Locale numericLocale = null;
+   private NumberFormat numberFormat = null;
 
    private DataToolSty datatoolSty;
    private DataGidxSty datagidxSty;

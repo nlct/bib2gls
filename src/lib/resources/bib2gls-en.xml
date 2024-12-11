@@ -483,8 +483,8 @@ the second list ({3,number}).</entry>
 <entry key="error.invalid.condition_missing_end">Condition missing terminating ''{0}''</entry>
 <entry key="error.invalid.regexp_or_cmp_condition_missing">Regular expression or comparison expected after {0}</entry>
 <entry key="error.invalid.unary_missing">Missing condition after unary ''{0}'' in {1}</entry>
-<entry key="error.invalid.expected">Expected one of {0}, found ''{1}''</entry>
-<entry key="error.invalid.expected_after">Expected one of {0} after ''{1}'', found ''{2}''</entry>
+<entry key="error.invalid.expected">Expected one of {0} but found ''{1}''</entry>
+<entry key="error.invalid.expected_after">Expected one of {0} after ''{1}'' but found ''{2}''</entry>
 <entry key="error.invalid.condition">Expected condition, found ''{0}''</entry>
 <entry key="error.invalid.condition_in">Expected condition, found ''{0}'' in {1}</entry>
 <entry key="error.invalid.condition_after">Expected condition, found ''{0}'' after {1}</entry>
@@ -638,8 +638,11 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-name">{0}	Strip name field for acronyms.</entry>
 <entry key="datatool2bib.syntax.strip-case-change">{0}	Strip known case-changing commands from field values.</entry>
 <entry key="datatool2bib.syntax.strip">{0}	Switch on/off all strip options.</entry>
+<entry key="datatool2bib.syntax.database-field">{0} &lt;field&gt;	Sets the name of the database field.</entry>
 <entry key="datatool2bib.syntax.dependency-field">{0} &lt;field&gt;	Sets the name of the dependency field (only applicable with {1}).</entry>
+<entry key="datatool2bib.syntax.detect-symbols">{0}	Attempt to determine if the entry type should be set to symbol or number.</entry>
 <entry key="datatool2bib.syntax.skip-datagidx">{0}	Skip the special "datagidx" internal database.</entry>
+<entry key="datatool2bib.syntax.numeric-locale">{0} &lt;lang-tag&gt;	Identify the language tag for detecting or parsing numeric values.</entry>
 
 <entry key="datatool2bib.syntax.invalid_map">Invalid mapping ''{0}'' for ''{1}''. Syntax requires element pairs &lt;key=&gt;=&lt;field=&gt;</entry>
 

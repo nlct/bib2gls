@@ -22,19 +22,12 @@ package com.dickimawbooks.bibgls.common;
  * Common listener for conversion applications.
  */
 
-import java.util.Properties;
-import java.util.Locale;
 import java.util.ArrayDeque;
 import java.util.Vector;
 import java.util.HashMap;
-import java.text.MessageFormat;
-import java.text.BreakIterator;
 import java.io.*;
 
-import java.net.URL;
-
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.primitives.Undefined;
@@ -689,6 +682,18 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       }
 
       return field;
+   }
+
+   public boolean isCaseChanger(TeXObject object)
+   {
+      return TeXParserUtils.isControlSequence(object,
+       "capitalisewords", "xcapitalisewords", "ecapitalisewords",
+       "capitalisefmtwords", "xcapitalisefmtwords", "ecapitalisefmtwords",
+       "makefirstuc", "xmakefirstuc", "emakefirstuc", "glsmakefirstuc",
+       "uppercase", "lowercase", "glsuppercase", "glslowercase",
+       "MakeTextUppercase", "MakeTextLowercase", "MFUsentencecase",
+       "MakeUppercase", "MakeLowercase", "mfirstucMakeUppercase"
+     );
    }
 
    protected void localeHelp()

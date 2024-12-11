@@ -4,7 +4,7 @@ DEPS=../../../lib/datatool2bib.jar ../../../lib/bib2gls.jar ../../../lib/texpars
 ARARA=arara --verbose
 RM=\rm -f
 
-all	: test-converted-index.pdf test-converted-gidx.pdf
+all	: test-converted-index.pdf test-converted-gidx.pdf test-converted-gidx2.pdf
 
 sample-index.bib	: sample-index.tex $(DEPS)
 	$(DATATOOL2BIB) --log-file datatool2bib-index.log -p -i --space-sub '-' -f sort sample-index.tex sample-index.bib
@@ -20,6 +20,12 @@ test-converted-gidx.pdf	: test-converted-gidx.tex sample-gidx-index.bib \
 			sample-gidx-glossary.bib \
 			sample-gidx-notation.bib
 			$(ARARA) test-converted-gidx.tex
+
+sample-gidx.bib	: sample-gidx.tex $(DEPS)
+	$(DATATOOL2BIB) --log-file datatool2bib-gidx2.log --detect-symbols --database-field identifier --strip-case-change -p -i --space-sub '-' -f sort sample-gidx.tex sample-gidx.bib
+
+test-converted-gidx2.pdf	: test-converted-gidx2.tex sample-gidx.bib 
+			$(ARARA) test-converted-gidx2.tex
 
 clean	:
 	$(RM) *.aux
