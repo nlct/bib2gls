@@ -638,6 +638,7 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-name">{0}	Strip name field for acronyms.</entry>
 <entry key="datatool2bib.syntax.strip-case-change">{0}	Strip known case-changing commands from field values.</entry>
 <entry key="datatool2bib.syntax.strip">{0}	Switch on/off all strip options.</entry>
+<entry key="datatool2bib.syntax.dependency-field">{0} &lt;field&gt;	Sets the name of the dependency field (only applicable with {1}).</entry>
 <entry key="datatool2bib.syntax.skip-datagidx">{0}	Skip the special "datagidx" internal database.</entry>
 
 <entry key="datatool2bib.syntax.invalid_map">Invalid mapping ''{0}'' for ''{1}''. Syntax requires element pairs &lt;key=&gt;=&lt;field=&gt;</entry>

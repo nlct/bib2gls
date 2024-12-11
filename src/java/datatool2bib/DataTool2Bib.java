@@ -204,6 +204,16 @@ public class DataTool2Bib extends BibGlsConverter
       datatoolSty = (DataToolSty)listener.requirepackage("datatool", null);
       datagidxSty = (DataGidxSty)listener.requirepackage("datagidx", null);
 
+      if (dependencyField != null)
+      {
+         dependencyField = processLabel(applyFieldCase(dependencyField)).trim();
+
+         if (dependencyField.isEmpty())
+         {
+            dependencyField = null;
+         }
+      }
+
       addCustomCommands();
 
       if (setup != null && !setup.isEmpty())
@@ -501,8 +511,20 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
+      Vector<String> dependencies = null;
+
+      if (dependencyField != null)
+      {
+         dependencies = new Vector<String>();
+      }
+
       for (DataToolEntryRow row : data)
       {
+         if (dependencies != null)
+         {
+            dependencies.clear();
+         }
+
          out.println();
 
          String entryType = "entry";
@@ -581,7 +603,7 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (entry != null)
             {
-               TeXObject content = processValue(entry.getContents());
+               TeXObject content = processValue(entry.getContents(), dependencies);
                String field = idxFieldMap.get(idx);
 
                out.println(",");
@@ -640,7 +662,25 @@ public class DataTool2Bib extends BibGlsConverter
             }
          }
 
+         if (dependencies != null && dependencies.size() > 0)
+         {
+            out.format(",%n  %s = {", dependencyField);
+
+            for (int i = 0; i < dependencies.size(); i++)
+            {
+               if (i > 0)
+               {
+                  out.print(",");
+               }
+
+               out.print(dependencies.get(i));
+            }
+
+            out.print("}");
+         }
+
          out.println();
+
          out.println("}");
       }
    }
@@ -722,9 +762,20 @@ public class DataTool2Bib extends BibGlsConverter
          }
       }
 
+      Vector<String> dependencies = null;
+
+      if (dependencyField != null)
+      {
+         dependencies = new Vector<String>();
+      }
 
       for (GidxData data : datalist)
       {
+         if (dependencies != null)
+         {
+            dependencies.clear();
+         }
+
          String orgLabel = data.getLabel();
          String label = getMappedLabel(orgLabel);
 
@@ -788,7 +839,7 @@ public class DataTool2Bib extends BibGlsConverter
 
             if (value == null) continue;
 
-            value = processValue(value);
+            value = processValue(value, dependencies);
 
             String bibfield = getFieldName(field);
 
@@ -918,6 +969,24 @@ public class DataTool2Bib extends BibGlsConverter
 
                out.format("  %s = {%s}", bibfield, valStr);
             }
+         }
+
+         if (dependencies != null && dependencies.size() > 0)
+         {
+            out.format(",%n  %s = {", dependencyField);
+
+            for (int i = 0; i < dependencies.size(); i++)
+            {
+               if (i > 0)
+               {
+                  out.print(",");
+               }
+
+               out.print(dependencies.get(i));
+            }
+
+            out.print("}");
+            fieldCount++;
          }
 
          if (fieldCount > 0)
@@ -1105,7 +1174,7 @@ public class DataTool2Bib extends BibGlsConverter
       datalist.add(data);
    }
 
-   protected TeXObject processValue(TeXObject value)
+   protected TeXObject processValue(TeXObject value, Vector<String> dependencies)
    {
       if (parser.isStack(value)
         && ( stripGlsAdd || stripAcronymFont || stripCaseChange || adjustGls ) )
@@ -1116,7 +1185,7 @@ public class DataTool2Bib extends BibGlsConverter
 
          try
          {
-            processTermValue(stack, list);
+            processTermValue(stack, list, dependencies);
          }
          catch (TeXSyntaxException e)
          {
@@ -1137,7 +1206,8 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
-   protected void processTermValue(TeXObjectList stack, TeXObjectList list)
+   protected void processTermValue(TeXObjectList stack, TeXObjectList list,
+     Vector<String> dependencies)
     throws IOException
    {
       while (!stack.isEmpty())
@@ -1146,7 +1216,46 @@ public class DataTool2Bib extends BibGlsConverter
 
          if (stripGlsAdd && TeXParserUtils.isControlSequence(obj, "glsadd"))
          {
-            stack.popArg(parser);
+            String orgLabel = TeXParserUtils.popLabelString(parser, stack).trim();
+
+            if (dependencies != null)
+            {
+               if (orgLabel.startsWith("["))
+               {
+                  int idx = orgLabel.indexOf(']');
+
+                  if (idx > 0)
+                  {
+                     orgLabel = orgLabel.substring(idx+1);
+                  }
+               }
+
+               String label = getMappedLabel(orgLabel);
+
+               if (label == null)
+               {
+                  label = processLabel(orgLabel);
+
+                  if (label.isEmpty())
+                  {
+                     label = orgLabel;
+                  }
+
+                  if (label.equals(orgLabel))
+                  {
+                     error(getMessage("common.unknown.reflabel", orgLabel));
+                  }
+                  else
+                  {
+                     error(getMessage("common.unknown.reflabel.sub", orgLabel, label));
+                  }
+               }
+
+               if (!dependencies.contains(label))
+               {
+                  dependencies.add(label);
+               }
+            }
          }
          else if (stripAcronymFont
             && TeXParserUtils.isControlSequence(obj, "acronymfont"))
@@ -1254,7 +1363,7 @@ public class DataTool2Bib extends BibGlsConverter
             TeXObjectList subList = ((TeXObjectList)obj).createList();
             list.add(subList);
 
-            processTermValue((TeXObjectList)obj, subList);
+            processTermValue((TeXObjectList)obj, subList, dependencies);
          }
          else
          {
@@ -1308,6 +1417,9 @@ public class DataTool2Bib extends BibGlsConverter
       printSyntaxItem(getMessage("datatool2bib.syntax.adjust-gls",
         "--[no-]adjust-gls"));
 
+      printSyntaxItem(getMessage("datatool2bib.syntax.dependency-field",
+        "--[no-]dependency-field", "strip-glsadd"));
+
       printSyntaxItem(getMessage("datatool2bib.syntax.strip-glsadd",
         "--[no-]strip-glsadd"));
 
@@ -1358,6 +1470,7 @@ public class DataTool2Bib extends BibGlsConverter
         || arg.equals("--auto-label-prefix")
         || arg.equals("--save-value")
         || arg.equals("--save-currency")
+        || arg.equals("--dependency-field")
          )
       {
          return 1;
@@ -1490,6 +1603,21 @@ public class DataTool2Bib extends BibGlsConverter
       {
          dataCurrencySuffix = null;
       }
+      else if (isArg(deque, arg, "--dependency-field", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("common.missing.arg.value",
+               arg));
+         }
+
+         dependencyField = returnVals[0].toString();
+      }
+      else if (arg.equals("--no-dependency-field"))
+      {
+         dependencyField = null;
+      }
       else if (arg.equals("--split"))
       {
          split = true;
@@ -1607,6 +1735,7 @@ public class DataTool2Bib extends BibGlsConverter
    private String readOpts = null;
    private int autoLabelIdx = 0;
    private String setup = null;
+   private String dependencyField = "dependency";
 
    private boolean stripGlsAdd = true;
    private boolean stripAcronymFont = true;
