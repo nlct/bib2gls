@@ -746,6 +746,12 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       return defaultCharset;
    }
 
+   @Override
+   public Locale getDefaultLocale()
+   {
+      return defaultLocale == null ? Locale.getDefault() : defaultLocale;
+   }
+         
    /*
     *  TeXApp method for providing warning messages.
     */ 

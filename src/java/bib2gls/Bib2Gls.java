@@ -2892,11 +2892,6 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          Locale l = getDefaultLocale();
 
-         if (l == null)
-         {
-            l = Locale.getDefault();
-         }
-
          logMessage(getMessage("message.default.locale", l.toLanguageTag(),
            l.getDisplayName()));
       }
@@ -5358,11 +5353,6 @@ public class Bib2Gls extends BibGlsTeXApp
    public String getDocDefaultLocale()
    {
       return docLocale;
-   }
-
-   public Locale getDefaultLocale()
-   {
-      return defaultLocale;
    }
 
    public Locale getLocale(String langTag)
