@@ -725,7 +725,8 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
         "--[no-]index-conversion", "-i"));
       printSyntaxItem(getMessage("common.syntax.field-map",
         "--[no-]field-map", "-m"));
-      printSyntaxItem(getMessage("common.syntax.field-case", "--field-case"));
+      printSyntaxItem(getMessage("common.syntax.field-case", "--field-case",
+       "none, lc, uc, title, sentence"));
    }
 
    protected void otherHelp()

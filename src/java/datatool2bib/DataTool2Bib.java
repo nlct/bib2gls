@@ -1294,10 +1294,10 @@ public class DataTool2Bib extends BibGlsConverter
       super.adjustHelp();
 
       printSyntaxItem(getMessage("datatool2bib.syntax.label",
-        "--label", "-L", "--label "+labelColumn));
+        "--label", "-L", labelColumn));
 
       printSyntaxItem(getMessage("datatool2bib.syntax.fallback-label",
-        "--fallback-label", "-F", "--fallback-label "+fallbackLabelColumn));
+        "--fallback-label", "-F", fallbackLabelColumn));
 
       printSyntaxItem(getMessage("datatool2bib.syntax.auto-label",
         "--[no-]auto-label", "-a"));
@@ -1322,6 +1322,9 @@ public class DataTool2Bib extends BibGlsConverter
 
       printSyntaxItem(getMessage("datatool2bib.syntax.strip-case-change",
         "--[no-]strip-case-change"));
+
+      printSyntaxItem(getMessage("datatool2bib.syntax.strip",
+        "--[no-]strip"));
    }
 
    @Override
@@ -1502,6 +1505,22 @@ public class DataTool2Bib extends BibGlsConverter
       else if (arg.equals("--no-adjust-gls"))
       {
          adjustGls = false;
+      }
+      else if (arg.equals("--strip"))
+      {
+         stripGlsAdd = true;
+         stripAcronymFont = true;
+         stripAcronymText = true;
+         stripAcronymName = true;
+         stripCaseChange = true;
+      }
+      else if (arg.equals("--no-strip"))
+      {
+         stripGlsAdd = false;
+         stripAcronymFont = false;
+         stripAcronymText = false;
+         stripAcronymName = false;
+         stripCaseChange = false;
       }
       else if (arg.equals("--strip-glsadd"))
       {

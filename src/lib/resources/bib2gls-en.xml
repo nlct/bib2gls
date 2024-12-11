@@ -600,7 +600,7 @@ Use {1} for help.</entry>
 <entry key="common.syntax.auto-trim">{0}	Auto-trim labels before space substitution</entry>
 <entry key="common.syntax.overwrite">{0}	Overwrite existing files.</entry>
 <entry key="common.syntax.field-map">{1}, {0} &lt;mappings&gt;	Add source field identifiers to bib field name mappings (cumulative).</entry>
-<entry key="common.syntax.field-case">{0} &lt;setting&gt;	Specify the case-change to apply to field labels.</entry>
+<entry key="common.syntax.field-case">{0} &lt;setting&gt;	Specify the case-change to apply to field labels. (Allowed settings: {1})</entry>
 
 <!-- convertgls2bib specific syntax help messages -->
 
@@ -626,7 +626,7 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.auto-label">{1}, {0}	auto-generate entry label instead of using a column.</entry>
 <entry key="datatool2bib.syntax.auto-label-prefix">{0} &lt;prefix&gt;	prefix to use for auto-generate entry labels.</entry>
 <entry key="datatool2bib.syntax.setup">{0} &lt;options&gt;	Implement \DTLsetup'{'&lt;options&gt;'}'.</entry>
-<entry key="datatool2bib.syntax.read">{0} &lt;options&gt;	Set default \DTLread options.</entry>
+<entry key="datatool2bib.syntax.read">{0} &lt;options&gt;	Implement \DTLread[&lt;options&gt;]'{'&lt;in-file&gt;'}' instead of simply \input'{'&lt;in-file&gt;'}'.</entry>
 <entry key="datatool2bib.syntax.save-datum">{0}	Equivalent to {1}</entry>
 <entry key="datatool2bib.syntax.save-value">{0} &lt;suffix&gt;	Save datum value in separate field with given suffix.</entry>
 <entry key="datatool2bib.syntax.save-currency">{0} &lt;suffix&gt;	Save datum currency symbol in separate field with given suffix.</entry>
@@ -637,6 +637,7 @@ Use {1} for help.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-text">{0}	Strip text field for acronyms.</entry>
 <entry key="datatool2bib.syntax.strip-acronym-name">{0}	Strip name field for acronyms.</entry>
 <entry key="datatool2bib.syntax.strip-case-change">{0}	Strip known case-changing commands from field values.</entry>
+<entry key="datatool2bib.syntax.strip">{0}	Switch on/off all strip options.</entry>
 <entry key="datatool2bib.syntax.skip-datagidx">{0}	Skip the special "datagidx" internal database.</entry>
 
 <entry key="datatool2bib.syntax.invalid_map">Invalid mapping ''{0}'' for ''{1}''. Syntax requires element pairs &lt;key=&gt;=&lt;field=&gt;</entry>

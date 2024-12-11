@@ -205,6 +205,14 @@ with the closest F<glossaries.sty> equivalent.
 
 Don't adjust labels in commands like C<\gls> in field values.
 
+=item B<--strip>
+
+Switch on all strip options.
+
+=item B<--no-strip>
+
+Switch off all strip options.
+
 =item B<--strip-glsadd>
 
 Strip C<\glsadd> and its argument from field values. (Default.)

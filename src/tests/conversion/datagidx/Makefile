@@ -15,8 +15,11 @@ test-converted-index.pdf	: test-converted-index.tex sample-index.bib
 sample-gidx-index.bib	: sample-gidx.tex $(DEPS)
 	$(DATATOOL2BIB) --log-file datatool2bib-gidx.log --split -p -i --space-sub '-' -f sort sample-gidx.tex sample-gidx.bib
 
-test-converted-gidx.pdf	: test-converted-gidx.tex sample-gidx*.bib
-				$(ARARA) test-converted-gidx.tex
+test-converted-gidx.pdf	: test-converted-gidx.tex sample-gidx-index.bib \
+			sample-gidx-acronyms.bib \
+			sample-gidx-glossary.bib \
+			sample-gidx-notation.bib
+			$(ARARA) test-converted-gidx.tex
 
 clean	:
 	$(RM) *.aux
