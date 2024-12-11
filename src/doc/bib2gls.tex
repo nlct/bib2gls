@@ -11347,6 +11347,8 @@ have values in the form \code{\oargm{tag}\meta{id-list}} where
 \meta{id-list} is a comma-separated list of entry labels. The value
 is required for this key but may be empty, which indicates an empty
 set of fields (that is, the setting is switched off).
+Note that the listed fields must be recognised as known fields, for
+example, custom fields defined with \cs{glsaddstoragekey}.
 
 This setting makes those fields act like the \field{see} field by
 identifying the listed entries as dependencies, but the information
@@ -24246,6 +24248,33 @@ example, \ics{datagidx.glsnl} will be replaced with \code{\ics{gls}*}
 \datatoolbibarg{no-adjust-gls}
 
 Don't adjust commands like \ics{datagidx.gls} in field values.
+
+\datatoolbibarg{dependency-field}
+
+Sets the name of the dependency field. Has no effect with
+\datatoolbiblongarg{no-strip-glsadd}. With
+\datatoolbiblongarg{strip-glsadd}, the label from the
+stripped \ics{datagidx.glsadd} argument will be added to the field identified
+by \meta{field}. The default is \fieldfmt{dependency} which will be ignored
+by \bibgls\ unless instructed otherwise (via resource options such
+as \csopt{field-aliases} or by defining the field with commands such
+as \cs{glsaddstoragekey}).
+
+For example, \meta{field} could be set to \field{see} (but be aware
+that this won't be merged with any existing \field{see} value for
+the same entry) or the new document to use the created \ext{bib}
+file could define \meta{field} and reference it in
+\csopt{dependency-fields}.
+
+The \meta{field} will have any invalid content stripped and will be
+adjusted to match the \converterlongarg{field-case} setting.
+If the \meta{field} ends up as an empty string, it will behave as 
+\datatoolbibarg{no-dependency-field}.
+
+\datatoolbibarg{no-dependency-field}
+
+Don't save any labels stripped with
+\datatoolbiblongarg{strip-glsadd}.
 
 \datatoolbibarg{strip}
 

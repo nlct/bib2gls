@@ -205,6 +205,18 @@ with the closest F<glossaries.sty> equivalent.
 
 Don't adjust labels in commands like C<\gls> in field values.
 
+=item B<--dependency-field> I<field-name>
+
+Sets the name of the dependency field. Has no effect with
+B<--no-strip-glsadd>. With B<--strip-glsadd>, the label from the
+stripped C<\glsadd> argument will be added to the field identified
+by I<field-name>. The default is B<dependency> which will be ignored
+by B<bib2gls> unless instructed otherwise (via field aliasing etc).
+
+=item B<--no-dependency-field>
+
+Don't save labels from any stripped C<\glsadd> instances.
+
 =item B<--strip>
 
 Switch on all strip options.

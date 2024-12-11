@@ -11133,6 +11133,19 @@ primary formats, if enabled.},
   parent={commandlineoptionsdatatool2bib}
 }
 
+@switch{switch.datatool2bib.dependency-field,
+  name={\longargfmt{dependency\dhyphen field}},
+  user1 = {\meta{field}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
+@switch{switch.datatool2bib.no-dependency-field,
+  name={\longargfmt{no\dhyphen dependency\dhyphen field}},
+  category={switch},
+  parent={commandlineoptionsdatatool2bib}
+}
+
 @switch{switch.datatool2bib.strip-glsadd,
   name={\longargfmt{strip\dhyphen glsadd}},
   category={switch},
@@ -13851,6 +13864,7 @@ can be referenced in \meta{true} or \meta{false} with
   description={adds a new key for internal use that can be set in 
     \csref{newglossaryentry}},
   topics={definingterms,providingcommands,fieldrefcommands},
+  seealso={glsxtrprovidestoragekey},
   note={\styfmt{glossaries}},
   category={command}
 }
