@@ -24236,9 +24236,12 @@ Attempt to detect entries that should be \atentrytype{symbol} or
 This tries to expand the value of the name field with
 \gls{DTLgidxParen} and \gls{DTLgidxIgnore} locally defined to
 discard their argument. If the result is empty or if the first
-character of the result is not alphabetic, then \atentrytype{number}
-will be assumed if the result parses as an integer otherwise
-\atentrytype{symbol} will be assumed.
+character of the result is not alphabetic then,
+if the result parses as an integer, \atentrytype{number}
+will be chosen otherwise \atentrytype{symbol} will be chosen.
+(An empty result can occur if the \field{name} field solely consists
+of commands that are unknown to the \texparserlib, which suggests
+symbols rather than words.)
 
 This setting is only applicable for entries defined with 
 \sty{datagidx}['s] \cs{newterm} command, not with general
@@ -24251,6 +24254,13 @@ not the \field{description} field is set.
 \datatoolbibarg{no-detect-symbols}
 
 Don't attempt to detect symbols (default).
+
+\datatoolbibarg{numeric-locale}
+
+For use with \datatoolbiblongarg{detect-symbol}, this switch
+identifies the locale used for numeric parsing to determine whether
+or not the \atentrytype{number} entry type should be used.
+If omitted, the \idx{JVM}['s] default locale is assumed.
 
 \datatoolbibarg{adjust-gls}
 
