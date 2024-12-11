@@ -1,5 +1,5 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: { options: [ --force-cross-resource-refs ]}
 % arara: pdflatex
 \documentclass{book}
 
@@ -54,10 +54,13 @@
 
 \newglossary*{notation}{Notation}
 
+\glsxtrprovidestoragekey{dependency}{}{}
+
 \GlsXtrLoadResources[
  src={sample-gidx-glossary},
  type=main,% default glossary
  post-description-dot=check,
+ dependency-fields={dependency},
  assign-fields =
   {
      ed = text + "ed",
