@@ -245,17 +245,31 @@ public class DataTool2Bib extends BibGlsConverter
          parser.parse(reader);
       }
 
-      if (skipDataGidx)
-      {
-         DataBase db = datatoolSty.removeDataBase("datagidx");
+      
+      Vector<String> dbNames = null;
 
-         if (db != null)
+      for (Enumeration<String> en = datatoolSty.getDataBaseNames();
+            en.hasMoreElements(); )
+      {
+         String dbName = en.nextElement();
+
+         if (skipDataGidx && dbName.equals("datagidx"))
          {
             verboseMessage("datatool2bib.skipping.database", "datagidx");
+            skipDataGidx = false;
+         }
+         else
+         {
+            if (dbNames == null)
+            {
+               dbNames = new Vector<String>();
+            }
+
+            dbNames.add(dbName);
          }
       }
 
-      int numDatabases = datatoolSty.getDataBaseCount();
+      int numDatabases = (dbNames == null ? 0 : dbNames.size());
       int numGidxDataBases = (gidxdata == null ? 0 : gidxdata.size());
 
       int total = numDatabases + numGidxDataBases;
@@ -272,8 +286,6 @@ public class DataTool2Bib extends BibGlsConverter
 
       message(getMessage("datatool2bib.databases.found", numDatabases));
       message(getMessage("datatool2bib.gidxdata.found", numGidxDataBases));
-
-      Enumeration<String> nameEnum = datatoolSty.getDataBaseNames();
 
       Charset bibCharset;
 
@@ -301,33 +313,34 @@ public class DataTool2Bib extends BibGlsConverter
             base = base.substring(0, idx);
          }
 
-         while (nameEnum != null && nameEnum.hasMoreElements())
+         if (dbNames != null)
          {
-            String dbName = nameEnum.nextElement();
-
-            File file = new File(parentFile, base+"-"+dbName+".bib");
-
-            if (!overwriteFiles && file.exists())
+            for (String dbName : dbNames)
             {
-               throw new IOException(getMessage("error.file_exists.nooverwrite",
-                  file, "--overwrite"));
-            }
+               File file = new File(parentFile, base+"-"+dbName+".bib");
 
-            message(getMessage("message.writing", file));
-
-            try
-            {
-               out = new PrintWriter(createBufferedWriter(file.toPath(), bibCharset));
-
-               out.println("% Encoding: "+bibCharsetName);
-
-               writeEntries(datatoolSty.getDataBase(dbName), out);
-            }
-            finally
-            {
-               if (out != null)
+               if (!overwriteFiles && file.exists())
                {
-                  out.close();
+                  throw new IOException(getMessage("error.file_exists.nooverwrite",
+                     file, "--overwrite"));
+               }
+
+               message(getMessage("message.writing", file));
+
+               try
+               {
+                  out = new PrintWriter(createBufferedWriter(file.toPath(), bibCharset));
+
+                  out.println("% Encoding: "+bibCharsetName);
+
+                  writeEntries(datatoolSty.getDataBase(dbName), out);
+               }
+               finally
+               {
+                  if (out != null)
+                  {
+                     out.close();
+                  }
                }
             }
          }
@@ -382,17 +395,12 @@ public class DataTool2Bib extends BibGlsConverter
 
             out.println("% Encoding: "+bibCharsetName);
 
-            while (nameEnum != null && nameEnum.hasMoreElements())
+            if (dbNames != null)
             {
-               String dbName = nameEnum.nextElement();
-
-               if (dbName.equals("datagidx"))
+               for (String dbName : dbNames)
                {
-                  verboseMessage("datatool2bib.skipping.database", dbName);
-                  continue;
+                  writeEntries(datatoolSty.getDataBase(dbName), out);
                }
-
-               writeEntries(datatoolSty.getDataBase(dbName), out);
             }
 
             if (gidxdata != null)
