@@ -8361,8 +8361,8 @@ Consider an adjustment to the previous example:
 ]{assign-fields}
 \end{codeenv}
 Now \code{\csfmt{csfmt}\marg{relax}} is converted into the literal string
-\qtt{\csfmt{csfmt}\marg{relax}} and then the case-conversion is performed,
-which results in the literal string \qtt{\csfmt{csfmt}\marg{Relax}} but this will become
+\qtt{\csfmt{relax}} and then the case-conversion is performed,
+which results in the literal string \qtt{\csfmt{Relax}} but this will become
 an undefined command in the \ext{glstex} file:
 \begin{codeenv}
 \field{user1}=\marg{\csfmt{Relax}},
@@ -8379,7 +8379,7 @@ Detokenises and replaces special characters with commands like \ics{glsbackslash
 For example:
 \begin{codeenv}
 \csopt[
- \field{user1} = \gls{REPLACESPCHARS} \marg {
+ \field{user1} = \gls{REPLACESPCHARS} \marg{
    \gls{FIRSTUC} \marg{ \gls{INTERPRETNOREPL} \marg{ \field{name} } } },
 ]{assign-fields}
 \end{codeenv}
@@ -8508,7 +8508,12 @@ grandparent entry can be referenced with \code{parent \idx{follow}
 parent \idx{follow}}.  Since \qt{parent} is also a field name, if
 the keyword \code{parent} is followed by \idx{follow} then the
 keyword refers to the \gls{parententry} otherwise it refers to the
-\field{parent} field.
+\field{parent} field. For example, 
+\code{self \idx{follow} parent} refers to the value of the entry's
+\field{parent} field, which is the \gls{parententry}['s] label, whereas
+\code{parent \idx{follow} name} refers to the value of the entry's parent's 
+\field{name} field.
+
 
 The special keywords identify values that aren't normally stored in
 a field.  The keyword must be followed by the \meta{delineator},
