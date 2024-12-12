@@ -38,6 +38,7 @@ import com.dickimawbooks.texparserlib.latex.NewCommand;
 import com.dickimawbooks.texparserlib.latex.latex3.NewDocumentCommand;
 import com.dickimawbooks.texparserlib.latex.Overwrite;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfTwo;
+import com.dickimawbooks.texparserlib.html.L2HStringConverter;
 
 public abstract class BibGlsConverter extends BibGlsTeXApp
 {
@@ -274,6 +275,87 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
       debugMessage("common.label.processed", label, builder);
 
       return builder.toString();
+   }
+
+   public String interpret(TeXObject code)
+   {
+      return interpret(code, true);
+   }
+
+   protected void initInterpreter()
+   {
+      interpreter = new L2HStringConverter(this);
+      interpreterParser = new TeXParser(interpreter);
+
+      interpreter.setIsInDocEnv(true);
+
+      interpreter.setUndefinedAction(
+       isDebuggingOn() ? UndefAction.MESSAGE : UndefAction.IGNORE);
+   }
+
+   public String interpret(TeXObject code, boolean trim)
+   {
+      String texCode = code.toString(parser);
+
+      if (interpreter == null)
+      {
+         initInterpreter();
+      }
+
+      try
+      {
+         StringWriter writer = new StringWriter();
+         interpreter.setWriter(writer);
+
+         if (isDebuggingOn())
+         {
+            logAndPrintMessage(String.format(
+              "%n%s%n%s%n%n",
+               getMessage("message.parsing.code"),
+               texCode));
+         }
+
+         interpreterParser.parse(new TeXReader(this, texCode));
+
+         String result = writer.toString();
+         interpreter.setWriter(null);
+
+         if (isDebuggingOn())
+         {
+            logAndPrintMessage(String.format("texparserlib:--> %s", result));
+         }
+
+         // Strip any html markup
+
+         result = result.replaceAll("<[^>]+>", "");
+
+         result = result.replaceAll("\\&le;", "<");
+         result = result.replaceAll("\\&ge;", ">");
+         result = result.replaceAll("\\&amp;", "&");
+
+         // trim leading/trailing spaces if required
+
+         if (trim)
+         {
+            result = result.trim();
+         }
+
+         logMessage(String.format("texparserlib: %s -> %s",
+            texCode, result));
+
+         return result;
+      }
+      catch (IOException e)
+      {// too complicated
+
+         if (isDebuggingOn())
+         {
+            debug("texparserlib: ");
+            debug(e);
+         }
+
+         return texCode;
+      }
    }
 
    protected boolean isIgnoredPackage(String styName)
@@ -845,4 +927,8 @@ public abstract class BibGlsConverter extends BibGlsTeXApp
 
    protected TeXParser parser;
    protected BibGlsConverterListener listener;
+
+   protected L2HStringConverter interpreter=null;
+   protected TeXParser interpreterParser=null;
+   
 }

@@ -18048,6 +18048,27 @@ has three or more items},
   category={command}
 }
 
+@command{DTLgidxParen,
+  name={\csfmt{DTL\-gidx\-Paren}},
+  user1={\margm{text}},
+  description={normally expands to \code{ (\meta{text})} but is
+locally redefined under certain situations.
+Note that \idx{datatool2bib} discards the argument for sorting,
+which is different to the behaviour with \sty{datagidx} when
+constructing the sort value},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
+@command{DTLgidxIgnore,
+  name={\csfmt{DTL\-gidx\-Ignore}},
+  user1={\margm{text}},
+  description={normally expands to its argument but is
+locally redefined to ignore its argument under certain situations},
+  note={\styfmt{datagidx}},
+  category={command}
+}
+
 @command{si,
   name={\csfmt{si}},
   user1={\margm{unit}},

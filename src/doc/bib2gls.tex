@@ -3699,20 +3699,18 @@ Alternatively, within the document:
 \argsection{datatool-sort-markers}
 
 The \sty{datatool-base} package provides some marker commands
-designed for use with \ics{DTLsortwordlist}. These commands will
-only be recognised by the interpreter if \sty{datatool-base} (or
-\sty{datatool}) is requested with \longswitch{packages}. However,
-the definition of those marker commands will match their normal
-definition with \sty{datatool-base}.
+designed for use with \ics{DTLsortwordlist}. These commands by
+default will be defined to match their normal \sty{datatool-base}
+behaviour.
 
-The \longswitch{datatool-sort-markers} will instead define those
+The \longswitch{datatool-sort-markers} switch will instead define those
 marker commands to match their localised definitions within
 \cs{DTLsortwordlist}. Additionally, \ics{dtltexorsort} will be
 redefined to expand to its second argument.
 
-Note that with this switch you don't need to
-request the \sty{datatool-base} package, unless you require support
-for other commands provided by that package.
+Note that you don't need to request the \sty{datatool-base} package,
+unless you require support for other commands provided by that
+package.
 
 The marker commands are: \ics{datatoolasciistart},
 \ics{datatoolpersoncomma}, \ics{datatoolplacecomma},
@@ -3743,10 +3741,8 @@ For example:
 
 \argsection{no-datatool-sort-markers}
 
-Don't provide definitions of the \sty{datatool-base} marker commands 
-that match their behaviour within \cs{DTLsortwordlist}. These
-commands (including \cs{dtltexorsort}) will only be defined if the
-\sty{datatool-base} package is requested with \longswitch{packages}.
+Define the \sty{datatool-base} marker commands 
+(including \cs{dtltexorsort}) to match their normal definition.
 
 \argsection{ignore-packages}
 
@@ -24231,14 +24227,14 @@ single output \meta{bib file} (default).
 
 \datatoolbibarg{detect-symbols}
 
-Attempt to detect entries that should be \atentrytype{symbol} or 
-\atentrytype{number} based on the value of the \field{name} field.
+Attempt to detect entries that should be \atentry{symbol} or 
+\atentry{number} based on the value of the \field{name} field.
 This tries to expand the value of the name field with
-\gls{DTLgidxParen} and \gls{DTLgidxIgnore} locally defined to
+\ics{DTLgidxParen} and \ics{DTLgidxIgnore} locally defined to
 discard their argument. If the result is empty or if the first
 character of the result is not alphabetic then,
-if the result parses as an integer, \atentrytype{number}
-will be chosen otherwise \atentrytype{symbol} will be chosen.
+if the result parses as an integer, \atentry{number}
+will be chosen otherwise \atentry{symbol} will be chosen.
 (An empty result can occur if the \field{name} field solely consists
 of commands that are unknown to the \texparserlib, which suggests
 symbols rather than words.)
@@ -24247,8 +24243,8 @@ This setting is only applicable for entries defined with
 \sty{datagidx}['s] \cs{newterm} command, not with general
 \sty{datatool} databases. Note that if this
 results in a change to the entry type from its default
-\atentrytype{entry} then \converterlongarg{index-conversion} won't
-convert the type to \atentrytype{index}, regardless of whether or
+\atentry{entry} then \converterlongarg{index-conversion} won't
+convert the type to \atentry{index}, regardless of whether or
 not the \field{description} field is set.
 
 \datatoolbibarg{no-detect-symbols}
@@ -24257,9 +24253,9 @@ Don't attempt to detect symbols (default).
 
 \datatoolbibarg{numeric-locale}
 
-For use with \datatoolbiblongarg{detect-symbol}, this switch
+For use with \datatoolbiblongarg{detect-symbols}, this switch
 identifies the locale used for numeric parsing to determine whether
-or not the \atentrytype{number} entry type should be used.
+or not the \atentry{number} entry type should be used.
 If omitted, the \idx{JVM}['s] default locale is assumed.
 
 \datatoolbibarg{adjust-gls}

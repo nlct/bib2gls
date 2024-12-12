@@ -44,6 +44,7 @@ import com.dickimawbooks.texparserlib.latex.LaTeXGenericCommand;
 import com.dickimawbooks.texparserlib.latex.AtGobble;
 import com.dickimawbooks.texparserlib.latex.GobbleOpt;
 import com.dickimawbooks.texparserlib.latex.AtFirstOfOne;
+import com.dickimawbooks.texparserlib.latex.AtNumberOfNumber;
 import com.dickimawbooks.texparserlib.latex.datatool.*;
 
 import com.dickimawbooks.bibgls.common.*;
@@ -697,22 +698,62 @@ public class DataTool2Bib extends BibGlsConverter
       }
    }
 
+   @Override
+   protected void initInterpreter()
+   {
+      super.initInterpreter();
+
+      interpreterParser.putControlSequence(true, new AtGobble("glsadd"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("acronymfont"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textrm"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("texttt"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textsf"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textbf"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textmd"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textit"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textsl"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("emph"));
+      interpreterParser.putControlSequence(true, new AtFirstOfOne("textsuperscript"));
+
+      interpreterParser.putControlSequence(true, new AtGobble("DTLgidxParen"));
+      interpreterParser.putControlSequence(true, new AtGobble("DTLgidxIgnore"));
+
+      interpreterParser.putControlSequence(true,
+         new AtNumberOfNumber("DTLgidxName", 2, 2));
+
+      interpreterParser.putControlSequence(true,
+         new DataGidxAtInvert("DTLgidxPlace"));
+
+      interpreterParser.putControlSequence(true,
+         new DataGidxAtInvert("DTLgidxSubject"));
+
+      interpreterParser.putControlSequence(true,
+         new AtNumberOfNumber("DTLgidxOffice", 2, 2));
+
+      interpreterParser.putControlSequence(true,
+         new DataGidxAtBothOfTwo("DTLgidxParticle"));
+
+      interpreterParser.putControlSequence(true,
+         new AtGobble("__datagidx_punc:n"));
+
+   }
+
    protected void writeGidxPreamble(PrintWriter out)
     throws IOException
    {
       out.format("@%s{\"", applyFieldCase("preamble"));
-      out.println("\\providecommand{\\IfNotBibGls}[2]{#1}");
-      out.println("\\providecommand{\\DTLgidxName}[2]{\\IfNotBibGls{#1 #2}{#2\\datatoolpersoncomma #1}}");
-      out.println("\\providecommand{\\DTLgidxOffice}[2]{\\IfNotBibGls{#2 (#1)}{#2\\datatoolpersoncomma #1}}");
-      out.println("\\providecommand{\\DTLgidxPlace}[2]{\\IfNotBibGls{#2}{#2\\datatoolplacecomma #1}}");
-      out.println("\\providecommand{\\DTLgidxSubject}[2]{\\IfNotBibGls{#2}{#2\\datatoolsubjectcomm #1}}");
-      out.println("\\providecommand{\\DTLgidxRank}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
-      out.println("\\providecommand{\\DTLgidxParticle}[2]{\\IfNotBibGls{#1~#2}{#2.}}");
-      out.println("\\providecommand{\\DTLgidxParen}[1]{\\IfNotBibGls{ (#1)}{\\datatoolparenstart #1}}");
-      out.println("\\providecommand{\\DTLgidxIgnore}[1]{\\IfNotBibGls{#1}{}}");
-      out.println("\\providecommand{\\DTLgidxSaint}[1]{\\IfNotBibGls{#1}{Saint}}");
-      out.println("\\providecommand{\\DTLgidxMac}[1]{\\IfNotBibGls{#1}{Mac}}");
-      out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\IfNotBibGls{\\csuse{@Roman}{#1}}{\\csuse{two@digits}{#1}}}");
+      out.println("\\providecommand{\\dtltexorsort}[2]{#1}");
+      out.println("\\providecommand{\\DTLgidxName}[2]{\\dtltexorsort{#1 #2}{#2\\datatoolpersoncomma #1}}");
+      out.println("\\providecommand{\\DTLgidxOffice}[2]{\\dtltexorsort{#2 (#1)}{#2\\datatoolpersoncomma #1}}");
+      out.println("\\providecommand{\\DTLgidxPlace}[2]{\\dtltexorsort{#2}{#2\\datatoolplacecomma #1}}");
+      out.println("\\providecommand{\\DTLgidxSubject}[2]{\\dtltexorsort{#2}{#2\\datatoolsubjectcomm #1}}");
+      out.println("\\providecommand{\\DTLgidxRank}[2]{\\dtltexorsort{#1~#2}{#2.}}");
+      out.println("\\providecommand{\\DTLgidxParticle}[2]{\\dtltexorsort{#1~#2}{#2.}}");
+      out.println("\\providecommand{\\DTLgidxParen}[1]{\\dtltexorsort{ (#1)}{}}");
+      out.println("\\providecommand{\\DTLgidxIgnore}[1]{\\dtltexorsort{#1}{}}");
+      out.println("\\providecommand{\\DTLgidxSaint}[1]{\\dtltexorsort{#1}{Saint}}");
+      out.println("\\providecommand{\\DTLgidxMac}[1]{\\dtltexorsort{#1}{Mac}}");
+      out.println("\\providecommand{\\DTLgidxNameNum}[1]{\\dtltexorsort{\\csuse{@Roman}{#1}}{\\csuse{two@digits}{#1}}}");
       out.println("\"}");
    }
 

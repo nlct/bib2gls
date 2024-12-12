@@ -1,5 +1,7 @@
 % arara: pdflatex
-% arara: bib2gls
+% arara: bib2gls: { group: on, options: [ --datatool-sort-markers ] }
+% arara: pdflatex
+% arara: bib2gls: { group: on, options: [ --datatool-sort-markers ] }
 % arara: pdflatex
 \documentclass{book}
 
@@ -13,15 +15,22 @@
    nostyles,stylemods={tree,long,bookindex},% only need these styles
    style=tree,
    abbreviations,index,
-   record=nameref
+   record=nameref,
+%   debug=showwrgloss,
+%   showtargets=annoteleft
  ]
  {glossaries-extra}
 
+\renewcommand{\glstarget}[2]{\glsxtrtarget{#1}{#2}}
+\renewcommand{\glsxtrtargetdup}[2]{%
+ \glslink{#1}{#2}%
+}
 
  % Define some convenient commands
 
 \newcommand*{\principleloc}[1]{\textbf{#1}}
 \newcommand*{\glossaryloc}[1]{\textit{#1}}
+\newcommand*{\exampleloc}[1]{\underline{\glsnumberformat{#1}}}
 \newcommand*{\appname}[1]{\texttt{#1}}
 
  % Add custom fields
@@ -55,6 +64,7 @@
 \newglossary*{notation}{Notation}
 
 \glsxtrprovidestoragekey{identifier}{}{}
+\glsxtrprovidestoragekey{childname}{}{}
 
 \setabbreviationstyle{long-short-sc}
 
@@ -62,8 +72,27 @@
 \GlsXtrResourceInitEscSequences
 }
 
+\newcommand{\bibglslettergroup}[4]{#3}
+
 \GlsXtrLoadResources[
  src={sample-gidx},
+ match={entrytype=symbol},
+ symbol-sort-fallback=name,
+ type=index,
+ sort=letter-case
+]
+
+\GlsXtrLoadResources[
+ src={sample-gidx},
+ match={entrytype=number},
+ symbol-sort-fallback=name,
+ type=index,
+ sort=integer
+]
+
+\GlsXtrLoadResources[
+ src={sample-gidx},
+ not-match={entrytype=number|symbol},
  post-description-dot=check,
  assign-fields =
   {
@@ -71,7 +100,10 @@
      type = "\glsxtrabbrvtype" [ identifier = "acronyms"],
      type = identifier,
      ed = text + "ed" [ identifier =/index|glossary/ ],
-     ing = text + "ing" [ identifier =/index|glossary/ ]
+     ing = text + "ing" [ identifier =/index|glossary/ ],
+     childname = \MGP{1}
+        [  name = parent -> name & description=/(.+) +\(.*\).*/ ] ,
+     childname = description [ name = parent -> name ]
   },
  copy-to-glossary =
   {
@@ -294,25 +326,31 @@ locations. Here's \gls{seal} again.
 
 \chapter{Glossaries}
 
+\renewcommand\glsextrapostnamehook[1]{\glsadd[format=glossaryloc]{#1}}
+
 \printunsrtglossary
  [% the default glossary
    style=treenoname,% use 'treenoname' style (don't print sub item names)
-%   nonumberlist% hide the location list
+   groups=false,
+   nonumberlist
  ]
 
 \printunsrtglossary
  [
    type=\glsxtrabbrvtype,% 'abbreviations' list
    style=long,% use the 'long' style
+   groups=false,
    subentrycounter=false,
-%   nonumberlist% hide the location list
+   nonumberlist
  ]
 
 \printunsrtglossary
  [
    type=notation,% 'notation' list
+   groups=false,
    subentrycounter=false,
-   style=alttree
+   style=alttree,
+   nonumberlist
  ]
 
 \renewcommand{\glsxtrbookindexprelocation}[1]{%
@@ -325,6 +363,21 @@ locations. Here's \gls{seal} again.
 %\renewcommand*{\glsxtrbookindexmulticolsenv}{multicols*}
 
 \setglossarysection{chapter}
+
+\renewcommand\glsextrapostnamehook[1]{}
+\renewcommand\glsxtrbookindexsubname[1]{%
+ \glsxtrifhasfield{childname}{#1}%
+ {\glossentrynameother{#1}{childname}}%
+ {\glsxtrbookindexname{#1}}%
+}
+
+\renewcommand{\glsxtrbookindextarget}[2]{%
+ \hypertarget{index:#1}{}%
+ \glstarget{#1}{#2}%
+}
+\renewrobustcmd{\glsseeitem}[1]{%
+ \hyperlink{index:#1}{\glsseeitemformat{#1}}%
+}
 
 \printunsrtglossary
  [

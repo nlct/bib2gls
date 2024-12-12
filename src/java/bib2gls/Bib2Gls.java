@@ -1344,6 +1344,26 @@ public class Bib2Gls extends BibGlsTeXApp
             new TeXCsRef("datatoolctrlboundary"))));
          listener.putControlSequence(new AtSecondOfTwo("dtltexorsort"));
       }
+      else
+      {
+         listener.putControlSequence(new GenericCommand("datatoolasciistart"));
+         listener.putControlSequence(new TextualContentCommand("datatoolpersoncomma", ", "));
+         listener.putControlSequence(new TextualContentCommand("datatoolplacecomma", ", "));
+         listener.putControlSequence(new TextualContentCommand("datatoolsubjectcomma", ", "));
+         listener.putControlSequence(new TextualContentCommand("datatoolparenstart", " "));
+         listener.putControlSequence(new GenericCommand("datatoolctrlboundary"));
+         listener.putControlSequence(new GenericCommand("datatoolasciiend"));
+
+         listener.putControlSequence(new LaTeXGenericCommand(true,
+          "datatoolparen", "m", 
+          TeXParserUtils.createStack(listener, 
+            new TeXCsRef("space"), 
+            listener.getOther('('),
+            listener.getParam(1),
+            listener.getOther(')'))));
+
+         listener.putControlSequence(new AtFirstOfTwo("dtltexorsort"));
+      }
 
       // Since the interpreter only has access to code fragments
       // not the entire document, there's no way for it to know the

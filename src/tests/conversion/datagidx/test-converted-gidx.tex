@@ -1,6 +1,8 @@
 % arara: pdflatex
 % arara: bib2gls: { options: [ --force-cross-resource-refs ]}
 % arara: pdflatex
+% arara: bib2gls: { options: [ --force-cross-resource-refs ]}
+% arara: pdflatex
 \documentclass{book}
 
 \usepackage[colorlinks]{hyperref}
@@ -20,8 +22,9 @@
 
  % Define some convenient commands
 
-\newcommand*{\principleloc}[1]{\textbf{#1}}
-\newcommand*{\glossaryloc}[1]{\textit{#1}}
+\newcommand*{\principleloc}[1]{\hyperbf{#1}}
+\newcommand*{\glossaryloc}[1]{\hyperit{#1}}
+\newcommand*{\exampleloc}[1]{\underline{\glsnumberformat{#1}}}
 \newcommand*{\appname}[1]{\texttt{#1}}
 
  % Add custom fields
@@ -307,6 +310,8 @@ locations. Here's \gls{seal} again.
 
 \chapter{Glossaries}
 
+\renewcommand\glsextrapostnamehook[1]{\glsadd[format=glossaryloc]{#1}}
+
 \printunsrtglossary
  [% the default glossary
    style=treenoname,% use 'treenoname' style (don't print sub item names)
@@ -338,6 +343,10 @@ locations. Here's \gls{seal} again.
 %\renewcommand*{\glsxtrbookindexmulticolsenv}{multicols*}
 
 \setglossarysection{chapter}
+
+\renewcommand\glsextrapostnamehook[1]{}
+
+\renewcommand\glsxtrbookindextarget[2]{\glsxtrtarget{#1}{#2}}
 
 \printunsrtglossary
  [

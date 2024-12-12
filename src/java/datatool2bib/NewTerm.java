@@ -21,6 +21,7 @@ package com.dickimawbooks.bibgls.datatool2bib;
 import java.io.IOException;
 
 import com.dickimawbooks.texparserlib.*;
+import com.dickimawbooks.texparserlib.generic.Symbol;
 import com.dickimawbooks.texparserlib.latex.*;
 
 public class NewTerm extends ControlSequence
@@ -172,25 +173,47 @@ public class NewTerm extends ControlSequence
 
       if (!abbreviation && datatool2bib.isDetectSymbolsOn())
       {
-         parser.startGroup();
+         TeXObject obj = null;
 
-         parser.putControlSequence(true, new AtGobble("DTLgidxParen"));
-         parser.putControlSequence(true, new AtGobble("DTLgidxIgnore"));
-
-         String nameStr = parser.expandToString((TeXObject)name.clone(), stack).trim();
-
-         parser.endGroup();
-
-         if (nameStr.isEmpty() || !Character.isAlphabetic(nameStr.codePointAt(0)))
+         if (parser.isStack(name))
          {
-            try
+            obj = ((TeXObjectList)name).peekStack();
+         }
+         else
+         {
+            obj = name;
+         }
+
+         if (obj instanceof TeXCsRef)
+         {
+            obj = parser.getListener().getControlSequence(((TeXCsRef)obj).getName());
+         }
+
+         if (obj instanceof CharObject
+               && Character.isAlphabetic(((CharObject)obj).getCharCode()))
+         {
+            // no change
+         }
+         else if (obj instanceof MathGroup || obj instanceof Symbol
+            || TeXParserUtils.isControlSequence(obj, "ensuremath"))
+         {
+            data.setEntryType("symbol");
+         }
+         else
+         {
+            String nameStr = datatool2bib.interpret((TeXObject)name.clone());
+
+            if (nameStr.isEmpty() || !Character.isAlphabetic(nameStr.codePointAt(0)))
             {
-               Integer.parseInt(nameStr);
-               data.setEntryType("number");
-            }
-            catch (NumberFormatException e)
-            {
-               data.setEntryType("symbol");
+               try
+               {
+                  Integer.parseInt(nameStr);
+                  data.setEntryType("number");
+               }
+               catch (NumberFormatException e)
+               {
+                  data.setEntryType("symbol");
+               }
             }
          }
       }
