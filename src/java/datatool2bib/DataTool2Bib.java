@@ -678,21 +678,26 @@ public class DataTool2Bib extends BibGlsConverter
             }
          }
 
-         if (dependencies != null && dependencies.size() > 0)
+         if (dependencies != null)
          {
-            out.format(",%n  %s = {", dependencyField);
+            dependencies.remove(rowLabel);
 
-            for (int i = 0; i < dependencies.size(); i++)
+            if (dependencies.size() > 0)
             {
-               if (i > 0)
+               out.format(",%n  %s = {", dependencyField);
+
+               for (int i = 0; i < dependencies.size(); i++)
                {
-                  out.print(",");
+                  if (i > 0)
+                  {
+                     out.print(",");
+                  }
+
+                  out.print(dependencies.get(i));
                }
 
-               out.print(dependencies.get(i));
+               out.print("}");
             }
-
-            out.print("}");
          }
 
          if (databaseField != null)
@@ -1030,22 +1035,29 @@ public class DataTool2Bib extends BibGlsConverter
             }
          }
 
-         if (dependencies != null && dependencies.size() > 0)
+         if (dependencies != null)
          {
-            out.format(",%n  %s = {", dependencyField);
+            // remove any self-referencing dependency
 
-            for (int i = 0; i < dependencies.size(); i++)
+            dependencies.remove(label);
+
+            if (dependencies.size() > 0)
             {
-               if (i > 0)
+               out.format(",%n  %s = {", dependencyField);
+
+               for (int i = 0; i < dependencies.size(); i++)
                {
-                  out.print(",");
+                  if (i > 0)
+                  {
+                     out.print(",");
+                  }
+
+                  out.print(dependencies.get(i));
                }
 
-               out.print(dependencies.get(i));
+               out.print("}");
+               fieldCount++;
             }
-
-            out.print("}");
-            fieldCount++;
          }
 
          if (databaseField != null)
