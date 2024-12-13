@@ -3367,7 +3367,10 @@ public class Bib2GlsEntry extends BibEntry
       return n;
    }
 
-   // only has ignored records
+   /**
+    Determines if this entry only has ignored records and does not have any 
+    dependencies.
+   */
    public boolean isIgnoredEntry()
    {
       if (ignoredRecords == null
@@ -3375,6 +3378,8 @@ public class Bib2GlsEntry extends BibEntry
           || (supplementalRecords != null && !supplementalRecords.isEmpty())
           || (primaryRecords != null && !primaryRecords.isEmpty())
           || (recordMap != null && !recordMap.isEmpty())
+          || !deps.isEmpty()
+          || (crossRefdBy != null && !crossRefdBy.isEmpty())
           || resource.hasEntryMglsRecords(getId()))
       {
          return false;

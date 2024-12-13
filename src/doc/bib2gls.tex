@@ -9294,6 +9294,18 @@ conditional (see \sectionref{sec:conditionals}).  For each
 \meta{element-list} \oargm{condition} specification, if the
 condition evaluates to false or if the \meta{element-list} evaluates
 to null then the copy instruction won't be added.
+
+For example, the following first sets the \field{type} to
+\qt{ignored} for any entries that only have \glspl{ignoredrecord}
+and then copies all entries that don't have the \field{type} field
+set to \qt{ignored} to the glossary labelled \qt{index}:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[ignored]{ignored-type},
+ \csopt[\qtdelim{index} \oarg{ \field{type} \idx{notequalscmp} \qtdelim{ignored}} ]{copy-to-glossary}
+}
+\end{codeenv}
+
 The fallback action for a missing field value is governed by the
 \csopt{copy-to-glossary-missing-field-action} setting. The result of
 the string concatenation (if not null) is the label of the target
@@ -11681,22 +11693,47 @@ creation of the default \mainglossary.)
 
 \optsection[\subsubsection]{ignored-type}
 
-Any entry that only has \igls{ignoredrecord} will still be
+Any entry that only has \iglspl{ignoredrecord} will still be
 identified as having a record for selection purposes, which is
 necessary for the entry to be defined in the document, but it may be
 preferable to move such entries to a special \igls{ignoredglossary}.
-This can be done with \csopt[\meta{type}]{ignored-type}.
+This can be done with \csopt[\meta{type}]{ignored-type}, where
+\meta{type} is the label of the \igls{ignoredglossary}. 
+
+The glossary will be provided with 
+\ics{provideignoredglossary} to ensure that it's
+defined even if \longarg{no-provide-glossaries} is set
+(see \sectionref{sec:newglossary}).
+Note that it uses the unstarred \ics{provideignoredglossary}
+since it's assumed that it won't be needed in a list and
+therefore won't have a target. This is different to all the other
+settings that provide an \gls{ignoredglossary}, which use the
+starred version instead.
 
 This option is not implemented for entries that have \emph{no} records
 (those entries may have been selected because they are dependent on
-another entry). The entry must have at least one \gls{ignoredrecord} and 
-no other type of record. The glossary will be provided with the
-unstarred \gls{provideignoredglossary} command.
+another entry, such as a parent of a recorded child entry). The entry 
+must have at least one \gls{ignoredrecord} and 
+no other type of record and not be dependent on other entries or be
+cross-referenced by other entries.
 
-Note that the \csopt{trigger-type} option overrides the
-\csopt{ignored-type} option for
-entries that have records with the special
-format \ics{glstriggerrecordformat}.
+Note that the \csopt{trigger-type} option, if set, overrides the
+\csopt{ignored-type} option for entries that have records with the
+special format \ics{glstriggerrecordformat} (which is also
+considered an \gls{ignoredrecord}).  However, \csopt{ignored-type}
+will override the \csopt{type}, \csopt{dual-type},
+\csopt{tertiary-type} and the type specification in
+\csopt{secondary}.
+
+Ignored entries may be copied to another glossary
+with \csopt{copy-to-glossary}. If this is undesirable, a condition
+may be applied to prevent it. For example:
+\begin{codeenv}
+\gls{GlsXtrLoadResources}\oarg{
+ \csopt[ignored]{ignored-type},
+ \csopt[\qtdelim{index} \oarg{ \field{type} \idx{notequalscmp} \qtdelim{ignored} }]{copy-to-glossary}
+}
+\end{codeenv}
 
 \optsection[\subsubsection]{trigger-type}
 
