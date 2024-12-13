@@ -115,28 +115,28 @@ public class GlsRecordNameRef extends GlsRecord
          getTitle(), getHref(), getHcounter());
    }
 
-   public boolean locationMatch(GlsRecord record)
+   public boolean locationMatch(GlsRecord rec)
    {
       if (bib2gls.mergeNameRefOnLocation()
           || (bib2gls.mergeWrGlossaryLocations() 
             && getCounter().equals("wrglossary")))
       {
-         return super.locationMatch(record);
+         return super.locationMatch(rec);
       }
 
-      if (!(record instanceof GlsRecordNameRef))
+      if (!(rec instanceof GlsRecordNameRef))
       {
          return false;
       }
 
       // don't match if the counter name isn't the same
 
-      if (!getCounter().equals(record.getCounter()))
+      if (!getCounter().equals(rec.getCounter()))
       {
          return false;
       }
 
-      GlsRecordNameRef nameref = (GlsRecordNameRef)record;
+      GlsRecordNameRef nameref = (GlsRecordNameRef)rec;
 
       if (bib2gls.mergeNameRefOnTitle())
       {
@@ -161,48 +161,48 @@ public class GlsRecordNameRef extends GlsRecord
 
       if (!(obj instanceof GlsRecordNameRef)) return false;
 
-      GlsRecordNameRef record = (GlsRecordNameRef)obj;
+      GlsRecordNameRef rec = (GlsRecordNameRef)obj;
 
-      return href.equals(record.href) && title.equals(record.title)
-              && hcounter.equals(record.hcounter);
+      return href.equals(rec.href) && title.equals(rec.title)
+              && hcounter.equals(rec.hcounter);
    }
 
    /*
     * Match all parts except the format.
     */ 
-   public boolean partialMatch(GlsRecord record)
+   public boolean partialMatch(GlsRecord rec)
    {
       if (bib2gls.mergeNameRefOnLocation()
            || (bib2gls.mergeWrGlossaryLocations() 
                 && getCounter().equals("wrglossary"))
-           || !(record instanceof GlsRecordNameRef))
+           || !(rec instanceof GlsRecordNameRef))
       {
-         return super.partialMatch(record);
+         return super.partialMatch(rec);
       }
 
-      if (!getLabel().equals(record.getLabel()))
+      if (!getLabel().equals(rec.getLabel()))
       {
          return false;
       }
 
       // don't match if the counter name isn't the same
 
-      if (!getCounter().equals(record.getCounter()))
+      if (!getCounter().equals(rec.getCounter()))
       {
          return false;
       }
 
       if (bib2gls.mergeNameRefOnHcounter())
       {
-         return hcounter.equals(((GlsRecordNameRef)record).hcounter);
+         return hcounter.equals(((GlsRecordNameRef)rec).hcounter);
       }
 
       if (bib2gls.mergeNameRefOnTitle())
       {
-         return title.equals(((GlsRecordNameRef)record).title);
+         return title.equals(((GlsRecordNameRef)rec).title);
       }
 
-      return href.equals(((GlsRecordNameRef)record).href);
+      return href.equals(((GlsRecordNameRef)rec).href);
    }
 
    public String toString()

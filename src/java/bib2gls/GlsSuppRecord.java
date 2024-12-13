@@ -84,21 +84,21 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
          theLocation);
    }
 
-   public boolean locationMatch(GlsRecord record)
+   public boolean locationMatch(GlsRecord rec)
    {
-      if (!(record instanceof GlsSuppRecord))
+      if (!(rec instanceof GlsSuppRecord))
       {
          return false;
       }
 
-      GlsSuppRecord suppRecord = (GlsSuppRecord)record;
+      GlsSuppRecord suppRecord = (GlsSuppRecord)rec;
 
       if (!src.equals(suppRecord.src))
       {
          return false;
       }
 
-      return super.locationMatch(record);
+      return super.locationMatch(rec);
    }
 
    public boolean equals(Object obj)
@@ -111,15 +111,15 @@ public class GlsSuppRecord extends GlsRecord implements SupplementalRecord
       return src.equals(((GlsSuppRecord)obj).src);
    }
 
-   public boolean partialMatch(GlsRecord record)
+   public boolean partialMatch(GlsRecord rec)
    {
-      if (!(record instanceof GlsSuppRecord) 
-            || !super.partialMatch(record))
+      if (!(rec instanceof GlsSuppRecord) 
+            || !super.partialMatch(rec))
       {
          return false;
       }
 
-      return src.equals(((GlsSuppRecord)record).src);
+      return src.equals(((GlsSuppRecord)rec).src);
    }
 
    public String toString()

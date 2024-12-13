@@ -109,27 +109,27 @@ public class RecordCountRule
       }
    }
 
-   public boolean isAllowed(GlsRecord record)
+   public boolean isAllowed(GlsRecord rec)
    {
       switch (ruleType)
       {
          case ALL: return true;
-         case NON_IGNORED: return !bib2gls.isIgnored(record);
+         case NON_IGNORED: return !bib2gls.isIgnored(rec);
          case FORMAT: 
-           return formatPattern.matcher(record.getFormat()).matches();
+           return formatPattern.matcher(rec.getFormat()).matches();
          case COUNTER:
-           return counterPattern.matcher(record.getCounter()).matches();
+           return counterPattern.matcher(rec.getCounter()).matches();
       }
 
       if (matchAnd)
       {
-        return formatPattern.matcher(record.getFormat()).matches()
-            && counterPattern.matcher(record.getCounter()).matches();
+        return formatPattern.matcher(rec.getFormat()).matches()
+            && counterPattern.matcher(rec.getCounter()).matches();
       }
       else
       {
-        return formatPattern.matcher(record.getFormat()).matches()
-            || counterPattern.matcher(record.getCounter()).matches();
+        return formatPattern.matcher(rec.getFormat()).matches()
+            || counterPattern.matcher(rec.getCounter()).matches();
       }
    }
 

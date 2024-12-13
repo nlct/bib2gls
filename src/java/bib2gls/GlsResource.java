@@ -7191,17 +7191,17 @@ public class GlsResource
 
             for (GlsRecord r : records)
             {
-               GlsRecord record = getRecord(primaryId, dualId, tertiaryId, r);
+               GlsRecord rec = getRecord(primaryId, dualId, tertiaryId, r);
 
-               if (record == null) continue;
+               if (rec == null) continue;
 
-               String recordLabel = record.getLabel(recordLabelPrefix);
+               String recordLabel = rec.getLabel(recordLabelPrefix);
 
                if (recordLabel.equals(primaryId))
                {
                   if (dual == null)
                   {
-                     entry.addRecord(record);
+                     entry.addRecord(rec);
                      hasRecords = true;
                   }
                   else
@@ -7221,7 +7221,7 @@ public class GlsResource
  * If 'dual retain principal' is on, only add if this is a
  * principal location.
  */
-                        entry.addRecord(record,
+                        entry.addRecord(rec,
                          combineDualLocations == COMBINE_DUAL_LOCATIONS_DUAL_RETAIN_PRINCIPAL);
                         hasRecords = true;
                      }
@@ -7234,7 +7234,7 @@ public class GlsResource
 /*
  * Copy the record to the dual entry location list.
  */
-                        dual.addRecord(record.copy(dualId));
+                        dual.addRecord(rec.copy(dualId));
                         dualHasRecords = true;
                      }
                   }
@@ -7259,7 +7259,7 @@ public class GlsResource
  * If 'primary retain principal' is on, only add if this is a
  * principal location.
  */
-                        dual.addRecord(record,
+                        dual.addRecord(rec,
                            combineDualLocations == COMBINE_DUAL_LOCATIONS_PRIMARY_RETAIN_PRINCIPAL);
                         dualHasRecords = true;
                      }
@@ -7273,21 +7273,21 @@ public class GlsResource
 /*
  * Copy the record to the primary entry location list.
  */
-                        entry.addRecord(record.copy(primaryId));
+                        entry.addRecord(rec.copy(primaryId));
                         hasRecords = true;
                      }
                   }
 
                   if (tertiaryId != null)
                   {
-                     if (record.getLabel().equals(tertiaryId))
+                     if (rec.getLabel().equals(tertiaryId))
                      {
-                        dual.addRecord(record.copy(dualId));
+                        dual.addRecord(rec.copy(dualId));
                         dualHasRecords = true;
 
                         if (combineDualLocations != COMBINE_DUAL_LOCATIONS_OFF)
                         {
-                           entry.addRecord(record.copy(primaryId));
+                           entry.addRecord(rec.copy(primaryId));
                            hasRecords = true;
                         }
                      }
@@ -7297,13 +7297,13 @@ public class GlsResource
 
             // any 'see' records?
 
-            for (GlsSeeRecord record : seeRecords)
+            for (GlsSeeRecord rec : seeRecords)
             {
-               String recordLabel = getRecordLabel(record);
+               String recordLabel = getRecordLabel(rec);
 
                if (recordLabel.equals(primaryId))
                {
-                  entry.addRecord(record);
+                  entry.addRecord(rec);
                   hasRecords = true;
                }
 
@@ -7311,7 +7311,7 @@ public class GlsResource
                {
                   if (recordLabel.equals(dualId))
                   {
-                     dual.addRecord(record);
+                     dual.addRecord(rec);
                      dualHasRecords = true;
                   }
                }
@@ -7988,9 +7988,9 @@ public class GlsResource
       {
          for (SupplementalRecord suppRecord : supplementalRecords)
          {
-            GlsRecord record = (GlsRecord)suppRecord;
+            GlsRecord rec = (GlsRecord)suppRecord;
 
-            Bib2GlsEntry entry = getEntryMatchingRecord(record);
+            Bib2GlsEntry entry = getEntryMatchingRecord(rec);
 
             if (entry != null)
             {
@@ -7999,7 +7999,7 @@ public class GlsResource
                   setCategory(entry, supplementalCategory);
                }
 
-               entry.addSupplementalRecord(record);
+               entry.addSupplementalRecord(rec);
             }
          }
       }
@@ -8525,14 +8525,14 @@ public class GlsResource
 
          for (int i = 0; i < records.size(); i++)
          {
-            GlsRecord record = records.get(i);
+            GlsRecord rec = records.get(i);
 
-            Bib2GlsEntry entry = getEntryMatchingRecord(record, data, hasDuals);
+            Bib2GlsEntry entry = getEntryMatchingRecord(rec, data, hasDuals);
 
             if (entry != null && !entries.contains(entry))
             {
                 bib2gls.debugMessage("message.selecting.entry.record.match",
-                  entry.getId(), record.getLabel(recordLabelPrefix));
+                  entry.getId(), rec.getLabel(recordLabelPrefix));
 
                if (selectionMode == SELECTION_RECORDED_AND_DEPS
                  ||selectionMode == SELECTION_RECORDED_AND_DEPS_AND_SEE
@@ -8601,9 +8601,9 @@ public class GlsResource
 
          for (int i = 0; i < seeRecords.size(); i++)
          {
-            GlsSeeRecord record = seeRecords.get(i);
+            GlsSeeRecord rec = seeRecords.get(i);
 
-            String recordLabel = getRecordLabel(record);
+            String recordLabel = getRecordLabel(rec);
 
             Bib2GlsEntry entry = getEntry(recordLabel, data);
 
@@ -8648,11 +8648,11 @@ public class GlsResource
          {
             for (SupplementalRecord suppRecord : supplementalRecords)
             {
-               GlsRecord record = (GlsRecord) suppRecord;
+               GlsRecord rec = (GlsRecord) suppRecord;
 
-               Bib2GlsEntry entry = getEntryMatchingRecord(record, data, false);
+               Bib2GlsEntry entry = getEntryMatchingRecord(rec, data, false);
 
-               String label = record.getLabel(recordLabelPrefix);
+               String label = rec.getLabel(recordLabelPrefix);
 
                if (entry != null && !entries.contains(entry))
                {
@@ -10018,9 +10018,9 @@ public class GlsResource
                {
                   for (int i = records.size()-1; i >= 0; i--)
                   {
-                     GlsRecord record = records.get(i);
+                     GlsRecord rec = records.get(i);
 
-                     Bib2GlsEntry entry = getEntryMatchingRecord(record, 
+                     Bib2GlsEntry entry = getEntryMatchingRecord(rec, 
                         secondaryList, false);
 
                      if (entry != null)
@@ -10036,9 +10036,9 @@ public class GlsResource
                }
                else
                {
-                  for (GlsRecord record : records)
+                  for (GlsRecord rec : records)
                   {
-                     Bib2GlsEntry entry = getEntryMatchingRecord(record, 
+                     Bib2GlsEntry entry = getEntryMatchingRecord(rec, 
                         secondaryList, false);
 
                      if (entry != null)
@@ -11753,9 +11753,9 @@ public class GlsResource
     * or null if no match
     */ 
    public GlsRecord getRecord(String primaryId, String dualId,
-     String tertiaryId, GlsRecord record)
+     String tertiaryId, GlsRecord rec)
    {
-      return record.getRecord(this, primaryId, dualId, tertiaryId);
+      return rec.getRecord(this, primaryId, dualId, tertiaryId);
    }
 
    /**
@@ -11765,30 +11765,30 @@ public class GlsResource
     * @return the entry that matches the record label or null if not
     * found
     */ 
-   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record)
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord rec)
    {
-      return record.getEntry(this, bibData, dualData);
+      return rec.getEntry(this, bibData, dualData);
    }
 
    /**
     * Gets the entry that matches the given record.
-    * @param record the record
+    * @param rec the record
     * @param data the list of data to search for the entry
     * @param tryFlipping if true try matching the flipped label if
     * no match on the label
     * @return the entry that matches the record label or null if not
     * found
     */ 
-   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord record,
+   public Bib2GlsEntry getEntryMatchingRecord(GlsRecord rec,
       Vector<Bib2GlsEntry> data, boolean tryFlipping)
    {
-      return record.getEntry(this, data, tryFlipping);
+      return rec.getEntry(this, data, tryFlipping);
    }
 
    @Deprecated
-   public String getRecordLabel(GlsRecord record)
+   public String getRecordLabel(GlsRecord rec)
    {
-      String label = record.getLabel();
+      String label = rec.getLabel();
 
       if (recordLabelPrefix == null || label.startsWith(recordLabelPrefix))
       {
@@ -11800,17 +11800,17 @@ public class GlsResource
 
    /**
     * Gets the prefixed label associated with the record.
-    * @param record the cross-reference record
+    * @param rec the cross-reference record
     * @return the prefixed label
     */ 
-   public String getRecordLabel(GlsSeeRecord record)
+   public String getRecordLabel(GlsSeeRecord rec)
    {
       if (recordLabelPrefix == null)
       {
-         return record.getLabel();
+         return rec.getLabel();
       }
 
-      return recordLabelPrefix+record.getLabel();
+      return recordLabelPrefix+rec.getLabel();
    }
 
    /**
@@ -17794,11 +17794,11 @@ public class GlsResource
       {
          Vector<GlsRecord> allRecords = bib2gls.getRecords();
 
-         for (GlsRecord record : allRecords)
+         for (GlsRecord rec : allRecords)
          {
-            if (element.equals(record.getLabel()))
+            if (element.equals(rec.getLabel()))
             {
-               set.add(record);
+               set.add(rec);
                return;
             }
          }
@@ -17850,7 +17850,7 @@ public class GlsResource
          for (Iterator<GlsRecord> iter = reverse ? set.descendingIterator()
            : set.iterator() ; iter.hasNext(); )
          {
-            GlsRecord record = iter.next();
+            GlsRecord rec = iter.next();
 
             if (addSep)
             {
@@ -17862,7 +17862,7 @@ public class GlsResource
                addSep = true;
             }
 
-            String id = record.getLabel();
+            String id = rec.getLabel();
             elementList.add(listener.createString(id));
             builder.append(id);
          }

@@ -55,11 +55,11 @@ public class Bib2GlsEntryRecordCountComparator extends Bib2GlsEntryNumericCompar
       {
          for (Iterator<GlsRecord> it = keys.iterator(); it.hasNext(); )
          {
-            GlsRecord record = it.next();
+            GlsRecord rec = it.next();
 
-            if (record.getLabel().equals(id))
+            if (rec.getLabel().equals(id))
             {
-               Integer count = bib2gls.getRecordCount(record);
+               Integer count = bib2gls.getRecordCount(rec);
                total += count;
             }
          }

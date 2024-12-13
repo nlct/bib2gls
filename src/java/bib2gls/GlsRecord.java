@@ -233,14 +233,14 @@ public class GlsRecord implements Comparable<GlsRecord>
    }
 
    @Override
-   public int compareTo(GlsRecord record)
+   public int compareTo(GlsRecord rec)
    {
-      if (index == record.index)
+      if (index == rec.index)
       {
          return 0;
       }
 
-      return index < record.index ? -1 : 1;
+      return index < rec.index ? -1 : 1;
    }
 
    public long getIndex()
@@ -439,9 +439,9 @@ public class GlsRecord implements Comparable<GlsRecord>
          prefix, counter, fmt, theLocation);
    }
 
-   public boolean locationMatch(GlsRecord record)
+   public boolean locationMatch(GlsRecord rec)
    {
-      if (location.equals(record.location))
+      if (location.equals(rec.location))
       {
          return true;
       }
@@ -449,7 +449,7 @@ public class GlsRecord implements Comparable<GlsRecord>
       if (bib2gls.mergeWrGlossaryLocations())
       {
          Matcher m1 = WRGLOSSARY_PATTERN.matcher(location);
-         Matcher m2 = WRGLOSSARY_PATTERN.matcher(record.location);
+         Matcher m2 = WRGLOSSARY_PATTERN.matcher(rec.location);
 
          if (m1.matches() && m2.matches() && m1.group(2).equals(m2.group(2)))
          {
@@ -464,37 +464,37 @@ public class GlsRecord implements Comparable<GlsRecord>
    {
       if (obj == null || !(obj instanceof GlsRecord)) return false;
 
-      GlsRecord record = (GlsRecord)obj;
+      GlsRecord rec = (GlsRecord)obj;
 
-      return label.equals(record.label)
-           && prefix.equals(record.prefix)
-           && counter.equals(record.counter)
-           && format.equals(record.format)
-           && locationMatch(record);
+      return label.equals(rec.label)
+           && prefix.equals(rec.prefix)
+           && counter.equals(rec.counter)
+           && format.equals(rec.format)
+           && locationMatch(rec);
    }
 
    /*
     * Match all parts except the format.
     */ 
-   public boolean partialMatch(GlsRecord record)
+   public boolean partialMatch(GlsRecord rec)
    {
-      return label.equals(record.label)
-           && prefix.equals(record.prefix)
-           && counter.equals(record.counter)
-           && locationMatch(record);
+      return label.equals(rec.label)
+           && prefix.equals(rec.prefix)
+           && counter.equals(rec.counter)
+           && locationMatch(rec);
    }
 
    // does location for this follow location for other record?
-   public boolean follows(GlsRecord record, int gap, int[] maxGap)
+   public boolean follows(GlsRecord rec, int gap, int[] maxGap)
    {
-      if (!prefix.equals(record.prefix)
-        ||!counter.equals(record.counter)
-        ||!format.equals(record.format))
+      if (!prefix.equals(rec.prefix)
+        ||!counter.equals(rec.counter)
+        ||!format.equals(rec.format))
       {
          return false;
       }
 
-      return consecutive(record.location, location, gap, maxGap);
+      return consecutive(rec.location, location, gap, maxGap);
    }
 
    // is location2 one more than location1?

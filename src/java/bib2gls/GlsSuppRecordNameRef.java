@@ -87,21 +87,21 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
          getTitle(), getHref(), getHcounter(), bib2gls.getTeXPathHref(src));
    }
 
-   public boolean locationMatch(GlsRecord record)
+   public boolean locationMatch(GlsRecord rec)
    {
-      if (!(record instanceof GlsSuppRecordNameRef))
+      if (!(rec instanceof GlsSuppRecordNameRef))
       {
          return false;
       }
 
-      GlsSuppRecordNameRef suppRecord = (GlsSuppRecordNameRef)record;
+      GlsSuppRecordNameRef suppRecord = (GlsSuppRecordNameRef)rec;
 
       if (!src.equals(suppRecord.src))
       {
          return false;
       }
 
-      return super.locationMatch(record);
+      return super.locationMatch(rec);
    }
 
    public boolean equals(Object obj)
@@ -114,15 +114,15 @@ public class GlsSuppRecordNameRef extends GlsRecordNameRef
       return src.equals(((GlsSuppRecordNameRef)obj).src);
    }
 
-   public boolean partialMatch(GlsRecord record)
+   public boolean partialMatch(GlsRecord rec)
    {
-      if (!(record instanceof GlsSuppRecordNameRef) 
-            || !super.partialMatch(record))
+      if (!(rec instanceof GlsSuppRecordNameRef) 
+            || !super.partialMatch(rec))
       {
          return false;
       }
 
-      return src.equals(((GlsSuppRecordNameRef)record).src);
+      return src.equals(((GlsSuppRecordNameRef)rec).src);
    }
 
    public String toString()

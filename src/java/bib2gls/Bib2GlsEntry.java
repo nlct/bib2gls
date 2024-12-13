@@ -3433,18 +3433,18 @@ public class Bib2GlsEntry extends BibEntry
       return false;
    }
 
-   public void addRecord(GlsSeeRecord record)
+   public void addRecord(GlsSeeRecord rec)
    {
-      // add as an ignored record
+      // add as an ignored rec
 
-      addIgnoredRecord(new GlsRecord(bib2gls, record.getLabel(),
+      addIgnoredRecord(new GlsRecord(bib2gls, rec.getLabel(),
        "", "page", "glsignore", ""));
 
       StringBuilder builder = new StringBuilder();
 
       if (crossRefTag == null)
       {
-         crossRefTag = record.getTag();
+         crossRefTag = rec.getTag();
       }
 
       if (crossRefTag != null)
@@ -3454,7 +3454,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (crossRefs == null)
       {
-         crossRefs = record.getXrLabels();
+         crossRefs = rec.getXrLabels();
 
          for (int i = 0; i < crossRefs.length; i++)
          {
@@ -3479,7 +3479,7 @@ public class Bib2GlsEntry extends BibEntry
       {
          Vector<String> list = new Vector<String>();
 
-         String[] newRefs = record.getXrLabels();
+         String[] newRefs = rec.getXrLabels();
 
          char sep = 0;
 
@@ -3545,30 +3545,30 @@ public class Bib2GlsEntry extends BibEntry
       return triggerRecordFound;
    }
 
-   public void addRecord(GlsRecord record)
+   public void addRecord(GlsRecord rec)
    {
-      addRecord(record, false);
+      addRecord(rec, false);
    }
 
-   public void addRecord(GlsRecord record, boolean onlyIfPrimary)
+   public void addRecord(GlsRecord rec, boolean onlyIfPrimary)
    {
-      if (record.getFormat().equals("glsignore"))
+      if (rec.getFormat().equals("glsignore"))
       {
-         bib2gls.debugMessage("message.ignored.record", record);
-         addIgnoredRecord(record);
+         bib2gls.debugMessage("message.ignored.record", rec);
+         addIgnoredRecord(rec);
          return;
       }
 
       if (recordIndex == -1)
       {
-         setRecordIndex(record.getIndex());
+         setRecordIndex(rec.getIndex());
       }
 
-      if (record.getFormat().equals("glstriggerrecordformat"))
+      if (rec.getFormat().equals("glstriggerrecordformat"))
       {
          triggerRecordFound = true;
-         bib2gls.debugMessage("message.ignored.record", record);
-         addIgnoredRecord(record);
+         bib2gls.debugMessage("message.ignored.record", rec);
+         addIgnoredRecord(rec);
          return;
       }
 
@@ -3577,15 +3577,15 @@ public class Bib2GlsEntry extends BibEntry
       {
          String indexCounter = resource.getSaveIndexCounter();
 
-         if (indexCounter != null && record.getCounter().equals("wrglossary"))
+         if (indexCounter != null && rec.getCounter().equals("wrglossary"))
          {
             if (indexCounter.equals("true"))
             {
-               indexCounterRecord = record;
+               indexCounterRecord = rec;
             }
-            else if (record.getFormat().equals(indexCounter))
+            else if (rec.getFormat().equals(indexCounter))
             {
-               indexCounterRecord = record;
+               indexCounterRecord = rec;
             }
          }
       }
@@ -3594,9 +3594,9 @@ public class Bib2GlsEntry extends BibEntry
       int setting = GlsResource.SAVE_PRIMARY_LOCATION_OFF;
       boolean addRecord = !onlyIfPrimary;
 
-      if (resource.isPrimaryLocation(record.getFormat()))
+      if (resource.isPrimaryLocation(rec.getFormat()))
       {
-         primary = record;
+         primary = rec;
 
          int primaryLocCounterSetting = resource.getPrimaryLocationCountersSetting();
 
@@ -3668,51 +3668,51 @@ public class Bib2GlsEntry extends BibEntry
 
       if (records != null)
       {
-         if (!records.contains(record))
+         if (!records.contains(rec))
          {
-            bib2gls.debugMessage("message.adding.record", record,
+            bib2gls.debugMessage("message.adding.record", rec,
              getId());
 
             if (primary != null 
                  && setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
             {
-               record = (GlsRecord)record.clone();
-               record.setFormat("glsnumberformat");
-               records.add(record);
+               rec = (GlsRecord)rec.clone();
+               rec.setFormat("glsnumberformat");
+               records.add(rec);
             }
             else if (primary == null
                 || setting == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
             {
-               records.add(record);
+               records.add(rec);
             }
             else if (setting == GlsResource.SAVE_PRIMARY_LOCATION_START)
             {
-               records.add(primaryRecords.size()-1, record);
+               records.add(primaryRecords.size()-1, rec);
             }
          }
       }
       else if (primary == null
                 || setting != GlsResource.SAVE_PRIMARY_LOCATION_REMOVE)
       {
-         String counter = record.getCounter();
+         String counter = rec.getCounter();
          Vector<GlsRecord> list = recordMap.get(counter);
 
-         if (list != null && !list.contains(record))
+         if (list != null && !list.contains(rec))
          {
-            bib2gls.debugMessage("message.adding.counter.record", record,
+            bib2gls.debugMessage("message.adding.counter.record", rec,
              getId(), counter);
 
             if (primary != null
                || setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
             {
-               record = (GlsRecord)record.clone();
-               record.setFormat("glsnumberformat");
-               list.add(record);
+               rec = (GlsRecord)rec.clone();
+               rec.setFormat("glsnumberformat");
+               list.add(rec);
             }
             else if (primary == null
                   || setting == GlsResource.SAVE_PRIMARY_LOCATION_RETAIN)
             {
-               list.add(record);
+               list.add(rec);
             }
             else if (resource.getSavePrimaryLocationSetting()
                 == GlsResource.SAVE_PRIMARY_LOCATION_START)
@@ -3725,7 +3725,7 @@ public class Bib2GlsEntry extends BibEntry
                {
                   if (!resource.isPrimaryLocation(list.get(i).getFormat()))
                   {
-                     list.add(i, record);
+                     list.add(i, rec);
                      done=true;
                      break;
                   }
@@ -3733,7 +3733,7 @@ public class Bib2GlsEntry extends BibEntry
 
                if (!done)
                {
-                  list.add(record);
+                  list.add(rec);
                }
             }
          }
@@ -3763,7 +3763,7 @@ public class Bib2GlsEntry extends BibEntry
       }
    }
 
-   public void addSupplementalRecord(GlsRecord record)
+   public void addSupplementalRecord(GlsRecord rec)
    {
       if (supplementalRecords == null)
       {
@@ -3772,7 +3772,7 @@ public class Bib2GlsEntry extends BibEntry
 
       if (!bib2gls.isMultipleSupplementarySupported())
       {
-         String fmt = record.getFormat();
+         String fmt = rec.getFormat();
 
          if (fmt.startsWith("("))
          {
@@ -3787,16 +3787,16 @@ public class Bib2GlsEntry extends BibEntry
             fmt = "glsxtrsupphypernumber";
          }
 
-         record.setFormat(fmt);
+         rec.setFormat(fmt);
       }
-      else if (record instanceof SupplementalRecord)
+      else if (rec instanceof SupplementalRecord)
       {
          if (supplementalRecordMap == null)
          {
             supplementalRecordMap = new HashMap<TeXPath,Vector<GlsRecord>>();
          }
 
-         TeXPath source = ((SupplementalRecord)record).getSource();
+         TeXPath source = ((SupplementalRecord)rec).getSource();
 
          Vector<GlsRecord> list = supplementalRecordMap.get(source);
 
@@ -3806,53 +3806,53 @@ public class Bib2GlsEntry extends BibEntry
             supplementalRecordMap.put(source, list);
          }
 
-         if (!list.contains(record))
+         if (!list.contains(rec))
          {
-            list.add(record);
+            list.add(rec);
          }
       }
 
-      if (!supplementalRecords.contains(record))
+      if (!supplementalRecords.contains(rec))
       {
          bib2gls.debugMessage("message.adding.supplemental.record", getId());
-         supplementalRecords.add(record);
+         supplementalRecords.add(rec);
       }
    }
 
-   public void addIgnoredRecord(GlsRecord record)
+   public void addIgnoredRecord(GlsRecord rec)
    {
       if (ignoredRecords == null)
       {
          ignoredRecords = new Vector<GlsRecord>();
       }
 
-      if (!ignoredRecords.contains(record))
+      if (!ignoredRecords.contains(rec))
       {
-         ignoredRecords.add(record);
+         ignoredRecords.add(rec);
       }
    }
 
-   public static void insertRecord(GlsRecord record, Vector<GlsRecord> list)
+   public static void insertRecord(GlsRecord rec, Vector<GlsRecord> list)
    {
       for (int i = 0, n = list.size(); i < n; i++)
       {
          GlsRecord r = list.get(i);
 
-         if (r.equals(record))
+         if (r.equals(rec))
          {
             return;
          }
 
-         int result = record.compareTo(r);
+         int result = rec.compareTo(r);
 
          if (result <= 0)
          {
-            list.add(i, record);
+            list.add(i, rec);
             return;
          }
       }
 
-      list.add(record);
+      list.add(rec);
    }
 
    public void copyRecordsFrom(Bib2GlsEntry entry)
@@ -3865,20 +3865,20 @@ public class Bib2GlsEntry extends BibEntry
 
       if (entry.records != null)
       {
-         for (GlsRecord record : entry.records)
+         for (GlsRecord rec : entry.records)
          {
             bib2gls.debugMessage(
-               "message.copying.record", record,
+               "message.copying.record", rec,
                  entry.getId(), getId());
 
-            if (record.getFormat().equals("glsignore")
-              || record.getFormat().equals("glstriggerrecordformat"))
+            if (rec.getFormat().equals("glsignore")
+              || rec.getFormat().equals("glstriggerrecordformat"))
             {
-               addIgnoredRecord(record.copy(getId()));
+               addIgnoredRecord(rec.copy(getId()));
             }
             else
             {
-               insertRecord(record.copy(getId()), records);
+               insertRecord(rec.copy(getId()), records);
             }
          }
       }
@@ -3901,20 +3901,20 @@ public class Bib2GlsEntry extends BibEntry
                   recordMap.put(counter, thisList);
                }
 
-               for (GlsRecord record : list)
+               for (GlsRecord rec : list)
                {
                   bib2gls.debugMessage(
-                     "message.copying.record", record,
+                     "message.copying.record", rec,
                        entry.getId(), getId());
 
-                  if (record.getFormat().equals("glsignore")
-                    || record.getFormat().equals("glstriggerrecordformat"))
+                  if (rec.getFormat().equals("glsignore")
+                    || rec.getFormat().equals("glstriggerrecordformat"))
                   {
-                     addIgnoredRecord(record.copy(getId()));
+                     addIgnoredRecord(rec.copy(getId()));
                   }
                   else
                   {
-                     insertRecord(record.copy(getId()), thisList);
+                     insertRecord(rec.copy(getId()), thisList);
                   }
                }
             }
@@ -3928,13 +3928,13 @@ public class Bib2GlsEntry extends BibEntry
             primaryRecords = new Vector<GlsRecord>();
          }
 
-         for (GlsRecord record : entry.primaryRecords)
+         for (GlsRecord rec : entry.primaryRecords)
          {
             bib2gls.debugMessage(
-               "message.copying.primary.record", record,
+               "message.copying.primary.record", rec,
                  entry.getId(), getId());
 
-            primaryRecords.add(record);
+            primaryRecords.add(rec);
          }
       }
       else if (entry.primaryRecordMap != null)
@@ -3959,26 +3959,26 @@ public class Bib2GlsEntry extends BibEntry
 
             Vector<GlsRecord> otherList = entry.primaryRecordMap.get(counter);
 
-            for (GlsRecord record : otherList)
+            for (GlsRecord rec : otherList)
             {
                bib2gls.debugMessage(
-                 "message.copying.primary.record", record,
+                 "message.copying.primary.record", rec,
                    entry.getId(), getId());
 
-               list.add(record);
+               list.add(rec);
             }
          }
       }
 
       if (entry.supplementalRecords != null)
       {
-         for (GlsRecord record : entry.supplementalRecords)
+         for (GlsRecord rec : entry.supplementalRecords)
          {
             bib2gls.debugMessage(
-               "message.copying.record", record,
+               "message.copying.record", rec,
                  entry.getId(), getId());
 
-            addSupplementalRecord(record.copy(getId()));
+            addSupplementalRecord(rec.copy(getId()));
          }
       }
    }
@@ -4008,12 +4008,12 @@ public class Bib2GlsEntry extends BibEntry
 
       for (int i = 0, n = recordList.size(); i < n; i++)
       {
-         GlsRecord record = recordList.get(i);
+         GlsRecord rec = recordList.get(i);
          String delimN = (i == n-1 ? "\\bibglslastDelimN " : "\\bibglsdelimN ");
 
-         locationList.add(record.getListTeXCode());
+         locationList.add(rec.getListTeXCode());
    
-         Matcher m = RANGE_PATTERN.matcher(record.getFormat());
+         Matcher m = RANGE_PATTERN.matcher(rec.getFormat());
    
          if (m.matches())
          {
@@ -4024,15 +4024,15 @@ public class Bib2GlsEntry extends BibEntry
                if (rangeStart != null)
                {
                   throw new Bib2GlsException(bib2gls.getMessage(
-                    "error.nested.range", record, rangeStart));
+                    "error.nested.range", rec, rangeStart));
                }
    
-               rangeStart = record;
+               rangeStart = rec;
                rangeFmt = m.group(2);
    
                if (resource.isMergeRangesOn())
                {
-                  explicitRangeStart = (GlsRecord)record.clone();
+                  explicitRangeStart = (GlsRecord)rec.clone();
                   explicitRangeStart.setFormat(rangeFmt);
 
                   if (prev != null && explicitRangeStart.follows(prev, gap, maxGap))
@@ -4053,7 +4053,7 @@ public class Bib2GlsEntry extends BibEntry
                         startRangeIdx = builder.length();
                      }
 
-                     builder.append(record.getFmtTeXCode());
+                     builder.append(rec.getFmtTeXCode());
                   }
                   else
                   {
@@ -4067,7 +4067,7 @@ public class Bib2GlsEntry extends BibEntry
                      implicitStart = rangeStart;
                      builder.append(delimN);
                      startRangeIdx = builder.length();
-                     builder.append(record.getFmtTeXCode());
+                     builder.append(rec.getFmtTeXCode());
                   }
 
                   count = minRange;
@@ -4091,7 +4091,7 @@ public class Bib2GlsEntry extends BibEntry
                   startRangeIdx = builder.length();
 
                   builder.append("\\bibglsrange{");
-                  builder.append(record.getFmtTeXCode());
+                  builder.append(rec.getFmtTeXCode());
                }
 
                explicitRangeEnd = null;
@@ -4101,12 +4101,12 @@ public class Bib2GlsEntry extends BibEntry
                if (rangeStart == null)
                {
                   throw new Bib2GlsException(bib2gls.getMessage(
-                    "error.range.missing.start", record));
+                    "error.range.missing.start", rec));
                }
 
                if (resource.isMergeRangesOn())
                {
-                  explicitRangeEnd = (GlsRecord)record.clone();
+                  explicitRangeEnd = (GlsRecord)rec.clone();
                   explicitRangeEnd.setFormat(rangeFmt);
                   prev = explicitRangeEnd;
                   explicitRangeStart = null;
@@ -4118,7 +4118,7 @@ public class Bib2GlsEntry extends BibEntry
                   mid.setLength(0);
 
                   builder.append("\\delimR ");
-                  builder.append(record.getFmtTeXCode(rangeStart, compact));
+                  builder.append(rec.getFmtTeXCode(rangeStart, compact));
                   builder.append("}");
                }
 
@@ -4128,16 +4128,16 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (rangeStart != null)
          {
-             String recordFmt = record.getFormat();
+             String recordFmt = rec.getFormat();
 
-             if (!(rangeStart.getPrefix().equals(record.getPrefix())
-               &&  rangeStart.getCounter().equals(record.getCounter())))
+             if (!(rangeStart.getPrefix().equals(rec.getPrefix())
+               &&  rangeStart.getCounter().equals(rec.getCounter())))
              {
                 bib2gls.warningMessage(
-                    "error.inconsistent.range", record, rangeStart);
+                    "error.inconsistent.range", rec, rangeStart);
 
                 String content = String.format("\\bibglsinterloper{%s}", 
-                  record.getFmtTeXCode());
+                  rec.getFmtTeXCode());
 
                 builder.insert(startRangeIdx, content);
 
@@ -4150,24 +4150,24 @@ public class Bib2GlsEntry extends BibEntry
                       || rangeFmt.equals(recordFmt))
              {
                 bib2gls.debugMessage("message.merge.range",
-                  record, rangeStart);
+                  rec, rangeStart);
              }
              else
              {
-                if (record.getFormat().equals("glsnumberformat")
+                if (rec.getFormat().equals("glsnumberformat")
                  || rangeFmt.isEmpty())
                 {
                    bib2gls.verboseMessage(
-                      "message.inconsistent.range", record, rangeStart);
+                      "message.inconsistent.range", rec, rangeStart);
                 }
                 else
                 {
                    bib2gls.warningMessage(
-                      "error.inconsistent.range", record, rangeStart);
+                      "error.inconsistent.range", rec, rangeStart);
                 }
 
                 String content = String.format("\\bibglsinterloper{%s}", 
-                  record.getFmtTeXCode());
+                  rec.getFmtTeXCode());
 
                 builder.insert(startRangeIdx, content);
 
@@ -4177,7 +4177,7 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (explicitRangeEnd != null)
          {
-            if (!record.follows(explicitRangeEnd, gap, maxGap))
+            if (!rec.follows(explicitRangeEnd, gap, maxGap))
             {
                builder.append(mid);
                builder.append("\\delimR ");
@@ -4191,7 +4191,7 @@ public class Bib2GlsEntry extends BibEntry
                maxGap[0] = 0;
 
                builder.append(delimN);
-               builder.append(record.getFmtTeXCode());
+               builder.append(rec.getFmtTeXCode());
                mid.setLength(0);
                count = 1;
                maxGap[0] = 0;
@@ -4200,10 +4200,10 @@ public class Bib2GlsEntry extends BibEntry
             else
             {
                mid.append(delimN);
-               mid.append(record.getFmtTeXCode());
+               mid.append(rec.getFmtTeXCode());
             }
 
-            prev = record;
+            prev = rec;
             explicitRangeEnd = null;
          }
          else if (prev == null)
@@ -4219,10 +4219,10 @@ public class Bib2GlsEntry extends BibEntry
                builder.append(delimN);
             }
 
-            builder.append(record.getFmtTeXCode());
+            builder.append(rec.getFmtTeXCode());
          }
          else if (minRange < Integer.MAX_VALUE
-                  && record.follows(prev, gap, maxGap))
+                  && rec.follows(prev, gap, maxGap))
          {
             if (count == 1)
             {
@@ -4232,13 +4232,13 @@ public class Bib2GlsEntry extends BibEntry
             count++;
 
             mid.append(delimN);
-            mid.append(record.getFmtTeXCode());
+            mid.append(rec.getFmtTeXCode());
          }
          else if (count==2 && suffixF != null)
          {
             builder.append(suffixF);
             builder.append(delimN);
-            builder.append(record.getFmtTeXCode());
+            builder.append(rec.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
@@ -4248,7 +4248,7 @@ public class Bib2GlsEntry extends BibEntry
          {
             builder.append(suffixFF);
             builder.append(delimN);
-            builder.append(record.getFmtTeXCode());
+            builder.append(rec.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
@@ -4267,7 +4267,7 @@ public class Bib2GlsEntry extends BibEntry
             maxGap[0] = 0;
 
             builder.append(delimN);
-            builder.append(record.getFmtTeXCode());
+            builder.append(rec.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
             implicitStart = null;
@@ -4276,14 +4276,14 @@ public class Bib2GlsEntry extends BibEntry
          {
             builder.append(mid);
             builder.append(delimN);
-            builder.append(record.getFmtTeXCode());
+            builder.append(rec.getFmtTeXCode());
             mid.setLength(0);
             count = 1;
             maxGap[0] = 0;
             implicitStart = null;
          }
 
-         prev = record;
+         prev = rec;
          start = false;
       }
 

@@ -3162,9 +3162,9 @@ public class Bib2Gls extends BibGlsTeXApp
       return dependencies == null ? null : dependencies.iterator();
    }
 
-   public boolean isIgnored(GlsRecord record)
+   public boolean isIgnored(GlsRecord rec)
    {
-      return isIgnoredFormat(record.getFormat());
+      return isIgnoredFormat(rec.getFormat());
    }
 
    private boolean isIgnoredFormat(String fmt)
@@ -4108,11 +4108,11 @@ public class Bib2Gls extends BibGlsTeXApp
 
    public GlsSeeRecord getSeeRecord(String label)
    {
-      for (GlsSeeRecord record : seeRecords)
+      for (GlsSeeRecord rec: seeRecords)
       {
-         if (record.getLabel().equals(label))
+         if (rec.getLabel().equals(label))
          {
-            return record;
+            return rec;
          }
       }
 
@@ -4131,9 +4131,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
    public boolean hasRecord(String id)
    {
-      for (GlsRecord record : records)
+      for (GlsRecord rec: records)
       {
-         if (id.equals(record.getLabel()))
+         if (id.equals(rec.getLabel()))
          {
             return true;
          }
@@ -4144,9 +4144,9 @@ public class Bib2Gls extends BibGlsTeXApp
 
    public boolean hasSeeRecord(String id)
    {
-      for (GlsSeeRecord record : seeRecords)
+      for (GlsSeeRecord rec: seeRecords)
       {
-         if (id.equals(record.getLabel()))
+         if (id.equals(rec.getLabel()))
          {
             return true;
          }
@@ -4155,7 +4155,7 @@ public class Bib2Gls extends BibGlsTeXApp
       return false;
    }
 
-   public GlsRecord getRecordCountKey(GlsRecord record)
+   public GlsRecord getRecordCountKey(GlsRecord rec)
    {
       if (recordCount == null) return null;
 
@@ -4165,12 +4165,12 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          GlsRecord key = it.next();
 
-         boolean match = key.getLabel().equals(record.getLabel())
-          && key.getCounter().equals(record.getCounter());
+         boolean match = key.getLabel().equals(rec.getLabel())
+          && key.getCounter().equals(rec.getCounter());
 
          if (saveRecordCountUnit)
          {
-            match = match && key.getLocation().equals(record.getLocation());
+            match = match && key.getLocation().equals(rec.getLocation());
          }
 
          if (match)
@@ -4208,20 +4208,20 @@ public class Bib2Gls extends BibGlsTeXApp
 
       for (Iterator<GlsRecord> it = keys.iterator(); it.hasNext(); )
       {
-         GlsRecord record = it.next();
+         GlsRecord rec = it.next();
 
-         if (record.getLabel().equals(entryLabel))
+         if (rec.getLabel().equals(entryLabel))
          {
-            Integer count = getRecordCount(record);
+            Integer count = getRecordCount(rec);
             total += count;
 
             writer.format("\\bibglssetrecordcount{%s}{%s}{%d}%n",
-              entryLabel, record.getCounter(), count);
+              entryLabel, rec.getCounter(), count);
 
             if (saveRecordCountUnit)
             {
                writer.format("\\bibglssetlocationrecordcount{%s}{%s}{%s}{%d}%n",
-                 entryLabel, record.getCounter(), record.getLocation(), count);
+                 entryLabel, rec.getCounter(), rec.getLocation(), count);
             }
          }
       }
@@ -4441,17 +4441,17 @@ public class Bib2Gls extends BibGlsTeXApp
       commonCommandsDone = true;
    }
 
-   public void incRecordCount(GlsRecord record)
+   public void incRecordCount(GlsRecord rec)
    {
       if (recordCount == null) return;
 
-      GlsRecord key = getRecordCountKey(record);
+      GlsRecord key = getRecordCountKey(rec);
 
-      if (recordCountRule.isAllowed(record))
+      if (recordCountRule.isAllowed(rec))
       {
          if (key == null)
          {
-            recordCount.put(record, Integer.valueOf(1));
+            recordCount.put(rec, Integer.valueOf(1));
          }
          else
          {
