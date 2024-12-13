@@ -107,8 +107,9 @@
   },
  copy-to-glossary =
   {
-    "index" [ identifier =/acronyms|notation|glossary/ ]
+    "index" [ type<>"ignored" ]
   },
+ ignored-type=ignored,
  identical-sort-action=def, % order entries with identical sort values according to their definition
  set-widest, % needed for alttree style
 ]
@@ -284,6 +285,7 @@ Another example: \ifglsused{cardinality}{cardinality has been
 used}{cardinality
 hasn't been used}.
 
+\glsadd[format=glsignore]{pglist}% comment out to test this paragraph
 Example of a term that isn't selected (because it hasn't
 been indexed) and so
 won't be defined: \ifglsused{pglist}{pglist has been used}{pglist

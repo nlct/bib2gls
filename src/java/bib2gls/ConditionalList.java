@@ -309,6 +309,12 @@ public class ConditionalList extends Vector<ConditionalListElement>
             obj = stack.pop();
             stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
+
+            if (nextObj instanceof SingleToken)
+            {
+               nextCp = ((SingleToken)nextObj).getCharCode();
+               nextCatCode = ((SingleToken)nextObj).getCatCode();
+            }
          }
          else if (nextCp == '>')
          {
@@ -316,6 +322,12 @@ public class ConditionalList extends Vector<ConditionalListElement>
             obj = stack.pop();
             stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
+
+            if (nextObj instanceof SingleToken)
+            {
+               nextCp = ((SingleToken)nextObj).getCharCode();
+               nextCatCode = ((SingleToken)nextObj).getCatCode();
+            }
          }
          else
          {
@@ -330,6 +342,12 @@ public class ConditionalList extends Vector<ConditionalListElement>
             obj = stack.pop();
             stack.popLeadingWhiteSpace();
             nextObj = stack.peek();
+
+            if (nextObj instanceof SingleToken)
+            {
+               nextCp = ((SingleToken)nextObj).getCharCode();
+               nextCatCode = ((SingleToken)nextObj).getCatCode();
+            }
          }
          else
          {

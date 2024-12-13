@@ -3367,6 +3367,22 @@ public class Bib2GlsEntry extends BibEntry
       return n;
    }
 
+   // only has ignored records
+   public boolean isIgnoredEntry()
+   {
+      if (ignoredRecords == null
+          || (records != null && !records.isEmpty())
+          || (supplementalRecords != null && !supplementalRecords.isEmpty())
+          || (primaryRecords != null && !primaryRecords.isEmpty())
+          || (recordMap != null && !recordMap.isEmpty())
+          || resource.hasEntryMglsRecords(getId()))
+      {
+         return false;
+      }
+
+      return !ignoredRecords.isEmpty();
+   }
+
    public int mainRecordCount()
    {
       int n = 0;

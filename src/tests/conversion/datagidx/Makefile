@@ -34,4 +34,5 @@ clean	:
 	$(RM) *.glstex
 	$(RM) *.glg
 	$(RM) *.out
+	$(RM) *.toc
 	$(RM) *.bib
