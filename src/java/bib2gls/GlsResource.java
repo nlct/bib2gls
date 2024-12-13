@@ -1519,6 +1519,10 @@ public class GlsResource
          {
             triggerType = getRequiredOrFalse(list, opt);
          }
+         else if (opt.equals("ignored-type"))
+         {
+            ignoredType = getRequiredOrFalse(list, opt);
+         }
          else if (opt.equals("progenitor-type"))
          {
             progenitorType = getRequiredOrFalse(list, opt);
@@ -9280,6 +9284,11 @@ public class GlsResource
             provideGlossary(writer, triggerType);
          }
 
+         if (ignoredType != null)
+         {
+            provideGlossary(writer, ignoredType, false);
+         }
+
          if (secondaryType != null)
          {
             provideGlossary(writer, secondaryType);
@@ -10329,17 +10338,37 @@ public class GlsResource
    private void provideGlossary(PrintWriter writer, String type)
      throws IOException
    {
+      provideGlossary(writer, type, true);
+   }
+
+   private void provideGlossary(PrintWriter writer, String type, boolean star)
+     throws IOException
+   {
       if (bib2gls.isProvideGlossariesOn())
       {
          if (!bib2gls.isKnownGlossary(type))
          {
-            writer.format("\\provideignoredglossary*{%s}%n", type);
+            writer.print("\\provideignoredglossary");
+
+            if (star)
+            {
+               writer.print('*');
+            }
+
+            writer.format("{%s}%n", type);
             bib2gls.addGlossary(type);
          }
       }
       else
       {
-         writer.format("\\provideignoredglossary*{%s}%n", type);
+         writer.print("\\provideignoredglossary");
+
+         if (star)
+         {
+            writer.print('*');
+         }
+
+         writer.format("{%s}%n", type);
       }
    }
 
@@ -12362,6 +12391,10 @@ public class GlsResource
       {
          entry.putField("type", triggerType);
       }
+      else if (ignoredType != null && entry.isIgnoredEntry())
+      {
+         entry.putField("type", ignoredType);
+      }
       else if (progenitorType != null && entry.getFieldValue("progeny") != null)
       {
          String entryType = getType(entry, progenitorType, false);
@@ -12426,6 +12459,11 @@ public class GlsResource
       if (triggerType != null && !types.contains(triggerType))
       {
          types.add(triggerType);
+      }
+
+      if (ignoredType != null && !types.contains(ignoredType))
+      {
+         types.add(ignoredType);
       }
 
       if (progenitorType != null && !types.contains(progenitorType))
@@ -12533,6 +12571,10 @@ public class GlsResource
       if (triggerType != null && dual.hasTriggerRecord())
       {
          dual.putField("type", triggerType);
+      }
+      else if (ignoredType != null && dual.isIgnoredEntry())
+      {
+         dual.putField("type", ignoredType);
       }
       else if (dualType != null)
       {
@@ -18115,7 +18157,7 @@ public class GlsResource
 
    private String dualType=null, dualCategory=null, dualCounter=null;
 
-   private String triggerType=null;
+   private String triggerType=null, ignoredType=null;
 
    private String progenitorType=null, progenyType=null;
 

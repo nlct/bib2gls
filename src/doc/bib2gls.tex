@@ -2060,8 +2060,8 @@ Greek characters, Latin characters and Pictographs.
 
 Some of the examples in this manual use \ics{newglossary*} to define
 a new glossary type and some use \ics{newignoredglossary} or
-\ics{newignoredglossary*}. Why the starred forms and why define an
-\igls{ignoredglossary}?
+\ics{newignoredglossary*}. You may be wondering why the starred
+forms and why define an \igls{ignoredglossary}?
 
 The base \styfmt{glossaries} package was originally designed to work
 with \idx!{makeindex}. Support for \idx!{xindy} was later added, but
@@ -2121,12 +2121,15 @@ have an \igls{ignoredglossary} that doesn't suppress the hyperlinks,
 which can be obtained with the starred form \ics{newignoredglossary*}
 provided by \styfmt{glossaries-extra} (or \cs{provideignoredglossary*}).
 
-Some resource options, such as \csopt{master}, \csopt{secondary} and
-\csopt{trigger-type}, need to ensure that a
+Some resource options, such as \csopt{master}, \csopt{secondary},
+and \csopt{trigger-type}, need to ensure that a
 required glossary is defined. In this case, \bibgls\ uses
 \ics{provideignoredglossary*} in the \iext{glstex} file 
-even if \longarg{no-provide-glossaries} is set. If you
-haven't already defined that glossary in the document with \cs{newglossary*},
+even if \longarg{no-provide-glossaries} is set.
+Note that only \csopt{ignored-type} uses the unstarred
+\ics{provideignoredglossary}.
+
+If you haven't already defined that glossary in the document with \cs{newglossary*},
 you'll need to set the title in the optional argument of
 \cs{printunsrtglossary} if you don't want the default. The glossary
 won't be defined on the first run (if the definition is only
@@ -2136,7 +2139,8 @@ the document build.
 
 If you want \bibgls\ to automatically provide unknown glossaries for
 all entries that have the \field{type} field set (unrelated to the
-\csopt{master}, \csopt{secondary} and \csopt{trigger-type} options)
+\csopt{master}, \csopt{secondary}, \csopt{trigger-type}
+and \csopt{ignored-type} options)
 then use the \longarg{provide-glossaries} switch.
 
 The base \sty{glossaries} package provides a command that can be
@@ -4813,7 +4817,7 @@ will prevent an error if the glossary has already been defined.
 
 This setting prevents \bibgls\ from providing unknown glossaries,
 except in a few documented situations (the \csopt{master},
-\csopt{trigger-type} and \csopt{secondary} options). This is the
+\csopt{trigger-type}, \csopt{ignored-type} and \csopt{secondary} options). This is the
 default since it's a useful way of detecting misspelt glossary
 labels. It's harder to detect the problem if a misspelt label has
 caused an entry to be added to a hidden glossary.
@@ -11674,6 +11678,25 @@ example:
 \end{codeenv}
 (The \styopt{nomain} option was added to suppress the
 creation of the default \mainglossary.)
+
+\optsection[\subsubsection]{ignored-type}
+
+Any entry that only has \igls{ignoredrecord} will still be
+identified as having a record for selection purposes, which is
+necessary for the entry to be defined in the document, but it may be
+preferable to move such entries to a special \igls{ignoredglossary}.
+This can be done with \csopt[\meta{type}]{ignored-type}.
+
+This option is not implemented for entries that have \emph{no} records
+(those entries may have been selected because they are dependent on
+another entry). The entry must have at least one \gls{ignoredrecord} and 
+no other type of record. The glossary will be provided with the
+unstarred \gls{provideignoredglossary} command.
+
+Note that the \csopt{trigger-type} option overrides the
+\csopt{ignored-type} option for
+entries that have records with the special
+format \ics{glstriggerrecordformat}.
 
 \optsection[\subsubsection]{trigger-type}
 
