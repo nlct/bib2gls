@@ -232,9 +232,9 @@ documents}}
 
 \DTMsavetimestamp{creation}{2017-01-20T15:39:00Z}
 
-\IfFileExists{../java/Bib2Gls.java}
+\IfFileExists{../java/common/BibGlsTeXApp}
 {
-  \DTMsavefilemoddate{moddate}{../java/Bib2Gls.java}
+  \DTMsavefilemoddate{moddate}{../java/common/BibGlsTeXApp.java}
 }
 {
   \DTMsavenow{moddate}
@@ -1730,7 +1730,8 @@ Symbol: \idx!{mshiftchar}\cs{gls}\marg{v}\idx!{mshiftchar}. Abbreviation: \cs{gl
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
-There are more examples provided in \sectionref{sec:examples}.
+There are more examples provided in \sectionref{sec:examples} and
+also in the \href{https://www.dickimaw-books.com/gallery/#bib2gls}{\bibgls\ gallery}.
 
 Note that there's no need to called \idx!{xindy} or \idx!{makeindex}
 since \bibgls\ automatically sorts the entries and collates the \glspl{location}
@@ -11727,9 +11728,12 @@ will override the \csopt{type}, \csopt{dual-type},
 
 Ignored entries may be copied to another glossary
 with \csopt{copy-to-glossary}. If this is undesirable, a condition
-may be applied to prevent it. For example:
+may be applied to prevent it. For example, to copy all selected
+entries to the glossary labelled \qt{index} except for ignored
+entries:
 \begin{codeenv}
 \gls{GlsXtrLoadResources}\oarg{
+ \csopt[\marg{terms,abbreviations}]{src}
  \csopt[ignored]{ignored-type},
  \csopt[\qtdelim{index} \oarg{ \field{type} \idx{notequalscmp} \qtdelim{ignored} }]{copy-to-glossary}
 }

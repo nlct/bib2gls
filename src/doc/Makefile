@@ -22,7 +22,7 @@ bib2gls-begin.pdf	: bib2gls-begin.tex bib2gls.bib bib2gls-cite.bib version.tex
 		@grep -E '(Package glossaries-extra Warning:|unreferenced destination)' bib2gls-begin.log || true
 		@grep -E '(Warning|Exception)' bib2gls-begin.glg || true
 
-version.tex	: ../java/bib2gls/Bib2Gls.java
+version.tex	: ../java/common/BibGlsTeXApp.java
 		@echo "\\date{Version " > version.tex
 		@grep 'String VERSION = ' ../java/common/BibGlsTeXApp.java | sed "s/public\sstatic\sfinal\sString\sVERSION\s=//" | tr -d "\"\; " >> version.tex
 		@grep 'String DATE = ' ../java/common/BibGlsTeXApp.java | sed "s/public\sstatic\sfinal\sString\sDATE\s=//" | tr -d "\"\; " >> version.tex
