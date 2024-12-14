@@ -73,6 +73,10 @@ will strip spaces. The values of the `see`, `seealso` and
 `\gls` etc will have to be replaced manually (or use your
 text editor's search and replace function).
 
+As from v4.0, there is now also a similar command line tool 
+`datatool2bib` to convert [`datatool`](https://ctan.org/pkg/datatool) 
+databases and `datagidx` indexing commands to `bib` files.
+
 # Example Document
 
 File `entries.bib`:
