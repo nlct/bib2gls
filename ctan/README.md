@@ -7,6 +7,15 @@ Author: Nicola Talbot (https://www.dickimaw-books.com/contact)
 
 Application Home Page: https://www.dickimaw-books.com/software/bib2gls
 
+Version details of the current installation can be obtained with
+`--version` or `-v`:
+
+```bash
+bib2gls --version
+convertgls2bib --version
+datatool2bib --version
+```
+
 ## Licence
 
 Copyright (C) 2017-2024 Nicola L. C. Talbot (dickimaw-books.com)
@@ -41,6 +50,10 @@ This means that the glossary entries can now be managed
 in a system such as JabRef, and only the entries that are
 actually required will be defined, reducing the resources
 required by TeX.
+
+##Supplementary applications
+
+### `convertgls2bib`
 
 The supplementary application `convertgls2bib` can be used
 to convert existing `.tex` files containing definitions
@@ -124,6 +137,11 @@ pdflatex myDoc
 (Replace `pdflatex` with `latex`, `xelatex` or `lualatex` as
 appropriate.)
 
+### `datatool2bib`.
+
+The supplementary application `datatool2bib` can be used to convert
+`datatool` databases to `.bib` files suitable for use with `bib2gls`.
+
 ## Related Resources
 
   - [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls).
@@ -147,18 +165,27 @@ your local or home TEXMF path (for example, `~/texmf/`):
 
  - *TEXMF*`/scripts/bib2gls/bib2gls.jar` (Java application.)
  - *TEXMF*`/scripts/bib2gls/convertgls2bib.jar` (Java application.)
+ - *TEXMF*`/scripts/bib2gls/datatool2bib.jar` (Java application.)
+ - *TEXMF*`/scripts/bib2gls/bibglscommon.jar` (Java library
+   providing code shared by `bib2gls` and the conversion tools.)
  - *TEXMF*`/scripts/bib2gls/texparserlib.jar` (Java library.)
- - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml` (English
+ - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml` (main English
    resource file.)
+ - *TEXMF*`/scripts/bib2gls/resources/bib2gls-extra-en.xml` 
+   (supplementary English resource file.)
+ - *TEXMF*`/scripts/bib2gls/resources/bib2gls-extra-nl.xml` 
+   (supplementary Dutch resource file.)
  - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only.)
  - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
+   only.)
+ - *TEXMF*`/scripts/bib2gls/datatool2bib.sh` (Unix-like systems
    only.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf` (User manual.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls-begin.pdf` (Introductory Guide.)
  - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
 Note that `texparserlib.jar` isn't an application. It's
-a library used by `bib2gls.jar` and `convertgls2bib.jar`
+a library used by `bib2gls.jar` and the `*2bib` conversion tools
 and so needs to be on the same class path as them.
 
 The bash `.sh` scripts are provided for Unix-like users.
