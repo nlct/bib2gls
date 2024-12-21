@@ -752,6 +752,12 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       return defaultLocale == null ? Locale.getDefault() : defaultLocale;
    }
          
+   @Override
+   public Locale getDefaultLocale(Locale.Category category)
+   {
+      return defaultLocale == null ? Locale.getDefault(category) : defaultLocale;
+   }
+         
    /*
     *  TeXApp method for providing warning messages.
     */ 
@@ -1745,7 +1751,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "4.0a";
-   public static final String DATE = "2024-12-15";
+   public static final String VERSION = "4.0a.20241221";
+   public static final String DATE = "2024-12-21";
 
 }
