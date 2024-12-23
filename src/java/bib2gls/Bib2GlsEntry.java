@@ -2875,11 +2875,19 @@ public class Bib2GlsEntry extends BibEntry
 
       Set<String> keyset = getFieldSet();
 
+      Vector<String> omitList = resource.getOmitFieldList(this);
+
       Iterator<String> it = keyset.iterator();
 
       while (it.hasNext())
       {
          String field = it.next();
+
+         if (omitList != null && omitList.contains(field))
+         {
+            bib2gls.verboseMessage("message.omitting.field", field, getId());
+            continue;
+         }
 
          String value = fieldValues.get(field);
 

@@ -1,3 +1,12 @@
+v4.1 (pending)
+
+ * bib2gls
+
+   - added resource option:
+
+     omit-fields
+     omit-fields-missing-field-action
+
 v4.0a (2024-12-15)
 
 Corrected distribution (missing files).

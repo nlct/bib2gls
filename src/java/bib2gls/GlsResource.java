@@ -337,6 +337,14 @@ public class GlsResource
          {
             missingFieldCopyToGlossary = getMissingFieldAction(list, opt);
          }
+         else if (opt.equals("omit-fields"))
+         {
+            omitFields = getFieldEvaluationList(list, opt);
+         }
+         else if (opt.equals("omit-fields-missing-field-action"))
+         {
+            missingFieldOmitFields = getMissingFieldAction(list, opt);
+         }
          else if (opt.equals("replicate-fields"))
          {
             fieldCopies = getHashMapVector(list, opt, true);
@@ -15736,6 +15744,44 @@ public class GlsResource
       return false;
    }
 
+   public Vector<String> getOmitFieldList(Bib2GlsEntry entry)
+   {
+      if (omitFields == null) return null;
+
+      bib2gls.debugMessage("message.calculating.omitlist", entry);
+
+      Vector<String> fields = new Vector<String>();
+
+      try
+      {
+         for (FieldEvaluation eval : omitFields)
+         {
+            String field = eval.getStringValue(entry);
+
+            if (field != null && !field.isEmpty() && !fields.contains(field))
+            {
+               if (bib2gls.isKnownField(field))
+               {
+                  bib2gls.debugMessage("message.adding.omitlist", field);
+                  fields.add(field);
+               }
+               else
+               {
+                  bib2gls.warningMessage("warning.unknown_field_in_omitlist",
+                    field, entry);
+               }
+            } 
+         }
+      }
+      catch (Exception e)
+      {
+         bib2gls.warning(e.getMessage());
+         bib2gls.debug(e);
+      }
+
+      return fields;
+   }
+
    /**
     * Gets the contributor order setting.
     * @return numeric identifier corresponding to "contributor-order" setting
@@ -16781,6 +16827,10 @@ public class GlsResource
       else if (option.equals("copy-to-glossary"))
       {
          return missingFieldCopyToGlossary;
+      }
+      else if (option.equals("omit-fields"))
+      {
+         return missingFieldOmitFields;
       }
       else if (option.equals("flatten-lonely-condition"))
       {
@@ -18087,6 +18137,10 @@ public class GlsResource
    private Vector<FieldEvaluation> copyToGlossary = null;
 
    private MissingFieldAction missingFieldCopyToGlossary = MissingFieldAction.FALLBACK;
+
+   private Vector<FieldEvaluation> omitFields = null;
+
+   private MissingFieldAction missingFieldOmitFields = MissingFieldAction.FALLBACK;
 
    private String[] skipFields = null;
 

@@ -165,11 +165,19 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
 
       Set<String> keyset = getFieldSet();
 
+      Vector<String> omitList = resource.getOmitFieldList(this);
+
       Iterator<String> it = keyset.iterator();
 
       while (it.hasNext())
       {
          String field = it.next();
+
+         if (omitList != null && omitList.contains(field))
+         {
+            bib2gls.verboseMessage("message.omitting.field", field, getId());
+            continue;
+         }
 
          if (field.equals("description"))
          {

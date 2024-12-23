@@ -775,7 +775,7 @@ test-glslike.pdf	: test-glslike.glstex
 			pdflatex test-glslike
 			pdflatex test-glslike
 
-test-glslike.glstex	: test-glslike.tex test-glslike.bib $(DEPS)
+test-glslike.glstex	: test-glslike.tex $(DEPS)
 			pdflatex test-glslike
 			$(BIB2GLS) test-glslike
 

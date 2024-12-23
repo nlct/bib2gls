@@ -2214,7 +2214,7 @@ the corresponding set of \ext{bib} files:
   don't have a corresponding key for use with \gls!{newglossaryentry} aren't 
   set until the \ext{glstex} file is written);
 
-  \item ignored fields (identified by \csopt{ignore-fields}) are
+  \item ignored fields (identified by \csopt{ignore-fields}, not by \csopt{omit-fields}) are
   removed;
 
   \item case-changes (for example, \csopt{short-case-change}) are
@@ -2333,6 +2333,11 @@ or (if \csopt{master})
 Processing master \meta{resource-name}
 \end{alltt}
 at this point.
+
+Options such as \csopt{copy-to-glossary} and \csopt{omit-fields} are
+implemented when each entry has its definition written to the \ext{glstex}
+file.  This means that the omitted fields will still be available for actions
+such as sorting, establishing dependencies, or field assignments.
 
 \end{description}
 
@@ -11787,6 +11792,11 @@ The default is \field{parent}.
 
 \optsection[\subsubsection]{ignore-fields}
 
+\begin{important}
+Take care not to confuse \csopt{ignore-fields} with \csopt{omit-fields}.
+The argument of \csopt{ignore-fields} is a simple list of field names.
+\end{important}
+
 The \csopt{ignore-fields} key indicates that you want \bibgls\ to
 skip the fields listed in the supplied comma-separated \meta{list} of field
 labels. Remember that unrecognised fields will always be skipped.
@@ -11822,6 +11832,133 @@ label in the \field{parent} field.
 If you want to maintain the dependency and \gls{ancestor} relationship but
 omit the \field{parent} field when writing the entries to the
 \ext{glstex} file, you need to use \csopt{flatten} instead.
+Alternatively, you can use \csopt{omit-fields}, however the hierarchical structure
+will continue to be maintained.
+
+The \csopt{ignore-fields} instruction removes the unwanted fields 
+early in the Stage~3 process (see \sectionref{sec:resourcesets}).
+This means that those field values won't be available if they are referenced
+nor can they be used to establish dependencies.
+If fields should be omitted from the \ext{glstex} file but the field values should
+still be available to \bibgls, then use \csopt{omit-fields} instead.
+
+\optsection[\subsubsection]{omit-fields}
+
+\begin{important}
+Take care not to confuse \csopt{omit-fields} with \csopt{ignore-fields}.
+The argument of \csopt{omit-fields} is a complex list of string \glspl{concatenation}.
+\end{important}
+
+The \csopt{omit-fields} action takes place in the final stage, at the point where 
+each entry is written to the \ext{glstex} file. Unlike \csopt{ignore-fields},
+the fields aren't removed from \bibgls's own internal data structure. This means that the fields
+can be referenced in other options and will be parsed as usual for dependencies.
+
+If set, the \meta{list} argument is a list of string \glspl{concatenation} with
+optional conditionals. Take care that constant strings are correctly delimited
+to ensure that they are not mistaken for references to field values.
+Note that this is different from \csopt{ignore-fields}, which simply requires 
+a list of field names.
+For example, to omit the \field{description} field for all entries:
+\begin{codeenv}
+\csopt[\qtdelim{description}]{omit-fields}
+\end{codeenv}
+
+Each identified field is simply omitted when writing the field list in the \ext{glstex} file.
+However, this may trigger a fallback if the field is required. This option only
+applies to fields that have a corresponding key that may be used in commands such
+as \gls{newglossaryentry}. The option does not apply to special internal fields.
+Any fields identified in the given list that are not recognised will be ignored.
+
+When each entry definition is being written to the \ext{glstex} file, the supplied
+\meta{list} is evaluated for the current entry. Each non-empty non-null result
+will be added to a temporary set of exclusion field names. Then each \keyval\ for the current
+entry will be written to the \ext{glstex} for each known \meta{key} that has the
+corresponding field set where the \meta{key} is not included in the exclusion set.
+
+Suppose the file \filefmt{abbrv.bib} contains:
+\begin{codeenv}
+\atentry{abbreviation}\marg{ssi,
+ \field{short}=\marg{SSI},
+ \field{long}=\marg{server-side includes},
+ \field{description}=\marg{a simple interpreted server-side
+scripting language}
+}
+\atentry{abbreviation}\marg{html,
+ \field{short}=\marg{HTML},
+ \field{long}=\marg{hypertext markup language},
+ \field{description}=\marg{a markup language for creating web
+pages}
+}
+\atentry{abbreviation}\marg{shtml,
+ \field{short}=\marg{SHTML},
+ \field{long}=\marg{server-side includes enabled hypertext markup language},
+ \field{description}=\marg{a combination of \cs{gls}\marg{html} and
+\cs{gls}\marg{ssi}}
+}
+\end{codeenv}
+With \csopt[description]{ignore-fields}, the \field{description} field will
+be removed when the entry is first processed. This means that the
+dependencies in the SHTML description field won't be detected.
+Whereas with \csopt[\qtdelim{description}]{omit-fields}, the \field{description}
+field won't be removed, so it will still be parsed and the dependent entries will 
+be detected, however the \field{description} field won't be written in the
+\ext{glstex} file.
+
+Remember that literal strings must be quoted with string \glspl{concatenation}.
+For example, suppose an entry has been defined as:
+\begin{codeenv}
+\atentry{index}\marg{nom-fr,
+ \field{name}=\marg{nom},
+ \field{description}=\marg{name}
+}
+\end{codeenv}
+In the case of \csopt[\qtdelim{description}]{omit-fields} then this will become:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{name-fr}\marg{
+ \field{name}=\marg{nom}
+}
+\end{codeenv} 
+Whereas \csopt[description]{omit-fields} returns \emph{the value of} the 
+\field{description} field. For the above example entry, the value of
+the \field{description} field is \qt{name}, so \field{name} is added to the exclusion set
+and so won't be written whilst \bibgls\ iterates over the \qt{name-fr} list of fields.
+
+This means that the \field{name} field will be flagged
+as not written to the \ext{glstex} file. In the case of \atentry{index}, this
+means that the fallback for the \field{name} field will be used, which is
+the entry label. The result will therefore end up as:
+\begin{codeenv}
+\gls{newglossaryentry}\marg{name-fr}\marg{
+ \field{description}=\marg{name},
+ \field{name}=\marg{name-fr}
+}
+\end{codeenv} 
+In this case, the \field{description} field value just happens to be the name of
+another recognised field. Mostly, this type of error would likely result
+in a string that doesn't match any known field, which will trigger a warning.
+
+Conditions may also be applied. For example, to omit the \field{description} 
+field for any entries defined with \atentry{abbreviation}:
+\begin{codeenv}
+\csopt[
+ \qtdelim{description} \oarg{entrytype \idx{follow} actual = \qtdelim{abbreviation}}
+]{omit-fields}
+\end{codeenv}
+
+\optsection{omit-fields-missing-field-action}
+
+This option indicates what to do if a source field identified in 
+\csopt{omit-fields} is missing. The value may be one of:
+\begin{itemize}
+\item \optfmt{skip}: return null;
+\item \optfmt{fallback}: use the fallback for the missing field 
+(see \sectionref{sec:fallbacks}), if
+one is available, otherwise return null (default);
+\item \optfmt{empty}: treat the missing value as empty.
+\end{itemize}
+Returning null or empty skips the string \gls{concatenation} element from the
+omision list.
 
 \optsection[\subsubsection]{field-aliases}
 
@@ -12324,7 +12461,7 @@ Return null will result in the assignment instruction being omitted.
 
 The \csopt{counter} option assigns the default counter to use
 for the selected entries. (This can be overridden with the
-\glsopt{counter} key when using commands like \csfmt{gls}.)
+\glsopt{counter} key when using commands like \cs{gls}.)
 The value must be the name of a counter. Since \bibgls\ doesn't know
 which counters are defined within the document, there's no check to
 determine if the value is valid (except for ensuring that

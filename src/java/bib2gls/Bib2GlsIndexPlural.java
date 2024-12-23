@@ -21,6 +21,7 @@ package com.dickimawbooks.bibgls.bib2gls;
 import java.io.*;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.Vector;
 
 import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
@@ -153,11 +154,19 @@ public class Bib2GlsIndexPlural extends Bib2GlsIndex
 
       Set<String> keyset = getFieldSet();
 
+      Vector<String> omitList = resource.getOmitFieldList(this);
+
       Iterator<String> it = keyset.iterator();
 
       while (it.hasNext())
       {
          String field = it.next();
+
+         if (omitList != null && omitList.contains(field))
+         {
+            bib2gls.verboseMessage("message.omitting.field", field, getId());
+            continue;
+         }
 
          if (field.equals("name"))
          {
