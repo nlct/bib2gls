@@ -10779,7 +10779,7 @@ as \field{group}).  These labels must not contain special
 characters or commands, but it's possible to convert a field value
 into a valid label using options such as \csopt{labelify}.
 
-\subsection{Label Options}
+\subsection{Entry Labels}
 \label{sec:labelopts}
 
 \optsection[\subsubsection]{interpret-label-fields}
@@ -11287,82 +11287,6 @@ matches the prefixed label.  If this option is set then the prefix
 won't be added if there's no matching entry.  The default setting is
 \csopt[false]{prefix-only-existing}.
 
-\optsection[\subsubsection]{save-original-id}
-
-The \meta{value} may be the keywords \code{false} or \code{true} or
-the name of a field in which to store the entry's original
-label (as given in the \ext{bib} file). The default setting is
-\csopt[false]{save-original-id}. If \meta{value} is omitted or is the
-keyword \code{true}, then \field{originalid} is assumed.
-
-If \meta{value} has an associated key in \gls!{newglossaryentry}
-(for example, one provided with \cs{glsaddstoragekey}) it will be
-set after the field aliases, otherwise (for example,
-\field{originalid}) it will simply be added to the \ext{glstex} file
-using \ics{GlsXtrSetField} after the entry definition (which means
-the field can't be referenced in other resource options). This
-setting is governed by \csopt{save-original-id-action}.
-
-\optsection[\subsubsection]{save-original-id-action}
-
-This option determines whether or not \csopt{save-original-id}
-should save the original entry label. No action is performed when
-\csopt[false]{save-original-id} otherwise the action is determined
-by \meta{value} which may be one of the following keywords:
-\begin{itemize}
-\item \code{always}: always save the original label (default);
-\item \code{no override}: don't override a field that's already been
-set;
-\item \code{changed override} or \code{changed} or \code{diff}:
-only save the original label if it's different from the final label;
-\item \code{changed no override}:
-only save the original label if it's different from the final label
-and the specified field hasn't been set. 
-\end{itemize}
-The \qt{no override} options make no difference if the given field
-has no associated key in \gls!{newglossaryentry} (such as
-\field{originalid}). For known fields, bear in mind that the field
-will be set after field aliasing but before other options, such as
-\csopt{ignore-fields}.
-
-\optsection[\subsubsection]{save-definition-index}
-
-This is a boolean option. If the value is omitted \code{true} is
-assumed. The default setting is \csopt[false]{save-definition-index}.
-
-This setting will save the \gls{definitionindex} that's used by
-\csopt[def]{identical-sort-action} to determine the order of
-definition in the special internal field \field{definitionindex}.
-This field is assigned when the entry is first created
-and can be referenced with \gls{bibglsdefinitionindex}.
-You can reference this field with certain resource options, such as
-\csopt{format-integer-fields}, but you must place the
-\csopt{save-definition-index} resource option first.
-
-Note that (unless you need to maintain \hierarchy) if you want to
-order all entries by definition, it's better to use
-\csopt[none]{sort}, which doesn't perform any sorting, so the order
-will be by definition.
-
-\optsection[\subsubsection]{save-use-index}
-
-This is a boolean option. If the value is omitted \code{true} is
-assumed. The default setting is \csopt[false]{save-use-index}.
-
-This setting will save the \gls{orderofuseindex} that's used by
-\csopt[use]{identical-sort-action} in the special internal field
-\field{useindex}.  This field is assigned when the entry picks up
-its first record and can be referenced with \gls{bibglsuseindex}.
-You can't reference this field in resource options such as
-\csopt{format-integer-fields}.
-
-Entries that don't have records won't have this field set. The order
-of use corresponds to the first time the entry is recorded in the document.
-
-Note that (unless you need to maintain \hierarchy) if you want to
-order all entries by use, it's better to use \csopt[use]{sort},
-which doesn't perform any sorting.
-
 \optsection[\subsubsection]{dependency-fields}
 
 The \meta{list} should be a comma-separated list of fields that
@@ -11496,6 +11420,224 @@ O \cs{gls}\marg{gato} sentou-se no \cs{gls}\marg{tapete}.
 \cs{printunsrtglossaries}
 \cmd{end}\marg{document}
 \end{codeenv}
+
+\subsection{Special Fields}
+\label{sec:specialfieldopts}
+
+\optsection[\subsubsection]{save-original-id}
+
+The \meta{value} may be the keywords \code{false} or \code{true} or
+the name of a field in which to store the entry's original
+label (as given in the \ext{bib} file). The default setting is
+\csopt[false]{save-original-id}. If \meta{value} is omitted or is the
+keyword \code{true}, then \field{originalid} is assumed.
+
+If \meta{value} has an associated key in \gls!{newglossaryentry}
+(for example, one provided with \cs{glsaddstoragekey}) it will be
+set after the field aliases, otherwise (for example,
+\field{originalid}) it will simply be added to the \ext{glstex} file
+using \ics{GlsXtrSetField} after the entry definition (which means
+the field can't be referenced in other resource options). This
+setting is governed by \csopt{save-original-id-action}.
+
+\optsection[\subsubsection]{save-original-id-action}
+
+This option determines whether or not \csopt{save-original-id}
+should save the original entry label. No action is performed when
+\csopt[false]{save-original-id} otherwise the action is determined
+by \meta{value} which may be one of the following keywords:
+\begin{itemize}
+\item \code{always}: always save the original label (default);
+\item \code{no override}: don't override a field that's already been
+set;
+\item \code{changed override} or \code{changed} or \code{diff}:
+only save the original label if it's different from the final label;
+\item \code{changed no override}:
+only save the original label if it's different from the final label
+and the specified field hasn't been set. 
+\end{itemize}
+The \qt{no override} options make no difference if the given field
+has no associated key in \gls!{newglossaryentry} (such as
+\field{originalid}). For known fields, bear in mind that the field
+will be set after field aliasing but before other options, such as
+\csopt{ignore-fields}.
+
+\optsection[\subsubsection]{save-definition-index}
+
+This is a boolean option. If the value is omitted \code{true} is
+assumed. The default setting is \csopt[false]{save-definition-index}.
+
+This setting will save the \gls{definitionindex} that's used by
+\csopt[def]{identical-sort-action} to determine the order of
+definition in the special internal field \field{definitionindex}.
+This field is assigned when the entry is first created
+and can be referenced with \gls{bibglsdefinitionindex}.
+You can reference this field with certain resource options, such as
+\csopt{format-integer-fields}, but you must place the
+\csopt{save-definition-index} resource option first.
+
+Note that (unless you need to maintain \hierarchy) if you want to
+order all entries by definition, it's better to use
+\csopt[none]{sort}, which doesn't perform any sorting, so the order
+will be by definition.
+
+\optsection[\subsubsection]{save-use-index}
+
+This is a boolean option. If the value is omitted \code{true} is
+assumed. The default setting is \csopt[false]{save-use-index}.
+
+This setting will save the \gls{orderofuseindex} that's used by
+\csopt[use]{identical-sort-action} in the special internal field
+\field{useindex}.  This field is assigned when the entry picks up
+its first record and can be referenced with \gls{bibglsuseindex}.
+You can't reference this field in resource options such as
+\csopt{format-integer-fields}.
+
+Entries that don't have records won't have this field set. The order
+of use corresponds to the first time the entry is recorded in the document.
+
+Note that (unless you need to maintain \hierarchy) if you want to
+order all entries by use, it's better to use \csopt[use]{sort},
+which doesn't perform any sorting.
+
+\optsection[\subsubsection]{save-from-see}
+
+This option allows you to save a comma-separated list of entry
+labels in a designated internal field of the target entry identified
+by their \field{see} field. If the \meta{value} is omitted,
+\csopt[from-see]{save-from-see} is assumed. The value may be the
+keyword \code{false}, which switches off this setting, otherwise the
+value should be the desired name of the internal field.
+The default setting is \csopt[false]{save-from-see}.
+
+For example, if the \ext{bib} file contains:
+\begin{codeenv}
+\atentry{index}\marg{gourd}
+\atentry{index}\marg{cucumber,\field{see}=\marg{gourd}}
+\atentry{index}\marg{pumpkin,\field{see}=\marg{gourd}}
+\end{codeenv}
+then the resource option \csopt[from-see]{save-from-see} will create
+an internal field called \fieldfmt{from-see} for the \code{gourd} entry
+that contains the comma-separated list \code{cucumber,pumpkin}.
+
+Note that the given internal field isn't actually assigned within \bibgls, so it
+can't be accessed via any resource options. Each item in this list is added using
+\ics{glsxtrapptocsvfield} after the source entry (that is, the entry
+containing the \field{see} field) is defined in the \ext{glstex}
+file. This means that the list will be in the same order as the
+entries. You can then pass the field value to \ics{glsseelist}.
+For example:
+\begin{codeenv}
+\cs{glsdefpostdesc}\marg{\comment{}
+  \cs{glsxtrifhasfield}\marg{from-see}\marg{\cs{glscurrententrylabel}}
+  \marg{, related: \cs{glsseelist}\marg{\cs{glscurrentfieldvalue}}}\marg{}\%
+}
+\end{codeenv}
+
+This option has no effect with the \qt{no dependency} selection
+criteria (such as \csopt[recorded no deps]{selection}).
+
+\optsection[\subsubsection]{save-from-seealso}
+
+As \csopt{save-from-see} but for the \field{seealso} field. If the
+value is omitted, \csopt[from-seealso]{save-from-seealso} is assumed.
+
+\optsection[\subsubsection]{save-from-alias}
+
+As \csopt{save-from-see} but for the \field{alias} field. If the
+value is omitted, \csopt[from-alias]{save-from-alias} is assumed.
+
+\optsection[\subsubsection]{save-crossref-tail}
+
+If you have a cross-reference trail where one entry references
+another entry using \field{see}, \field{seealso} or \field{alias}
+and the referenced entry also references another, and so on, then
+you can save the tail end of the trail with this option. Note that
+the trail only follows single-label lists (in \field{see} or
+\field{seealso}). The trail is terminated if an entry doesn't have
+one of those three fields set or if it cross-references multiple
+entries or if the trail loops back on itself.
+
+If you have a loop, the tail for some entries may end prematurely
+since the algorithm to obtain the tail saves the tail for each
+sub-trail to avoid recalculating it.  It's best to avoid
+this setting if you have cross-reference loops. (Aside from two-way
+cross-references, it's best to avoid loops in general.)
+
+The tail label is stored in the field identified by 
+the \meta{value} of this option. If the value is omitted, 
+\csopt[crossref-tail]{save-crossref-tail} is assumed.
+The field won't be set if there's no tail. The tails are calculated
+when writing the entry definitions to the \ext{glstex} file so the
+value can't be referenced or otherwise accessed by \bibgls.
+
+Example:
+\begin{codeenv}
+\atentry{index}\marg{sample1,\field{see}=\marg{sample2}}
+\atentry{index}\marg{sample2,\field{see}=\marg{sample3}}
+\atentry{index}\marg{sample3,\field{see}=\marg{sample4}}
+\atentry{index}\marg{sample4}
+\end{codeenv}
+The tail for \code{sample1} is \code{sample4}. As a by-product of
+the recursion used in calculating the tail for \code{sample1}, the
+tail for each element in the trail (\code{sample2} and
+\code{sample3}) is also calculated.  The tail is the same for each
+entry in the trail. The final entry \code{sample4} doesn't have a
+tail.
+
+If \code{sample4} is modified to cross-reference \code{sample1}:
+\begin{codeenv}
+\atentry{index}\marg{sample4,\field{see}=\marg{sample1}}
+\end{codeenv}
+then when the tail for \code{sample4} is calculated the tail for its
+cross-reference (\code{sample1}) is consulted. This has already been
+set to \code{sample4}. An entry can't have itself as a tail so the
+tail for \code{sample4} is set to \code{sample3}. All the other
+entries still have \code{sample4} as their tail because their tail
+was determined while traversing the trail for \code{sample1}, which
+had to stop when it wrapped round to its starting point.
+
+\optsection[\subsubsection]{save-original-entrytype}
+
+The \meta{value} may be the keywords \code{false} or \code{true} or
+the name of a field in which to store the original \gls{entrytype} (as
+given in the \ext{bib} file but without the leading \idx{atchar} and
+converted to \idx!{lowercase}). The setting is
+\csopt[false]{save-original-entrytype}. If \meta{value} is omitted or the
+keyword \code{true}, then \csopt[originalentrytype]{save-original-entrytype} 
+If \meta{value} has an associated key in \gls!{newglossaryentry}
+(for example, one provided with \cs{glsaddstoragekey}) it will be
+set after the field aliases, otherwise (for example,
+\field{originalentrytype}) it will simply be added to the \ext{glstex} file
+using \ics{GlsXtrSetField} after the entry definition (which means
+the field can't be referenced in other resource options). This
+setting is governed by \csopt{save-original-entrytype-action}.
+
+\optsection[\subsubsection]{save-original-entrytype-action}
+
+This option determines whether or not \csopt{save-original-entrytype}
+should save the original \gls{entrytype}. No action is performed when
+\csopt[false]{save-original-entrytype} otherwise the action is determined
+by \meta{value} which may be one of the following keywords:
+\begin{itemize}
+\item \code{always}: always save the original \gls{entrytype} (default);
+\item \code{no override}: don't override a field that's already been
+set;
+\item \code{changed override} or \code{changed} or \code{diff}:
+only save the original \gls{entrytype} if it's different from the final
+\gls{entrytype};
+\item \code{changed no override}:
+only save the original \gls{entrytype} if it's different from the final
+\gls{entrytype} and the specified field hasn't been set. 
+\end{itemize}
+The \qt{no override} options make no difference if the given field
+is unknown (such as \field{originalentrytype}). For known fields, bear in
+mind that the field will be set after field aliasing but before
+other options, such as \csopt{ignore-fields}.
+
+The \qt{changed} options ignore case. For example, if the \ext{bib}
+file defined an entry with \atentryfmt{INDEX} then both the original
+and final \gls{entrytype} will be \code{index}.
 
 \subsection{Assignments}
 \label{sec:fieldassignments}
@@ -12513,145 +12655,6 @@ style. For example:
 If set, the value of the \field{alias} field is copied to
 the \field{see} field. The default setting is \csopt[false]{copy-alias-to-see}.
 
-\optsection[\subsubsection]{save-from-see}
-
-This option allows you to save a comma-separated list of entry
-labels in a designated internal field of the target entry identified
-by their \field{see} field. If the \meta{value} is omitted,
-\csopt[from-see]{save-from-see} is assumed. The value may be the
-keyword \code{false}, which switches off this setting, otherwise the
-value should be the desired name of the internal field.
-The default setting is \csopt[false]{save-from-see}.
-
-For example, if the \ext{bib} file contains:
-\begin{codeenv}
-\atentry{index}\marg{gourd}
-\atentry{index}{cucumber,\field{see}=\marg{gourd}}
-\atentry{index}{pumpkin,\field{see}=\marg{gourd}}
-\end{codeenv}
-then the resource option \csopt[from-see]{save-from-see} will create
-an internal field called \code{from-see} for the \code{gourd} entry
-that contains the comma-separated list \code{cucumber,pumpkin}.
-
-Note that the given internal field isn't actually assigned within \bibgls, so it
-can't be accessed via any resource options. Each item in this list is added using
-\ics{glsxtrapptocsvfield} after the source entry (that is, the entry
-containing the \field{see} field) is defined in the \ext{glstex}
-file. This means that the list will be in the same order as the
-entries. You can then pass the field value to \ics{glsseelist}.
-For example:
-\begin{codeenv}
-\cs{glsdefpostdesc}\marg{\comment{}
-  \cs{glsxtrifhasfield}\marg{from-see}\marg{\cs{glscurrententrylabel}}
-  {, related: \cs{glsseelist}\marg{\cs{glscurrentfieldvalue}}}{}%
-}
-\end{codeenv}
-
-This option has no effect with the \qt{no dependency} selection
-criteria (such as \csopt[recorded no deps]{selection}).
-
-\optsection[\subsubsection]{save-from-seealso}
-
-As \csopt{save-from-see} but for the \field{seealso} field. If the
-value is omitted, \csopt[from-seealso]{save-from-seealso} is assumed.
-
-\optsection[\subsubsection]{save-from-alias}
-
-As \csopt{save-from-see} but for the \field{alias} field. If the
-value is omitted, \csopt[from-alias]{save-from-alias} is assumed.
-
-\optsection[\subsubsection]{save-crossref-tail}
-
-If you have a cross-reference trail where one entry references
-another entry using \field{see}, \field{seealso} or \field{alias}
-and the referenced entry also references another, and so on, then
-you can save the tail end of the trail with this option. Note that
-the trail only follows single-label lists (in \field{see} or
-\field{seealso}). The trail is terminated if an entry doesn't have
-one of those three fields set or if it cross-references multiple
-entries or if the trail loops back on itself.
-
-If you have a loop, the tail for some entries may end prematurely
-since the algorithm to obtain the tail saves the tail for each
-sub-trail to avoid recalculating it.  It's best to avoid
-this setting if you have cross-reference loops. (Aside from two-way
-cross-references, it's best to avoid loops in general.)
-
-The tail label is stored in the field identified by 
-the \meta{value} of this option. If the value is omitted, 
-\csopt[crossref-tail]{save-crossref-tail} is assumed.
-The field won't be set if there's no tail. The tails are calculated
-when writing the entry definitions to the \ext{glstex} file so the
-value can't be referenced or otherwise accessed by \bibgls.
-
-Example:
-\begin{codeenv}
-\atentry{index}\marg{sample1,\field{see}=\marg{sample2}}
-\atentry{index}\marg{sample2,\field{see}=\marg{sample3}}
-\atentry{index}\marg{sample3,\field{see}=\marg{sample4}}
-\atentry{index}\marg{sample4}
-\end{codeenv}
-The tail for \code{sample1} is \code{sample4}. As a by-product of
-the recursion used in calculating the tail for \code{sample1}, the
-tail for each element in the trail (\code{sample2} and
-\code{sample3}) is also calculated.  The tail is the same for each
-entry in the trail. The final entry \code{sample4} doesn't have a
-tail.
-
-If \code{sample4} is modified to cross-reference \code{sample1}:
-\begin{codeenv}
-\atentry{index}\marg{sample4,\field{see}=\marg{sample1}}
-\end{codeenv}
-then when the tail for \code{sample4} is calculated the tail for its
-cross-reference (\code{sample1}) is consulted. This has already been
-set to \code{sample4}. An entry can't have itself as a tail so the
-tail for \code{sample4} is set to \code{sample3}. All the other
-entries still have \code{sample4} as their tail because their tail
-was determined while traversing the trail for \code{sample1}, which
-had to stop when it wrapped round to its starting point.
-
-\optsection[\subsubsection]{save-original-entrytype}
-
-The \meta{value} may be the keywords \code{false} or \code{true} or
-the name of a field in which to store the original \gls{entrytype} (as
-given in the \ext{bib} file but without the leading \idx{atchar} and
-converted to \idx!{lowercase}). The setting is
-\csopt[false]{save-original-entrytype}. If \meta{value} is omitted or the
-keyword \code{true}, then \csopt[originalentrytype]{save-original-entrytype} 
-If \meta{value} has an associated key in \gls!{newglossaryentry}
-(for example, one provided with \cs{glsaddstoragekey}) it will be
-set after the field aliases, otherwise (for example,
-\field{originalentrytype}) it will simply be added to the \ext{glstex} file
-using \ics{GlsXtrSetField} after the entry definition (which means
-the field can't be referenced in other resource options). This
-setting is governed by \csopt{save-original-entrytype-action}.
-
-\optsection[\subsubsection]{save-original-entrytype-action}
-
-This option determines whether or not \csopt{save-original-entrytype}
-should save the original \gls{entrytype}. No action is performed when
-\csopt[false]{save-original-entrytype} otherwise the action is determined
-by \meta{value} which may be one of the following keywords:
-\begin{itemize}
-\item \code{always}: always save the original \gls{entrytype} (default);
-\item \code{no override}: don't override a field that's already been
-set;
-\item \code{changed override} or \code{changed} or \code{diff}:
-only save the original \gls{entrytype} if it's different from the final
-\gls{entrytype};
-\item \code{changed no override}:
-only save the original \gls{entrytype} if it's different from the final
-\gls{entrytype} and the specified field hasn't been set. 
-\end{itemize}
-The \qt{no override} options make no difference if the given field
-is unknown (such as \field{originalentrytype}). For known fields, bear in
-mind that the field will be set after field aliasing but before
-other options, such as \csopt{ignore-fields}.
-
-The \qt{changed} options ignore case. For example, if the \ext{bib}
-file defined an entry with \atentryfmt{INDEX} then both the original
-and final \gls{entrytype} will be \code{index}.
-
 \subsection{Field Adjustments}
 \label{sec:fieldmods}
 
@@ -12839,8 +12842,9 @@ recognised by \bibgls' interpreter (such as those listed in
 \tableref{tab:bibglsdefs}).
 \end{itemize}
 The final \code{:\meta{csname}} part may be omitted if no command
-need be applied. (That is, sort by label.) The value is required for this key but
-may be empty, which indicates the setting is switched off.
+need be applied. (That is, sort by label.) The \meta{list} value
+is required for this option but may be empty, which indicates the setting is
+switched off.
 
 The sorting options are as those for the \gls{mainlist}.  For
 example, for entries in the \glsdisp{mainlist}{primary list} the
@@ -13351,7 +13355,8 @@ trail that long is excessive for an index.
 \optsection[\subsubsection]{bibtex-contributor-fields}
 
 This option indicates that the listed fields all use \BibTeX's name
-syntax (as used in \BibTeX's \code{author} and \code{editor} fields). The value is required for this key but
+syntax (as used in \BibTeX's \code{author} and \code{editor} fields). 
+The \meta{list} value is required for this key but
 may be empty, which indicates an empty set of fields (that is, the
 setting is switched off).
 
@@ -13507,6 +13512,7 @@ same field is listed in both settings, its value will end up as:
 \begin{codeenv}
 \cmd{\meta{cs-name-2arg}}\marg{\cmd{\meta{cs-name-1arg}}\margm{value}}\margm{label}
 \end{codeenv}
+An alternative is to use the more complex \csopt{assign-fields} option.
 
 \optsection[\subsubsection]{format-integer-fields}
 
