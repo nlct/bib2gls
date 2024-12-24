@@ -239,21 +239,7 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
    {
       if (isPrimary())
       {
-         writer.println("\\ifdef\\glsuseabbrvfont");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}{\\glsuseabbrvfont}");
-         writer.println("}%");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
-         writer.println("}%");
-
-         writer.println("\\ifdef\\glsuselongfont");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuselongfont}{\\glsuselongfont}");
-         writer.println("}%");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuselongfont}[2]{{\\glssetabbrvfmt{#2}\\glslongfont{#1}}}");
-         writer.println("}%");
+         resource.writeAbbrvFontCommands(writer);
 
          // syntax: {label}{duallabel}{opts}{name}{short}{long}{description}
 
@@ -262,13 +248,19 @@ public class Bib2GlsDualIndexAbbrev extends Bib2GlsDualEntry
          writer.println("  \\longnewglossaryentry*{#1}{%");
          writer.print("      name={\\protect");
 
-         if (resource.getAbbrevDefaultNameField().equals("short"))
+         String field = resource.getAbbrevDefaultNameField();
+
+         if (field.equals("short"))
          {
             writer.print("\\bibglsuseabbrvfont");
          }
-         else
+         else if (field.equals("long"))
          {
             writer.print("\\bibglsuselongfont");
+         }
+         else
+         {
+            writer.print("\\bibglsuseotherfont");
          }
 
          writer.println("{#4}{\\glscategory{#2}}},%");

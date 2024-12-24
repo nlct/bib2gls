@@ -218,15 +218,10 @@ public class Bib2GlsTertiaryIndexAbbrevEntry extends Bib2GlsDualIndexAbbrev
 
    public void writeCsDefinition(PrintWriter writer) throws IOException
    {
+      resource.writeAbbrvFontCommands(writer);
+
       if (isPrimary())
       {
-         writer.println("\\ifdef\\glsuseabbrvfont");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}{\\glsuseabbrvfont}");
-         writer.println("}%");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
-         writer.println("}%");
 
          // syntax: {label}{duallabel}{opts}{name}{short}{long}{description}
 
@@ -239,15 +234,6 @@ public class Bib2GlsTertiaryIndexAbbrevEntry extends Bib2GlsDualIndexAbbrev
       }
       else
       {
-         writer.println("\\ifdef\\glsuselongfont");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuselongfont}{\\glsuselongfont}");
-         writer.println("}%");
-         writer.println("{%");
-         writer.println("  \\providecommand*{\\bibglsuselongfont}[2]{{\\glssetabbrvfmt{#2}\\glslongfont{#1}}}");
-         writer.println("}%");
-
-
          // syntax: {label}{tertiarylabel}{opts}{tertiary opts}{name}{short}{long}{description}
 
          writer.format("\\providecommand{\\%s}[8]{%%%n", getCsName());

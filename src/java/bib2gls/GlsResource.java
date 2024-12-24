@@ -11114,6 +11114,38 @@ public class GlsResource
    }
 
    /**
+    * Writes the code that provides the abbreviation font commands.
+    * @param writer the file writer stream
+    * @throws IOException if I/O error occurs
+    */ 
+   public void writeAbbrvFontCommands(PrintWriter writer)
+      throws IOException
+   {
+      if (!abbrvFontCommandsWritten)
+      {
+         writer.println("\\ifdef\\glsuseabbrvfont");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}{\\glsuseabbrvfont}");
+         writer.println("}%");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuseabbrvfont}[2]{{\\glssetabbrvfmt{#2}\\glsabbrvfont{#1}}}");
+         writer.println("}%");
+
+         writer.println("\\ifdef\\glsuselongfont");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuselongfont}{\\glsuselongfont}");
+         writer.println("}%");
+         writer.println("{%");
+         writer.println("  \\providecommand*{\\bibglsuselongfont}[2]{{\\glssetabbrvfmt{#2}\\glslongfont{#1}}}");
+         writer.println("}%");
+
+         writer.println("\\providecommand*{\\bibglsuseotherfont}[2]{#1}");
+
+         abbrvFontCommandsWritten = true;
+      }
+   }
+
+   /**
     * Calculates the width of the entry's name and updates the
     * current widest name, if applicable.
     * @param entry the entry
@@ -18619,5 +18651,7 @@ public class GlsResource
 
    private boolean wordifyMathGreek = false;
    private boolean wordifyMathSymbol = false;
+
+   private boolean abbrvFontCommandsWritten = false;
 }
 
