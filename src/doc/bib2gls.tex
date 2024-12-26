@@ -23440,6 +23440,16 @@ Converts \meta{text} to \idx{titlecase}. This just uses
 Converts the first letter of \meta{text} to \idx{uppercase}. This just uses
 \ics{makefirstuc} by default.
 
+\cssection{BibGlsNoCaseChange}
+
+Behaves as \cs{NoCaseChange} within \bibgls, so it will prevent its argument
+from being altered by options such as \csopt{short-case-change} or if the
+interpreter encounters this command within a case-changing command such as
+\cs{glsuppercase}. However, the definition provided in the \ext{glstex} file
+simply expands to \meta{text} in the document without adding the command to the
+case-changing exclusion list so it won't prevent any case-change within
+the \LaTeX\ document.
+
 \cssection{bibglsdefinitionindex}
 
 \formatdef{bibglsdefinitionindex}

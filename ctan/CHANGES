@@ -7,6 +7,8 @@ v4.1 (pending)
      omit-fields
      omit-fields-missing-field-action
 
+   - added \BibGlsNoCaseChange
+
 v4.0a (2024-12-15)
 
 Corrected distribution (missing files).

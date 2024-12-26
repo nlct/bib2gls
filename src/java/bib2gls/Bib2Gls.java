@@ -60,6 +60,7 @@ import com.dickimawbooks.texparserlib.latex.LaTeXSty;
 import com.dickimawbooks.texparserlib.latex.fontenc.FontEncSty;
 import com.dickimawbooks.texparserlib.latex.textcase.MakeTextLowercase;
 import com.dickimawbooks.texparserlib.latex.textcase.MakeTextUppercase;
+import com.dickimawbooks.texparserlib.latex.textcase.NoCaseChange;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MfirstucSty;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.MakeFirstUc;
 import com.dickimawbooks.texparserlib.latex.mfirstuc.CapitaliseWords;
@@ -1381,6 +1382,9 @@ public class Bib2Gls extends BibGlsTeXApp
       // this command is specifically for the bib2gls interpreter:
 
       listener.putControlSequence(new AtSecondOfTwo("IfNotBibGls"));
+
+      // Prohibit case change within bib2gls but not in the LaTeX document:
+      listener.putControlSequence(new NoCaseChange("BibGlsNoCaseChange"));
 
       listener.putControlSequence(new MakeTextUppercase("bibglsuppercase"));
       listener.putControlSequence(new MakeTextLowercase("bibglslowercase"));
@@ -4385,8 +4389,10 @@ public class Bib2Gls extends BibGlsTeXApp
          writer.println("\\providecommand{\\bibglsuppercase}{\\MakeTextUppercase}");
          writer.println("\\providecommand{\\bibglslowercase}{\\MakeTextLowercase}");
       }
+
       writer.println("\\providecommand{\\bibglsfirstuc}{\\makefirstuc}");
       writer.println("\\providecommand{\\bibglstitlecase}{\\capitalisewords}");
+      writer.println("\\providecommand{\\BibGlsNoCaseChange}[1]{#1}");
       writer.println();
 
       writer.println("\\providecommand{\\bibglsprimaryprefixlabel}[1]{}");

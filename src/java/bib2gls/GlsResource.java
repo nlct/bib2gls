@@ -14205,7 +14205,7 @@ public class GlsResource
    public boolean isNoCaseChangeCs(String csname)
    {
       if (csname.equals("si") || csname.equals("ensuremath")
-       || csname.equals("NoCaseChange"))
+       || csname.equals("NoCaseChange") || csname.equals("BibGlsNoCaseChange"))
       {
          return true;
       }
