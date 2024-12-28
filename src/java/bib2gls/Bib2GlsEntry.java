@@ -439,9 +439,9 @@ public class Bib2GlsEntry extends BibEntry
          }
          else if (object instanceof TeXCsRef)
          {
-            String csname = ((TeXCsRef)object).getName();
+            String orgcsname = ((TeXCsRef)object).getName();
 
-            GlsLike glsLike = bib2gls.getGlsLike(csname);
+            GlsLike glsLike = bib2gls.getGlsLike(orgcsname);
 
             boolean isGlslike = (glsLike != null);
 
@@ -453,10 +453,10 @@ public class Bib2GlsEntry extends BibEntry
 
             if (!isGlslike)
             {
-               mglslike = bib2gls.isMglsCs(csname);
+               mglslike = bib2gls.isMglsCs(orgcsname);
             }
 
-            csname = csname.toLowerCase();
+            String csname = orgcsname.toLowerCase();
 
             try
             {
@@ -522,7 +522,7 @@ public class Bib2GlsEntry extends BibEntry
                         object.toString(parser), label));
                   }
 
-                  addDependency(label);
+                  addParsedDependency(label, orgcsname, glsLike, mglslike);
 
                   // get next argument
 
@@ -557,7 +557,7 @@ public class Bib2GlsEntry extends BibEntry
                            object.toString(parser), label));
                      }
 
-                     addDependency(label);
+                     addParsedDependency(label, orgcsname, glsLike, mglslike);
                   }
 
                   list.set(i, grp);
@@ -603,7 +603,7 @@ public class Bib2GlsEntry extends BibEntry
                         object.toString(parser), label));
                   }
 
-                  addDependency(label);
+                  addParsedDependency(label, orgcsname, glsLike, mglslike);
                }
                else if (isGlslike || mglslike || isGlsCsOptLabel(csname))
                {
@@ -712,7 +712,7 @@ public class Bib2GlsEntry extends BibEntry
                      {
                         for (String elem : comp.getElements())
                         {
-                           addDependency(elem);
+                           addParsedDependency(elem, orgcsname, glsLike, mglslike);
                         }
                      }
 
@@ -777,7 +777,7 @@ public class Bib2GlsEntry extends BibEntry
                            object.toString(parser), label));
                      }
 
-                     addDependency(label);
+                     addParsedDependency(label, orgcsname, glsLike, mglslike);
                   }
 
                   if (bib2gls.checkNestedLinkTextField(fieldName)
@@ -3305,6 +3305,131 @@ public class Bib2GlsEntry extends BibEntry
       if (!deps.contains(label) && !label.equals(getId()))
       {
          deps.add(label);
+      }
+   }
+
+   /**
+    * Adds a label found from parsing a field value to the list of dependencies.
+    * The extra parameters allow for possible future options which may allow for
+    * conditional appending for "gather-parsed-dependencies".
+    * @param label the label to be added to the list of dependencies
+    */
+   protected void addParsedDependency(String label,
+     String csname, GlsLike glslike, boolean mglslike)
+    throws IOException
+   {
+      TeXParser parser = resource.getBibParser();
+
+      if (!label.equals(getId()))
+      {
+         if (!deps.contains(label))
+         { 
+            deps.add(label);
+         }
+
+         String field = resource.getGatherParsedDependenciesField();
+
+         if (field != null)
+         {
+            String strVal = getFieldValue(field);
+            BibValueList bibList = null;
+            TeXObjectList listVal = null;
+            boolean changed = true;
+
+            if (strVal == null)
+            {
+               bibList = getField(field);
+
+               if (bibList != null)
+               {
+                  listVal = bibList.expand(parser);
+                  strVal = listVal.toString(parser);
+               }
+            }
+
+            if (strVal == null || strVal.isEmpty())
+            {
+               strVal = label;
+               listVal = parser.getListener().createString(label);
+            }
+            else
+            {
+               TeXObject prefix = null;
+               String labelList = strVal;
+
+               if (strVal.startsWith("["))
+               {
+                  if (listVal == null)
+                  {
+                     if (bibList == null)
+                     {
+                        bibList = getField(field);
+                     }
+
+                     if (bibList != null)
+                     {
+                        listVal = bibList.expand(parser);
+                     }
+                  }
+
+                  if (listVal == null)
+                  {
+                     int idx = strVal.lastIndexOf(']');
+
+                     if (idx > 0)
+                     {
+                        labelList = strVal.substring(idx+1);
+                        prefix = parser.getListener().createString(
+                         strVal.substring(1, idx-1));
+                     }
+                  }
+                  else
+                  {
+                     prefix = listVal.popArg(parser, '[', ']');
+                     strVal = listVal.toString(parser);
+                  }
+               }
+
+               String[] split = labelList.split(" *, *");
+
+               for (String s : split)
+               {
+                  if (s.equals(label))
+                  {
+                     changed = false;
+                     break;
+                  }
+               }
+
+               if (changed)
+               {
+                  if (prefix == null)
+                  {
+                     strVal += "," + label;
+                     listVal = parser.getListener().createString(strVal);
+                  }
+                  else
+                  {
+                     listVal = parser.getListener().createStack();
+                     listVal.add(parser.getListener().getOther('['));
+                     listVal.add(prefix, true);
+                     listVal.add(parser.getListener().getOther(']'));
+                     listVal.addAll(parser.getListener().createString(strVal+","+label));
+
+                     strVal = "[" + prefix + "]" + strVal + "," + label;
+                  }
+               }
+            }
+
+            if (changed)
+            {
+               bibList = new BibValueList();
+               bibList.add(new BibUserString(listVal));
+
+               putField(field, strVal);
+               putField(field, bibList);
+            }
+         }
       }
    }
 

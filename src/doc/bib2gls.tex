@@ -11639,6 +11639,19 @@ The \qt{changed} options ignore case. For example, if the \ext{bib}
 file defined an entry with \atentryfmt{INDEX} then both the original
 and final \gls{entrytype} will be \code{index}.
 
+\optsection[\subsubsection]{gather-parsed-dependencies}
+
+Dependencies that are found by parsing field values may be gathered into a 
+comma-separated list saved in a field for later use.
+The \meta{value} is the name of the desired field. If the \meta{value} is omitted
+\csopt[seealso]{gather-parsed-dependencies} is assumed.
+If the designated field is already set, the list will be appended to the existing value.
+
+Note that other dependencies, such as those obtained by examining the 
+cross-reference fields (\field{see}, \field{seealso} or \field{alias})
+or ancestors or dual entries, are not automatically added.
+The \meta{value} may be the keyword \code{false} to switch off this option (which is the default).
+
 \subsection{Assignments}
 \label{sec:fieldassignments}
 
@@ -12045,7 +12058,8 @@ dependencies in the SHTML description field won't be detected.
 Whereas with \csopt[\qtdelim{description}]{omit-fields}, the \field{description}
 field won't be removed, so it will still be parsed and the dependent entries will 
 be detected, however the \field{description} field won't be written in the
-\ext{glstex} file.
+\ext{glstex} file. In this case, you may want to also use 
+\csopt{gather-parsed-dependencies} to save a list of the dependent entries.
 
 Remember that literal strings must be quoted with string \glspl{concatenation}.
 For example, suppose an entry has been defined as:

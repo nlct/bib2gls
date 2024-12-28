@@ -2,10 +2,11 @@ v4.1 (pending)
 
  * bib2gls
 
-   - added resource option:
+   - added resource options:
 
      omit-fields
      omit-fields-missing-field-action
+     gather-parsed-dependencies
 
    - added \BibGlsNoCaseChange
 

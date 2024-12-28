@@ -1107,6 +1107,10 @@ public class GlsResource
          {
             dependencyListFields = getFieldArray(list, opt, true);
          }
+         else if (opt.equals("gather-parsed-dependencies"))
+         {
+            gatherParsedDeps = getOptionalOrFalse("seealso", list, opt);
+         }
          else if (opt.equals("sort-replace"))
          {
             sortSettings.setRegexList(
@@ -17653,6 +17657,16 @@ public class GlsResource
    }
 
    /**
+    * Gets the name of the gather-parsed-dependencies field.
+    * @return the field name if "gather-parsed-dependencies" on otherwise
+    * null
+    */ 
+   public String getGatherParsedDependenciesField()
+   {
+      return gatherParsedDeps;
+   }
+
+   /**
     * Gets the name of the definition index field.
     * @return the field name if "save-definition-index" on otherwise
     * null
@@ -18526,6 +18540,8 @@ public class GlsResource
    private String saveFromSee = null;
 
    private String saveCrossRefTail = null;
+
+   private String gatherParsedDeps = null;
 
    private boolean saveDefinitionIndex = false;
    private boolean saveUseIndex = false;
