@@ -3346,7 +3346,7 @@ This is equivalent to:
 \end{codeenv}
 The \meta{options} list should be a \keyvallist\ where the \meta{key}
 is the same as the long switch without the preceding
-\code{\longswitch}. Any \code{\longswitch no-\meta{option}} should 
+\code{\longswitch} and any \code{\longswitch no-\meta{option}} should 
 be specified as \code{\meta{option}=false} within
 \gls{BibGlsOptions}.
 For example, to set global options via the command line:
@@ -3437,12 +3437,11 @@ from the normal messages. If you report an issue, you may be asked
 to switch on debugging mode to help identify a non-reproducible
 error and provide the transcript file.
 
-The \longargfmt{debug} option can be used to switch on debugging mode. 
-If \meta{n} is present, it must be a non-negative integer indicating
-the debugging mode. If omitted, 1 is assumed. This option also
-switches on the verbose mode. A value of 0 is equivalent to
-\commonlongarg{no-debug}.
-This option cannot be set in \gls{BibGlsOptions}.
+The \commonlongarg{debug} optional value can be used to adjust the level of
+debugging information.  If \meta{n} is present, it must be a non-negative
+integer indicating the debugging mode. If omitted, 1 is assumed. This option
+also switches on the verbose mode. A value of 0 is equivalent to
+\commonlongarg{no-debug}.  This option cannot be set in \gls{BibGlsOptions}.
 
 The value of \meta{n} determines how much extra information is
 provided. If \meta{n} is greater than 0 then all \bibgls\ debugging
@@ -3463,7 +3462,7 @@ an exception with a stack trace in debug mode.
 
 \commonarg{debug-mode}
 
-This option is an alternative to \longargfmt{debug} where the value
+This option is an alternative to \commonlongarg{debug} where the value
 of \meta{n} needs to be calculated. 
 This option cannot be set in \gls{BibGlsOptions}.
 Debugging mode requires a
@@ -3523,9 +3522,9 @@ typically just be data read from recognised \iext{aux} commands.
 \end{itemize}
 
 For example:
-\begin{alltt}
-bib2gls \longargfmt{debug-mode} catcode,sty-data \meta{filename}
-\end{alltt}
+\begin{codeenv}
+bib2gls \commonlongarg{debug-mode} catcode,sty-data \meta{filename}
+\end{codeenv}
 
 \commonarg{no-debug}
 
@@ -3686,7 +3685,7 @@ switch is used, the interpreter can recognise \ics{ProvidesPackage},
 \ics{ProcessOptions}, \ics{PackageError} and \ics{RequirePackage},
 but it can't deal with complicated code.  In the case of
 \ics{RequirePackage}, support will also be governed by
-\longargfmt{custom-packages}.  This option has a cumulative action.
+\longarg{custom-packages}.  This option has a cumulative action.
 
 Multiple instances of this switch can occur on the command line.
 If used in \gls{BibGlsOptions}, the nature of the \keyvallist\
@@ -3709,25 +3708,23 @@ Alternatively, within the document:
 \argsection{datatool-sort-markers}
 
 The \sty{datatool-base} package provides some marker commands
-designed for use with \ics{DTLsortwordlist}. These commands by
-default will be defined to match their normal \sty{datatool-base}
-behaviour.
-
-The \longswitch{datatool-sort-markers} switch will instead define those
-marker commands to match their localised definitions within
-\cs{DTLsortwordlist}. Additionally, \ics{dtltexorsort} will be
-redefined to expand to its second argument.
+designed for use with \ics{DTLsortwordlist}: \ics{datatoolasciistart},
+\ics{datatoolpersoncomma}, \ics{datatoolplacecomma},
+\ics{datatoolsubjectcomma}, \ics{datatoolparenstart},
+\ics{datatoolctrlboundary}, \ics{datatoolasciiend}, and
+\ics{datatoolparen}. These commands by default will be defined by the
+interpreter to match their normal \sty{datatool-base} behaviour  (see the
+\sty{datatool} documentation for further details). Additionally,
+\ics{dtltexorsort} will be redefined to expand to its \emph{first} argument.
 
 Note that you don't need to request the \sty{datatool-base} package,
 unless you require support for other commands provided by that
 package.
 
-The marker commands are: \ics{datatoolasciistart},
-\ics{datatoolpersoncomma}, \ics{datatoolplacecomma},
-\ics{datatoolsubjectcomma}, \ics{datatoolparenstart},
-\ics{datatoolctrlboundary}, \ics{datatoolasciiend}, and
-\ics{datatoolparen} (see the \sty{datatool} documentation for
-further details). With \longswitch{datatool-sort-markers}, these
+The \longarg{datatool-sort-markers} switch will instead define these
+commands to match their localised definitions within
+\cs{DTLsortwordlist}. This means that \ics{dtltexorsort} will be
+defined to expand to its \emph{second} argument and the marker
 commands will expand to content that includes special control codes.
 Note that language-sensitive sort methods typically ignore control
 codes, so these would either need to be used with a character-code
@@ -3749,6 +3746,9 @@ For example:
 ]{sort-rule}
 \end{codeenv}
 
+Instead of \ics{dtltexorsort} (which varies according to this setting), you may
+prefer to use \ics{IfTeXParserLib} or \ics{IfNotBibGls}.
+
 \argsection{no-datatool-sort-markers}
 
 Define the \sty{datatool-base} marker commands 
@@ -3762,7 +3762,7 @@ listed in \meta{list}. Note that this option simply instructs
 \bibgls\ to ignore the package information in the log file. Any packages
 that are identified with \longarg{packages} will be passed to the
 interpreter if support is available, even if the package is also
-listed in \longargfmt{ignore-packages}.  Note that
+listed in \longarg{ignore-packages}.  Note that
 unknown packages can't be included in the ignored \meta{list}.
 This option cannot be set in \gls{BibGlsOptions}.
 
@@ -4001,7 +4001,7 @@ entry given by \code{gls.sample}.)
 \item The second \gls{record} (\encap{hypersf}) conflicts 
 with the existing \gls{record} (\encap{emph}). Neither has
 the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ consults
-the mappings provided by \longargfmt{map-format}.
+the mappings provided by \longarg{map-format}.
 \begin{itemize}
 \item The \encap{hypersf} format (from the new record) is mapped to
 \encap{hyperit},
@@ -4022,7 +4022,7 @@ records for other entries also used on page~3 interspersed between these records
 \item The third \gls{record} (\encap{hyperbf}) conflicts 
 with the existing \gls{record} (\encap{emph}). Neither has
 the format \encap{glsnumberformat} or \encap{glsignore} so \bibgls\ again consults
-the mappings provided by \longargfmt{map-format}.
+the mappings provided by \longarg{map-format}.
 \begin{itemize}
 \item  The new \gls{record}['s] \encap{hyperbf} format has no mapping provided,
 so \bibgls\ moves on to the next test:
@@ -4506,7 +4506,7 @@ For example:
 }
 \end{codeenv}
 Here the \csopt{type} is set and \bibgls\ can detect that
-\isty{hyperref} has been loaded, so if the \longargfmt{group} switch
+\isty{hyperref} has been loaded, so if the \longarg{group} switch
 is used, then the group hyperlinks can be set (using
 \gls!{bibglshypergroup}). This means that the build process is
 just:
@@ -4520,7 +4520,7 @@ Note that this requires \isty{glossaries} v4.53+ and
 or \sty{glossaries-extra} is too old, an extra \LaTeX\ run is
 required.
 
-If \isty{hyperref} isn't loaded or the \longargfmt{group} switch
+If \isty{hyperref} isn't loaded or the \longarg{group} switch
 isn't used or the \field{type} isn't set or your version of
 \sty{glossaries} is too old, then the information can't be saved in
 the \ext{glstex} file.
@@ -15615,7 +15615,7 @@ usual \igls{locationlist};
 \item \optfmt{remove}: save \glspl{principallocation} in the
 \field{primarylocations} field and remove from the usual
 \igls{locationlist}. You may want to consider using the
-\longswitch{retain-formats} switch with this setting if you don't
+\longarg{retain-formats} switch with this setting if you don't
 want to lose a partial \gls{location} match (for example, if the 
 \gls{principallocation} coincides with the start of an
 \idx{explicit-range}).
@@ -23984,7 +23984,7 @@ to:
 \atentry{index}\marg{\meta{label}}
 \end{codeenv}
 
-If \longargfmt{space-sub} is used and \meta{label} contains one or
+If \converterlongarg{space-sub} is used and \meta{label} contains one or
 more spaces, then \field{name} will be set if not included in
 \meta{\keyvallist}. For example, if \filefmt{entries.bib}
 contains:
@@ -24520,7 +24520,7 @@ file could define \meta{field} and reference it in
 The \meta{field} will have any invalid content stripped and will be
 adjusted to match the \converterlongarg{field-case} setting.
 If the \meta{field} ends up as an empty string, it will behave as 
-\datatoolbibarg{no-dependency-field}.
+\datatoolbiblongarg{no-dependency-field}.
 
 \datatoolbibarg{no-dependency-field}
 
