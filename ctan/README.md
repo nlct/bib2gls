@@ -18,7 +18,7 @@ datatool2bib --version
 
 ## Licence
 
-Copyright (C) 2017-2024 Nicola L. C. Talbot (dickimaw-books.com)
+Copyright (C) 2017-2025 Nicola L. C. Talbot (dickimaw-books.com)
 
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html

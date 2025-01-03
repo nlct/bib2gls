@@ -13937,6 +13937,14 @@ functions will use the \gls{resource-locale}, but whether or not
 whether or not the locale is correctly supported by the Java locale
 provider. The \langxml\ may provide assistance with case-conversion.
 
+\begin{important}
+Note the difference between \ics{NoCaseChange} (which prevents case-changing
+for both \bibgls\ and in the \LaTeX\ document) and \ics{BibGlsNoCaseChange}
+(which only prevents case-changing in \bibgls). The options that defer
+the case-change action to \LaTeX, such as \optfmt{uc-cs}, will treat 
+\ics{NoCaseChange} as an exclusion but not \ics{BibGlsNoCaseChange}.
+\end{important}
+
 Each of the case-changing resource options may take one of the
 following values:
 \begin{itemize}

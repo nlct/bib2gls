@@ -14230,20 +14230,9 @@ public class GlsResource
 
    public boolean isCaseExclusion(String csname)
    {
-      if (bib2gls.isCaseExclusion(csname))
+      if (bib2gls.isCaseExclusion(csname) || isNoCaseChangeCs(csname))
       {
          return true;
-      }
-
-      if (noCaseChangeCs != null)
-      {
-         for (String cs : noCaseChangeCs)
-         {
-            if (cs.equals(csname))
-            {
-               return true;
-            }
-         }
       }
 
       return false;
