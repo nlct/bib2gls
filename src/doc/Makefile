@@ -1,4 +1,4 @@
-all	: bib2gls.1 convertgls2bib.1 datatool2bib.1 bib2gls.pdf bib2gls-begin.pdf 
+all	: bib2gls.man1.pdf convertgls2bib.man1.pdf datatool2bib.man1.pdf bib2gls.pdf bib2gls-begin.pdf 
 	@grep -E '(Package glossaries-extra Warning:|unreferenced destination)' bib2gls*.log || true
 	@grep -E '(Warning|Exception)' *.glg ../examples/*.glg || true
 
@@ -28,11 +28,20 @@ version.tex	: ../java/common/BibGlsTeXApp.java
 		@grep 'String DATE = ' ../java/common/BibGlsTeXApp.java | sed "s/public\sstatic\sfinal\sString\sDATE\s=//" | tr -d "\"\; " >> version.tex
 		@echo "}%" >> version.tex
 
+bib2gls.man1.pdf	: bib2gls.1
+		mandoc -Tpdf -l bib2gls.1 >bib2gls.man1.pdf
+
 bib2gls.1	: bib2gls.pod
 		pod2man -c bib2gls bib2gls.pod bib2gls.1
 
+convertgls2bib.man1.pdf	: convertgls2bib.1
+		mandoc -Tpdf -l convertgls2bib.1 >convertgls2bib.man1.pdf
+
 convertgls2bib.1	: convertgls2bib.pod
 		pod2man -c convertgls2bib convertgls2bib.pod convertgls2bib.1
+
+datatool2bib.man1.pdf	: datatool2bib.1
+		mandoc -Tpdf -l datatool2bib.1 >datatool2bib.man1.pdf
 
 datatool2bib.1	: datatool2bib.pod
 		pod2man -c datatool2bib datatool2bib.pod datatool2bib.1

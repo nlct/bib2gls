@@ -11,6 +11,7 @@
 *.glg
 *.glstex
 *.1
+*.man1.pdf
 *.sty
 *.def
 *.bbl
