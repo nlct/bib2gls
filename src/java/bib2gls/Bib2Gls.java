@@ -6883,8 +6883,16 @@ public class Bib2Gls extends BibGlsTeXApp
    {
       if (auxFileName == null)
       {
-         throw new Bib2GlsSyntaxException(getMessage("error.no.aux",
-           getMessage("syntax.usage", NAME)));
+         if (argsFound)
+         {
+            throw new Bib2GlsSyntaxException(getMessage("error.no.aux.args_found",
+              getMessage("syntax.usage", NAME)));
+         }
+         else
+         {
+            throw new Bib2GlsSyntaxException(getMessage("error.no.aux",
+              getMessage("syntax.usage", NAME)));
+         }
       }
 
       if (!auxFileName.endsWith(".aux"))

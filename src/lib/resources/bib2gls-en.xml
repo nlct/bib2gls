@@ -438,6 +438,8 @@ Have you indexed your entries using commands like \gls?</entry>
 <entry key="error.missing.aux.new.cs">Missing \{0} in aux file (make sure glossaries-extra.sty is at least {1}).</entry>
 <entry key="error.only.one.aux">Only one aux file permitted.</entry>
 <entry key="error.no.aux">Aux file not supplied. {0}</entry>
+<entry key="error.no.aux.args_found">Aux file not supplied or an option is missing its argument.
+{0}</entry>
 <entry key="error.file.not.found">File not found: {0}</entry>
 <entry key="error.cant.parse.file.malformed.input">Can''t parse {0}: may not be {1} encoded.
 (Try a different encoding with {2} or {3}.)</entry>
