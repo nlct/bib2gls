@@ -45,7 +45,7 @@ texparser-src.zip	:
 	cd $(texparserdir)/src/ ; \
 	zip --exclude="*.swp" -r $(bib2glsdir)/ctan/texparser-src.zip java/lib
 
-bib2gls.tds.zip	: README.md CHANGES bib2gls-src.zip texparser-src.zip \
+bib2gls.tds.zip	: README.md CHANGES DEPENDS.txt bib2gls-src.zip texparser-src.zip \
 	../src/lib/bib2gls.jar \
 	../src/lib/bibglscommon.jar \
 	../src/lib/convertgls2bib.jar \
@@ -57,7 +57,7 @@ bib2gls.tds.zip	: README.md CHANGES bib2gls-src.zip texparser-src.zip \
 	../src/doc/bib2gls-begin.pdf
 	mkdir -p doc/support/bib2gls
 	mkdir -p doc/support/bib2gls/examples
-	cp README.md CHANGES doc/support/bib2gls/
+	cp README.md CHANGES DEPENDS.txt doc/support/bib2gls/
 	cp ../src/doc/bib2gls.pdf doc/support/bib2gls/
 	cp ../src/doc/bib2gls-begin.pdf doc/support/bib2gls/
 	cp ../src/examples/*.{tex,bib,pdf} doc/support/bib2gls/examples
