@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Nicola L.C. Talbot
+    Copyright (C) 2024-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -1514,8 +1514,10 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
 
       for (int i = 1; i < n; i++)
       {
-         returnVals[0] = BibGlsArgValue.create(this, argName, deque.poll(), type);
+         returnVals[i] = BibGlsArgValue.create(this, argName, deque.poll(), type);
       }
+
+      argsFound = true;
 
       return true;
    }
@@ -1553,6 +1555,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
                {
                   int i = Integer.parseInt(val);
                   returnVals[0] = new BibGlsArgValue(deque.poll(), i);
+                  argsFound = true;
                }
                catch (NumberFormatException e)
                {
@@ -1562,6 +1565,8 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
          }
          else
          {
+            argsFound = true;
+
             returnVals[0] = BibGlsArgValue.create(this, split[0], split[1], 
               BibGlsArgValueType.INT);
          }
@@ -1580,6 +1585,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
             {
                int i = Integer.parseInt(val);
                returnVals[0] = new BibGlsArgValue(deque.poll(), i);
+               argsFound = true;
             }
             catch (NumberFormatException e)
             {
@@ -1741,6 +1747,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    protected int verboseLevel=NORMAL; // bib2gls verbosity
    protected boolean shownVersion = false;
    protected String docLocale = null;
+   protected boolean argsFound = false;
 
    protected String logName = null;
    protected File transcriptFile = null;
@@ -1751,7 +1758,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "4.0a.20250103";
+   public static final String VERSION = "4.1";
    public static final String DATE = "2025-01-03";
 
 }
