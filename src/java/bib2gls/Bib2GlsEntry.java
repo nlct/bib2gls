@@ -2410,7 +2410,7 @@ public class Bib2GlsEntry extends BibEntry
 
       String sep = resource.getFieldConcatenationSeparator();
 
-      String fields[] = fallbackField.split("\\+");
+      String fields[] = fallbackField.split("\\s*\\+\\s*");
 
       String value = null;
 

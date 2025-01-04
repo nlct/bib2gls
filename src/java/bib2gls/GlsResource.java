@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017-2024 Nicola L.C. Talbot
+    Copyright (C) 2017-2025 Nicola L.C. Talbot
     www.dickimaw-books.com
 
     This program is free software; you can redistribute it and/or modify
@@ -4383,7 +4383,7 @@ public class GlsResource
    private void checkAllowedSortFallbackConcatenation(String fields, String opt)
     throws IllegalArgumentException
    {
-      String[] split = fields.split("\\+");
+      String[] split = fields.split("\\s*\\+\\s*");
 
       for (String field : split)
       {
@@ -4425,8 +4425,8 @@ public class GlsResource
       // The fallback field can't be "sort" as it will cause
       // infinite recursion.
 
-      if (!bib2gls.isKnownField(abbrevDefaultSortField)
-             && !bib2gls.isKnownSpecialField(abbrevDefaultSortField))
+      if (!bib2gls.isKnownField(field)
+             && !bib2gls.isKnownSpecialField(field))
       {
          return false;
       }

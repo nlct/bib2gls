@@ -1,3 +1,10 @@
+v4.2 (pending)
+
+ * bib2gls
+
+   - bug fix: corrected fallback field concatenation check for options like
+     abbreviation-sort-fallback
+
 v4.1 (2025-01-03)
 
  * bib2gls
