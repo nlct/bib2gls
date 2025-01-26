@@ -10176,7 +10176,7 @@ public class GlsResource
          }
 
          // Only define compound sets provided with @compoundset in
-         // this resource .
+         // this resource set.
 
          if (compoundEntries != null && compoundEntriesDef != COMPOUND_DEF_FALSE)
          {
@@ -10191,9 +10191,33 @@ public class GlsResource
 
                if (all || bib2gls.isMglsRefd(comp.getLabel()))
                {
-                  writer.format("\\bibglsdefcompoundset{%s}{%s}{%s}{%s}%n",
-                    comp.getOptions(), comp.getLabel(), comp.getMainLabel(),
-                    comp.getElementList());
+                  // check that all elements are defined
+
+                  boolean allfound = true;
+
+                  for (String elemId : comp.getElements())
+                  {
+                     if (!bib2gls.isEntrySelected(elemId))
+                     {
+                        allfound = false;
+
+                        bib2gls.verboseMessage(
+                          "message.compound_element_missing", elemId, 
+                           comp.getLabel());
+                     }
+                  }
+
+                  if (allfound)
+                  {
+                     writer.format("\\bibglsdefcompoundset{%s}{%s}{%s}{%s}%n",
+                       comp.getOptions(), comp.getLabel(), comp.getMainLabel(),
+                       comp.getElementList());
+                  }
+                  else
+                  {
+                     bib2gls.verboseMessage(
+                      "message.skipping_compound_element", comp.getLabel());
+                  }
                }
             }
          }

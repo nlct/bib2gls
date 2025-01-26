@@ -279,6 +279,8 @@ Defaulting to: {0}.
 <entry key="message.omitting.field">Omitting field {0} for entry {1}</entry>
 <entry key="message.calculating.omitlist">Calculating field exclusion list for entry {0}</entry>
 <entry key="message.adding.omitlist">Adding ''{0}'' to field exclusion list.</entry>
+<entry key="message.compound_element_missing">Element ''{0}'' in compound entry ''{1}'' has not been selected</entry>
+<entry key="message.skipping_compound_element">Skipping compound entry ''{1}''</entry>
 
 <entry key="comment.header">% This file was created by {0} v{1} on {2}.</entry>
 <entry key="comment.header.no_date">% This file was created by {0} v{1}.</entry>

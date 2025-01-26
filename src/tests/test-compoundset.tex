@@ -1,0 +1,29 @@
+% arara: pdflatex
+% arara: bib2gls: { group: on }
+% arara: pdflatex
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[stylemods=bookindex,style=bookindex,record]{glossaries-extra}
+
+\GlsXtrLoadResources
+[
+  src=test-compoundset,
+  selection={recorded and deps and see},
+  match={entrytype=symbol},
+  sort=letter-case
+]
+
+\GlsXtrLoadResources
+[
+  src=test-compoundset,
+  selection={recorded and deps and see},
+  not-match={entrytype=symbol}
+]
+
+\begin{document}
+\gls{+} \gls{-} and \gls{/} may be used in \mglsmainpl{math-exp}.
+\Mglsmainpl{math-fn} \ldots
+
+\printunsrtglossaries
+\end{document}

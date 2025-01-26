@@ -43,7 +43,7 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
 	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
 	  test-nl.pdf test-match-action.pdf test-assign-fields2.pdf \
-	  test-see-entries.pdf
+	  test-see-entries.pdf test-compoundset.pdf
 	make -C conversion/gls2bib
 	make -C conversion/datagidx
 	make -C conversion/datatool
@@ -843,6 +843,13 @@ test-see-entries.pdf	: test-see-entries.glstex
 test-see-entries.glstex	: test-see-entries.tex $(DEPS) testseeentries.bib test-see-entries2.bib
 		pdflatex test-see-entries
 		$(BIB2GLS) test-see-entries
+
+test-compoundset.pdf	: test-compoundset.glstex
+		pdflatex test-compoundset
+
+test-compoundset.glstex	: test-compoundset.tex $(DEPS) test-compoundset.bib
+		pdflatex test-compoundset
+		$(BIB2GLS) test-compoundset
 
 clean	:
 	$(RM) *.aux

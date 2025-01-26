@@ -1,5 +1,10 @@
 v4.3 (pending)
 
+ * bib2gls:
+
+   - skip compound entries that don't have one or more
+     elements selected
+
  * texparserlib.jar: Corrected definition of \textdegree
 
 v4.2 (2025-01-24)
