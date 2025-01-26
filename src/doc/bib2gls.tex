@@ -7634,6 +7634,11 @@ corresponding to entries that \emph{have already been defined}. One
 element in the set is considered the \gls{compmainlabel}. Entry
 labels may appear in multiple sets.
 
+\begin{important}
+Since \gls{compoundentry} aren't normal entries, they cannot be
+matched in options such as \csopt{match}.
+\end{important}
+
 A \gls{compoundentry} provides a convenient way to apply commands
 like \ics{gls} to multiple entries in one command (such as \ics{mgls}).
 \Gls{compoundentry} labels may only be used in the \cs{mgls}-like
@@ -9649,6 +9654,15 @@ field identifying the glossary label). If you've used
 \csopt{entry-type-aliases}, this refers to the target \gls{entrytype} not
 the original \gls{entrytype} specified in the \ext{bib} file.
 
+\begin{important}
+Filtering options don't apply directly to \atentry{compoundset}
+entries, so you can't match the entry type to \atentry{compoundset}.
+However, if any elements within a \gls{compoundentry} are filtered
+then the \gls{compoundentry} won't be written to the \ext{glstex}
+file. Use the \csopt{compound-write-def} option to determine whether
+or not to write the \gls{compoundentry} to the resource file.
+\end{important}
+
 The \meta{regexp} part should be a \gls{regular-expression} conforming
 to
 \href{http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html}{Java's
@@ -9722,6 +9736,15 @@ entry to be ignored.  The value is required for this key but may be
 empty, which indicates that the setting is switched off.  If you
 have both \csopt{match} and \csopt{not-match} in the same resource
 set, the last one listed takes precedence.
+
+\begin{important}
+Filtering options don't apply directly to \atentry{compoundset}
+entries, so you can't match the entry type to \atentry{compoundset}.
+However, if any elements within a \gls{compoundentry} are filtered
+then the \gls{compoundentry} won't be written to the \ext{glstex}
+file. Use the \csopt{compound-write-def} option to determine whether
+or not to write the \gls{compoundentry} to the resource file.
+\end{important}
 
 \optsection{match-action}
 
