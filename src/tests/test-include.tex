@@ -3,11 +3,19 @@
 % arara: pdflatex
 \documentclass{report}
 
-\usepackage[record]{glossaries-extra}
+\usepackage[
+ bibglsaux={\jobname-bibrecords},
+ record
+]{glossaries-extra}
 
 \GlsXtrLoadResources[src=test-entries]
 
+\title{An Example}
+\author{Me}
+
 \begin{document}
+\maketitle
+
 \include{test-include-subfile1}
 \include{test-include-subfile2}
 

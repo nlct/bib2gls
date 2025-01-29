@@ -4482,6 +4482,11 @@ public class Bib2Gls extends BibGlsTeXApp
       return mfirstucProtectFields;
    }
 
+   public AuxInputAction getAuxInputAction()
+   {
+      return auxInputAction;
+   }
+
    /**
     * Creates a new TeXParser instance. 
     */ 
@@ -5155,6 +5160,8 @@ public class Bib2Gls extends BibGlsTeXApp
          "--default-encoding"));
       printSyntaxItem(getMessage("syntax.date_in_header",
          "--[no-]date-in-header"));
+      printSyntaxItem(getMessage("syntax.aux_input_action",
+         "--aux-input-action"));
 
       System.out.println();
       System.out.println(getMessage("syntax.options.interpreter"));
@@ -5469,6 +5476,7 @@ public class Bib2Gls extends BibGlsTeXApp
         || arg.equals("--log-encoding")
         || arg.equals("--trim-only-fields")
         || arg.equals("--trim-except-fields")
+        || arg.equals("--aux-input-action")
          )
       {
          return 1;
@@ -6094,6 +6102,29 @@ public class Bib2Gls extends BibGlsTeXApp
             {
                throw new Bib2GlsSyntaxException(
                   getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("aux-input-action"))
+         {
+            TeXObject obj = options.getValue(key);
+
+            if (obj == null)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.missing.value", key));
+            }
+
+            String val = obj.toString(parser).trim();
+
+            try
+            {
+               auxInputAction = AuxInputAction.valueOfArg(val);
+            }
+            catch (IllegalArgumentException e)
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.choice.value", key, val,
+                    AuxInputAction.getValidList()));
             }
          }
          else if (key.equals("trim-fields"))
@@ -6751,6 +6782,27 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          dateInHeader = false;
       }
+      else if (isArg(deque, arg, "--aux-input-action", returnVals))
+      {
+         if (returnVals[0] == null)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.missing.value", arg));
+         }
+
+         String val = returnVals[0].toString();
+
+         try
+         {
+            auxInputAction = AuxInputAction.valueOfArg(val);
+         }
+         catch (IllegalArgumentException e)
+         {
+            throw new Bib2GlsSyntaxException(
+               getMessage("error.invalid.choice.value", arg, val,
+                 AuxInputAction.getValidList()));
+         }
+      }
       else if (isArg(deque, arg, "--tex-encoding", returnVals))
       {
          if (returnVals[0] == null)
@@ -7285,6 +7337,8 @@ public class Bib2Gls extends BibGlsTeXApp
 
    private boolean replaceQuotes = false;
    private boolean datatoolSortMarkers = false;
+
+   private AuxInputAction auxInputAction = AuxInputAction.SKIP_AFTER_BIBGLSAUX;
 
    private String[] nestedLinkCheckFields = new String[]
     {"name", "text", "plural", "first", "firstplural",

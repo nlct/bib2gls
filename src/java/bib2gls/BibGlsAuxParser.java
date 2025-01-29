@@ -39,7 +39,48 @@ public class BibGlsAuxParser extends AuxParser
    {
       super.addPredefined();
 
-      putControlSequence(new Input("@bibgls@input", Input.NOT_FOUND_ACTION_WARN, false));
+      putControlSequence(new Input("@bibgls@input", Input.NOT_FOUND_ACTION_WARN, false)
+       {
+          @Override
+          protected boolean doInput(TeXParser parser, TeXObject arg, TeXObjectList stack)
+            throws IOException
+          {
+             bibglsInputFound = true;
+
+             return super.doInput(parser, arg, stack);
+          }
+       });
+
+      putControlSequence(new Input("@input", Input.NOT_FOUND_ACTION_WARN, false)
+       {
+          protected boolean isInputEnabled()
+          {
+             switch (bib2gls.getAuxInputAction())
+             {
+                case FOLLOW: return true;
+                case SKIP_AFTER_BIBGLSAUX: return !bibglsInputFound;
+                case SKIP: return false;
+                default:
+                  assert false : "Unknown aux input action";
+             }
+
+             return true;
+          }
+
+          @Override
+          public void process(TeXParser parser, TeXObjectList stack)
+           throws IOException
+          {
+             if (isInputEnabled())
+             {
+                super.process(parser, stack);
+             }
+             else
+             {
+                popArg(parser, stack);
+             }
+          }
+       });
 
       putControlSequence(new AuxBibGlsOptions(bib2gls));
 
@@ -68,4 +109,5 @@ public class BibGlsAuxParser extends AuxParser
    }
 
    private Bib2Gls bib2gls;
+   private boolean bibglsInputFound = false;
 }

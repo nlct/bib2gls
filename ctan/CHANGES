@@ -1,9 +1,15 @@
-v4.3 (pending)
+v4.3 (2025-01-29)
 
  * bib2gls:
 
    - skip compound entries that don't have one or more
      elements selected
+
+   - new command line switch:
+
+     --aux-input-action 
+
+   - bug fix: save-principle-locations=retain changes encap
 
  * texparserlib.jar: Corrected definition of \textdegree
 

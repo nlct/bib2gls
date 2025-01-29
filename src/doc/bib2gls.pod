@@ -21,6 +21,33 @@ or in a location that can be found by kpsewhich.
 
 =over 4
 
+=item B<--aux-input-action> I<setting>
+
+Determines what to do when B<bib2gls> encounters C<\@input> in the
+F<aux> file. The I<setting> may be one of:
+
+=over 4
+
+=item B<follow>
+
+Follow the reference (that is, input the file as usual).
+
+=item B<skip-after-bibglsaux> (or B<skip after bibglsaux>) 
+
+Follow the reference for each C<\@input> encountered until 
+C<\@bibgls@input> is encountered, after which skip all remaining
+instances of C<\@input> (default).
+
+=item B<skip>
+
+Skip all instances of C<\@input> (but not C<\@bibgls@input>
+which is always followed).
+
+=back
+
+The C<\@bibgls@input> command will be in the F<aux> file if the package
+option C<bibglsaux> has been used.
+
 =item B<--break-space>
 
 Interpret C<~> (tilde) character and C<\nobreakspace> as a normal space.

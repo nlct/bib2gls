@@ -2226,7 +2226,7 @@ extra code to the end of \meta{description}},
   name={\csfmt{glsxtr@resource}},
   user1={\margm{options}\margm{filename}},
   description={this internal command is written to the \ext{aux}
-file by \csref{glsxtrresourcefile}
+file by \csref{GlsXtrLoadResources}
    to provide \bibgls\ with the resource information},
   topics={internalcommands,auxcommands},
   note={\styfmt{glossaries-extra} v1.08+},
@@ -2332,11 +2332,35 @@ starred version \csref{glsxtrfmt*}},
 
 @mainglscommand{glsxtrresourcefile,
   name={\csfmt{gls\-xtr\-resource\-file}},
-  user1={\oargm{options}\margm{filename}},
+  user1={\oargm{options}\margm{basename}},
+  description={input the \ext{glstex} file created by \bibgls\ and
+   write resource instructions to the \ext{aux} file.
+   This command is deprecated as from \sty{glossaries-extra} v1.55
+    (use \gls{glsbibdata} instead)},
+  topics={indexing},
+  note={\styfmt{glossaries-extra} v1.08+ (deprecated)},
+  seealso={resourceoptions,GlsXtrLoadResources},
+  category={command}
+}
+
+@mainglscommand{GlsXtrLoadResources,
+  name={\csfmt{Gls\-Xtr\-Load\-Resources}},
+  user1={\oargm{options}},
   description={input the \ext{glstex} file created by \bibgls\ and
    write resource instructions to the \ext{aux} file},
-  topics={indexing},
-  note={\styfmt{glossaries-extra} v1.08+},
+  topics={indexing,shortcutcommands},
+  note={\styfmt{glossaries-extra} v1.11+},
+  seealso={resourceoptions,glsbibdata},
+  category={command}
+}
+
+@mainglscommand{glsbibdata,
+  name={\csfmt{gls\-bib\-data}},
+  user1={\oargm{options}\margm{bib-list}},
+  description={a shortcut command that uses
+   \csref{GlsXtrLoadResources} with \csopt[\margm{bib-list}]{src}},
+  topics={indexing,shortcutcommands},
+  note={\styfmt{glossaries-extra} v1.55+},
   seealso={resourceoptions,GlsXtrLoadResources},
   category={command}
 }
@@ -4323,16 +4347,6 @@ pattern}},
    parent={resourceoptions}
 }
 
-@mainglscommand{GlsXtrLoadResources,
-  name={\csfmt{Gls\-Xtr\-Load\-Resources}},
-  user1={\oargm{options}},
-  description={a shortcut command that uses \csref{glsxtrresourcefile}},
-  topics={indexing,shortcutcommands},
-  note={\styfmt{glossaries-extra} v1.11+},
-  seealso={resourceoptions,glsxtrresourcefile},
-  category={command}
-}
-
 @mainglscommand{glsxtrcopytoglossary,
   name={\csfmt{gls\-xtr\-copy\-to\-glossary}},
   user1={\margm{label}\margm{type}},
@@ -4461,6 +4475,29 @@ cs}\margm{Glspl-like cs}},
    \styopt[nameref]{record} option is used},
   topics={internalcommands,auxcommands,indexing},
   note={\styfmt{glossaries-extra} v1.37+},
+  category={command}
+}
+
+@mainglscommand{@bibgls@input,
+  name={\csfmt{@bibgls@input}},
+  user1={\margm{filename}},
+  description={this command is written to the \ext{aux} file by the
+\styopt{bibglsaux} option (or by \gls{glsxtrsetbibglsaux})},
+  topics={internalcommands,auxcommands,indexing},
+  seealso={switch.aux-input-action,glsxtrsetbibglsaux,styopt.bibglsaux},
+  note={\styfmt{glossaries-extra} v1.49+\texparserdefnote},
+  category={command}
+}
+
+@mainglscommand{glsxtrsetbibglsaux,
+  name={\csfmt{gls\-xtr\-set\-bib\-gls\-aux}},
+  user1={\margm{basename}},
+  description={an alternative to the \styopt{bibglsaux} option, this creates a separate \ext{aux} file containing all
+records, which is input using \cs{@bibgls@input} instead of
+\cs{@input}},
+  note={\styfmt{glossaries-extra} v1.49+},
+  seealso={switch.aux-input-action,styopt.bibglsaux},
+  topics={indexing},
   category={command}
 }
 
@@ -5526,6 +5563,11 @@ and \L/\l\ treated as L/l},
   name={\styfmt{acc\-supp}},
   category={package},
   parent={packages}
+}
+
+@index{field-reference,
+  name={field reference (string concatenation)},
+  text={field reference}
 }
 
 @index{stringconcatenation,
@@ -8452,6 +8494,18 @@ long form on \idx{firstuse}. The default definition just uses
   parent={packageoptions}
 }
 
+@packageoption{styopt.bibglsaux,
+  name={\styoptfmt{bib\-gls\-aux}},
+  user1={\meta{basename}},
+  description={creates a separate \ext{aux} file containing all
+records, which is input using \cs{@bibgls@input} instead of
+\cs{@input}},
+  package={glossaries-extra},
+  category={packageoption},
+  seealso={switch.aux-input-action,glsxtrsetbibglsaux,@bibgls@input},
+  parent={packageoptions}
+}
+
 @packageoption{styopt.accsupp,
   name={\styoptfmt{accsupp}},
   description={load the \sty{glossaries-accsupp} package to provide
@@ -10852,6 +10906,13 @@ primary formats, if enabled.},
 @switch{switch.no-provide-glossaries,
   name={\longargfmt{no\dhyphen provide\dhyphen glossaries}},
   user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.aux-input-action,
+  name={\longargfmt{aux\dhyphen input\dhyphen action}},
+  user1={\meta{setting}},
   category={switch},
   parent={commandlineoptions}
 }
@@ -14913,6 +14974,17 @@ usual delay},
   description={clears the page, creates a supplementary \ext{aux}
   file, and selectively inputs the given file},
   note={kernel command\texparserdefnote},
+  seealso={@input},
+  category={command}
+}
+
+@command{@input,
+  name={\csfmt{@input}},
+  user1={\margm{file}},
+  description={used in the \ext{aux} file to input another \ext{aux}
+file, typically because the document contains \cs{include}},
+  note={kernel command\texparserdefnote},
+  seealso={switch.aux-input-action,@bibgls@input},
   category={command}
 }
 
@@ -15735,7 +15807,7 @@ warning rather than an error if the command isn't already defined},
   user1={},
   description={provides code that locally redefines commands 
    during the protected write operation performed by 
-   \csref{glsxtrresourcefile}},
+   \csref{GlsXtrLoadResources}},
   topics={hooks},
   note={\styfmt{glossaries-extra} v1.21+},
   category={command},
@@ -16300,7 +16372,7 @@ conditional in \csopt{assign-fields} conditionals. This token needs
   name={\csfmt{Gls\-Xtr\-Default\-Resource\-Options}},
   user1={},
   description={provides default options for 
-   \csref{glsxtrresourcefile}},
+   \csref{GlsXtrLoadResources}},
   topics={hooks},
   note={\styfmt{glossaries-extra} v1.40+},
   category={command}

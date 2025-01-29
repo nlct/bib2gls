@@ -88,6 +88,8 @@
  {}{}%
 }
 
+\newcommand\dash{\,---\,}
+
 \renewcommand{\glsentrycounterlabel}{}
 \renewcommand{\glssubentrycounterlabel}{}
 \renewcommand\glstreeitem{\par\hangindent10pt}
@@ -1535,6 +1537,10 @@ enabled.)
 Both \XeLaTeX\ and \LuaLaTeX\ default to UTF-8 \igls{encoding}. With modern \TeX\
 distributions, \pdfLaTeX\ also defaults to UTF-8 but may be changed
 with the \sty{inputenc} package.
+The \sty{glossaries-extra} package writes the document encoding to
+the \ext{aux} file so that \bibgls\ can pick it up. However, if it
+doesn't match \bibgls\ expected encoding, it will have to close the
+file and reopen it.
  
 The default encoding for Java applications, such as \bibgls, is the
 default encoding of the \idx{JVM}. This typically matches the
@@ -1559,7 +1565,8 @@ file. For example, when the \ext{aux} file is opened:
 Reading myDoc.aux
 Encoding: UTF-8
 \end{verbatim}
-If the document encoding is detected in the \ext{aux} file, it will
+If the document encoding is detected in the \ext{aux} file
+(which \bibgls\ should now be able to do), the encoding will
 be written to the transcript. For example:
 \begin{verbatim}
 TeX character encoding: UTF-8
@@ -1736,10 +1743,10 @@ also in the \href{https://www.dickimaw-books.com/gallery/#bib2gls}{\bibgls\ gall
 Note that there's no need to called \idx!{xindy} or \idx!{makeindex}
 since \bibgls\ automatically sorts the entries and collates the \glspl{location}
 after selecting the required entries from the \ext{bib} file and
-before writing the temporary file that's input with \gls{glsxtrresourcefile}
-(or the more convenient shortcut
-\gls{GlsXtrLoadResources}).\footnote{This document will mostly use
-the more convenient \gls{GlsXtrLoadResources}.}  This
+before writing the temporary file that's input with
+\gls{GlsXtrLoadResources} (or the shortcut
+\gls{glsbibdata}).\footnote{This document will mostly use
+\gls{GlsXtrLoadResources}.}  This
 means the entries are already defined in the correct order, and only
 those entries that are required in the document are defined, so
 \ics{printunsrtglossary} (or \ics{printunsrtglossaries}) may be used.
@@ -2163,8 +2170,8 @@ up-to-date versions of both \sty{glossaries} and
 \section{Resource Sets}
 \label{sec:resourcesets}
 
-Each instance of \gls{glsxtrresourcefile} or
-\gls{GlsXtrLoadResources} in the document represents a \igls{resourceset}. Each
+Each instance of \gls{GlsXtrLoadResources} (or
+\gls{glsbibdata}) in the document represents a \igls{resourceset}. Each
 \igls{resourceset} has one or more associated \iext{bib} files
 that provides the data for that set. Command line switches
 (\sectionref{sec:switches}) are applied to all \iglspl{resourceset}.
@@ -2605,9 +2612,9 @@ with single quote characters for convenience, but the process isn't
 actually called in that way.
 
 \bibgls\ creates files with the extension \ext{glstex}, which are
-input by \gls{glsxtrresourcefile} (and therefore by the shortcut
-\gls{GlsXtrLoadResources}). This extension is fixed and is imposed
-by both \bibgls\ and \gls{glsxtrresourcefile}. \bibgls\ also creates
+input by \gls{GlsXtrLoadResources} (and therefore by the shortcut
+\gls{glsbibdata}). This extension is fixed and is imposed
+by both \bibgls\ and \gls{GlsXtrLoadResources}. \bibgls\ also creates
 a transcript file with the default extension \ext{glg}. This may be
 overridden by the \longarg{log-file} switch, but \bibgls\ always
 forbids write access to any file with the following extensions:
@@ -2681,11 +2688,13 @@ If you are using a document build method that tries to determine
 whether or not \bibgls\ should be run, you can find the information
 by searching the \iext{aux} file for instances of
 \nosecdef{glsxtr@resource}
-Each instance corresponds to an instance of \gls{glsxtrresourcefile}
+Each instance corresponds to an instance of \gls{GlsXtrLoadResources} (or \gls{glsbibdata})
 where \meta{filename} is the base name of the \iext{glstex} file
 that \bibgls\ needs to create for this resource set. If the
 \meta{options} part is missing the \csopt{src} option, then
 \meta{filename} also indicates the base name for the \iext{bib} file.
+In the case of \gls{glsbibdata}, the \csopt{src} option is
+automatically set to the mandatory argument.
 
 So the simplest check to determine if \bibgls\ needs to be run is to test
 if the \iext{aux} file contains \gls{glsxtr@resource}. For
@@ -3532,6 +3541,49 @@ Switches off the debugging mode.
 This option cannot be set in \gls{BibGlsOptions}.
 
 \section{File Options}
+
+\argsection{aux-input-action}
+
+Determines what \bibgls\ should do it it encounters \ics{@input} in
+the \ext+{aux} file. The \meta{setting} may be one of the following:
+\begin{description}
+\item[\optfmt{follow}] follow the reference (that is, input the file).
+
+\item[\optfmt{skip after bibglsaux}] follow the reference until
+\gls{@bibgls@input} is encounter, after which skip all remaining 
+instances of \ics{@input} (default).  If there is no
+\styopt{bibglsaux} file, this setting is no different from 
+\optfmt{follow}.
+
+\item[\optfmt{skip-after-bibglsaux}] synonym of \optfmt{skip after
+bibglsaux}.
+
+\item[\optfmt{skip}] skip the reference. Be careful with this
+setting if you haven't used \styopt{bibglsaux} or
+\gls{glsxtrsetbibglsaux} as you may cause \bibgls\ to miss records.
+However, if you are using \csopt[all]{selection} and you're not
+interested in locations then this might help speed up \bibgls's
+processing time.
+\end{description}
+
+This setting is designed to work with \sty{glossaries-extra}['s] 
+\styopt{bibglsaux} package option or with
+\nosecdef{glsxtrsetbibglsaux}
+which does the same thing.
+This specifies a special \ext{aux} file containing the records that
+\bibgls\ will read but \LaTeX\ will skip.
+The reference will be written to the \ext{aux} file with
+\nosecdef{@bibgls@input}
+which is defined by \sty{glossaries-extra} to simply ignore its
+argument but \bibgls\ will input the file (regardless of the
+\longarg{aux-input-action} setting).
+
+Since the \styopt{bibglsaux} file contains all records and is
+typically written to the \ext{aux} file after all the commands that
+\bibgls\ is interested in, it's unlikely that the additional
+\ext{aux} files (created by \ics{include}) will be of any interest
+to \bibgls. Therefore the default setting is to ignore all
+\cs{@input} after \gls{@bibgls@input}.
 
 \argsection{dir}
 
@@ -4855,7 +4907,13 @@ If used in \gls{BibGlsOptions}, this option should be specified as
 
 \bibgls\ recognises certain \glspl{entrytype}. Any unrecognised types will
 be ignored and a warning will be written to the transcript file.
-Entries are defined in the usual \ext{bib} format:
+Bib file entry types can be divided into: special entry types and
+glossary entry types. The resource options mostly apply only to
+the glossary entry types (except where noted).
+
+The glossary entry types correspond to glossary entries that can be
+referenced in the document with commands like \ics{gls}.
+They are defined in the usual \ext{bib} format:
 \begin{codeenv*}
 \idx{atchar}\meta{entry-type}\marg{\meta{id},
   \meta{field-name-1} = \margm{text},
@@ -4928,32 +4986,6 @@ for the comment line.
 If there is no encoding line in the \ext{bib} file and the
 \csopt{charset} option hasn't been used, then the default encoding
 will be assumed (see \sectionref{sec:defencoding}).
-
-\section{Comments}
-\label{sec:bibcomments}
-
-The original \ext{bib} file format as defined by \BibTeX\ doesn't
-have a designated comment character, but instead treats anything
-outside of \code{@\meta{entry}\margm{data}} as unwanted material
-that's ignored. This can catch out users who try to do something
-like:
-\begin{verbatim}
-%@misc{sample, title={Sample} }
-\end{verbatim}
-In this case, the percent character is simply discarded and the
-line is treated as:
-\begin{verbatim}
-@misc{sample, title={Sample} }
-\end{verbatim}
-Some applications that parse \ext{bib} files are less tolerant of
-unwanted material. In the case of \bibgls, the percent character is
-treated as a comment character and other unwanted material
-should be omitted.  Avoid using comments within field values.
-Comments are best placed outside of entry definitions.
-
-The most common type of comment is the \gls{encoding} comment, described
-above.  \BibTeX's \entrydef{comment} is also supported by \bibgls\
-for general comments, but not for the \gls{encoding}.
 
 \section{Fields}
 \label{sec:fields}
@@ -5169,7 +5201,281 @@ Note that some resource options allow string \gls{concatenation} in
 their syntax. That uses a different operator. See
 \sectionref{sec:optstringconcat} for further details.
 
-\section{Standard Entry Types}
+\section{Special Entry Types}
+\label{sec:specialentrytypes}
+
+The bib entry types described in this section don't correspond to
+any glossary entry type. They aren't affected by most of the
+resource options, including sorting or filtering.
+
+\subsection{Comments}
+\label{sec:bibcomments}
+
+The original \ext{bib} file format as defined by \BibTeX\ doesn't
+have a designated comment character, but instead treats anything
+outside of \code{@\meta{entry}\margm{data}} as unwanted material
+that's ignored. This can catch out users who try to do something
+like:
+\begin{verbatim}
+%@misc{sample, title={Sample} }
+\end{verbatim}
+In this case, the percent character is simply discarded and the
+line is treated as:
+\begin{verbatim}
+@misc{sample, title={Sample} }
+\end{verbatim}
+Some applications that parse \ext{bib} files are less tolerant of
+unwanted material. In the case of \bibgls, the percent character is
+treated as a comment character and other unwanted material
+should be omitted.  Avoid using comments within field values.
+Comments are best placed outside of entry definitions.
+
+The most common type of comment is the \gls{encoding} comment, described
+above.  \BibTeX's \entrydef{comment} is also supported by \bibgls\
+for general comments, but not for the \gls{encoding}.
+
+\subsection{Preamble}
+\label{sec:preamble}
+
+As with \BibTeX, \entrydef{preamble} is also supported by \bibgls.
+This will be written to the \ext{glstex} file unless
+prevented with \csopt[false]{write-preamble}.
+The \texparserlib\ used by \bibgls\ will parse the contents of
+\atentry{preamble} unless \csopt[false]{interpret-preamble}
+(or the interpreter is switched off with \longarg{no-interpret}).
+
+\subsection{Compound Entry Sets}
+\label{sec:compoundsetentry}
+
+A \gls{compoundentry} isn't a normal glossary entry
+but corresponds to a multi-entry (compound or combined) set provided
+by \sty{glossaries-extra} v1.48+, which is defined by the command
+\ics{multiglossaryentry} (or \ics{providemultiglossaryentry}).
+These are referred to as multi-entries in \sty{glossaries-extra} but
+are referred to as \glspl{compoundentry} here to avoid confusion
+with the \glspl{multientrytype}. They are referenced with commands
+like \ics{mgls} not with the \cs{gls} set of commands.
+As such, they don't belong in any glossary list, although their
+component elements do.
+
+\begin{important}
+Most resource options don't apply to this \gls{entrytype}. Options
+specific to \glspl{compoundentry} are listed in
+\sectionref{sec:compoundentries}.
+\end{important}
+
+Essentially, a label is defined that refers to a set of labels
+corresponding to entries that \emph{have already been defined}. One
+element in the set is considered the \gls{compmainlabel}. Entry
+labels may appear in multiple sets.
+
+A \gls{compoundentry} provides a convenient way to apply commands
+like \ics{gls} to multiple entries in one command (such as \ics{mgls}).
+\Gls{compoundentry} labels may only be used in the \cs{mgls}-like
+commands or in a \gls{cross-referencefield}.
+
+For example, consider the following document:
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
+\cs{setabbreviationstyle}\marg{long-only-short-only}
+\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
+  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
+}
+\cs{newabbreviation}\marg{clostridium}\marg{C.}\marg{Clostridium}
+\gls{newglossaryentry}\marg{botulinum}\marg{name=botulinum,
+  description=\marg{},parent=clostridium}
+\gls{newglossaryentry}\marg{perfringens}\marg{name=perfringens,
+  description=\marg{},parent=clostridium}
+\cmd{begin}\marg{document}
+\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum},
+\cs{gls}\marg{clostridum} \cs{gls}\marg{perfringens},
+\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}.
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+This produces:
+\begin{quote}
+Clostridium botulinum,
+C. perfringens,
+C. botulinum.
+\end{quote}
+followed by the glossary. This is very cumbersome. Defining a
+\gls{compoundentry} label simply provides a shortcut:
+\begin{codeenv*}
+\ics{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
+\ics{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
+\end{codeenv*}
+(This has to be done after the entries have been defined.) Now the
+entries can be more compactly referenced:
+\begin{codeenv*}
+\ics{mgls}\marg{cbot},
+\ics{mgls}\marg{cperf},
+\ics{mgls}\marg{cbot}.
+\end{codeenv*}
+Each \gls{compoundentry} set must contain at least two elements. The
+\gls{compmainlabel} is the label of the element that is considered
+the main entry of the set. If the \gls{compmainlabel} isn't
+identified in \cs{multiglossaryentry} then it's assumed to be the
+last element in the set.
+
+In the above example, \code{botulinum} is the \gls{compmainlabel} of
+the \code{cbot} set, and \code{perfringens} is the
+\gls{compmainlabel} of the \code{cperf} set.  In both sets,
+\code{clostridium} is the \qt{\gls{compotherlabel}}. If there are
+more than two elements in the set then \qt{others} refers to all the
+elements except for the \gls{compmainlabel}. An entry can be a
+\gls{compmainlabel} of one set and an \gls{compotherlabel} of
+another set.
+
+The options, which can be applied to all sets with
+\ics{multiglossaryentrysetup} or to a specific set using the
+first optional argument of \ics{multiglossaryentry}, determine
+if each element of the list has a separate hyperlink to their
+own target, or if only the main element should have a hyperlink, or 
+if the entire content of \ics{mgls} should be a single hyperlink to
+the main entry's target.
+
+With \bibgls, the component entries that form the set should be in \ext{bib} files as usual. 
+The \gls{compoundentry} set may either be defined in the document \ext{tex}
+file using \ics{multiglossaryentry} (or \ics{providemultiglossaryentry})
+or they can be defined in the \ext{bib} file using
+\atentry{compoundset}. Remember that the set can only be defined
+after the entries that make up the elements of the set have been
+defined. If any \ext{bib} files in a \gls{resourceset} contain
+\atentry{compoundset}, the definitions will be added at the end of
+the \ext{glstex} file (using \gls{bibglsdefcompoundset}).
+
+If you have multiple \glspl{resourceset} that reuse the same
+\ext{bib} file containing \atentry{compoundset} then either redefine
+\gls{bibglsdefcompoundset} to use \ics{providemultiglossaryentry} or
+prevent duplicate definitions with \csopt[false]{compound-write-def}.
+
+The elements of the set will still need to be indexed as usual to
+ensure that they have \glspl{record} to enable selection.
+If any element hasn't been selected, the \gls{compoundentry} define won't
+be written to the \ext{glstex} file, regardless of the
+\csopt{compound-write-def} setting.
+
+The above example can be converted to \bibgls\ as follows
+(\glspl{compoundentry} defined in the document \ext{tex} file):
+\begin{codeenv}
+\cmd{documentclass}\marg{article}
+\cmd{usepackage}\marg{hyperref}
+\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
+\cs{setabbreviationstyle}\marg{long-only-short-only}
+\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
+  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
+}
+\gls{GlsXtrLoadResources}\oarg{\csopt[bacteria]{src}}
+\cs{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
+\cs{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
+\cmd{begin}\marg{document}
+\cs{mgls}\marg{cbot}, \cs{mgls}\marg{cperf}, \cs{mgls}\marg{cbot}.
+\cs{printunsrtglossary}
+\cmd{end}\marg{document}
+\end{codeenv}
+Note that \cs{multiglossaryentry} must come after \gls{GlsXtrLoadResources}.
+
+The \file{bacteria.bib} contains the definitions in the usual way:
+\begin{codeenv}
+\atentry{abbreviation}\marg{clostridium,
+ \field{short}=\marg{C.},
+ \field{long}=\marg{Clostridium}
+}
+\atentry{index}\marg{botulinum,
+ \field{parent}=\marg{clostridium}
+}
+\atentry{index}\marg{perfringens,
+ \field{parent}=\marg{clostridium}
+}
+\end{codeenv}
+
+Alternatively, the \glspl{compoundentry} can be defined in the
+\ext{bib} file instead:
+\begin{codeenv}
+\atentry{compoundset}\marg{cbot,
+  \field{elements}=\marg{clostridium,botulinum}
+}
+\atentry{compoundset}\marg{cperf,
+  \field{elements}=\marg{clostridium,perfringens}
+}
+\end{codeenv}
+The \cs{multiglossaryentry} commands should now be removed from the
+\ext{tex} file.
+
+There's a difference between these two methods on the first \LaTeX\
+build. In the first example, \code{cbot} is known, so
+\code{\cs{mgls}\marg{cbot}} can perform
+\code{\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}}. These
+commands aren't yet defined so they are both replaced by \qt{??}
+(resulting in \qt{?? ??}). As usual, the \gls{locationlist} is
+unreliable until entries are defined and the unknown markers \qt{??}
+can be replaced with the correct content. If the document is in a
+file called \filefmt{myDoc.tex} then the document build:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+will have \glspl{location} in the resulting PDF file, but they may
+be incorrect if the associated temporary files were initially
+missing.
+
+In the second example, \code{cbot} is unknown, so
+\code{\cs{mgls}\marg{cbot}} is simply displayed as \qt{??}.
+In this case, the \ext{aux} file contains information that
+\code{cbot} has been referenced, but there are no associated
+\glspl{record}. The entries that belong to the \code{cbot} set will
+be selected as they are considered dependent on the
+\gls{compoundentry}. In this case, if you are starting from scratch
+(no associated temporary files), you will need:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+At this point, the \glspl{locationlist} will appear.
+After that, you can reduce the document build to:
+\begin{codeenv}
+pdflatex myDoc
+bib2gls myDoc
+pdflatex myDoc
+\end{codeenv}
+(Until you later add new entries.)
+
+If you don't want \glspl{location} for the 
+\glslink{compotherlabel}{other elements} then set the 
+\idx{encap} to \encap{glsignore}:
+\begin{codeenv*}
+\ics{multiglossaryentrysetup}\marg{encapothers=\encap{glsignore}}
+\end{codeenv*} 
+
+\entrysection{compoundset}
+The following fields are available:
+\begin{description}
+\item[\field{elements}] The comma-separated list of element labels.
+This corresponds to the final argument of \cs{multiglossaryentry}.
+(Required.)
+\item[\field{main}] The \gls{compmainlabel}. This field is optional.
+If omitted, the main label is assumed to be the last element.
+\item[\field{options}] A comma-separated list of options. This
+corresponds to the first optional argument of
+\cs{multiglossaryentry}. This field may be omitted.
+\end{description}
+These fields can only be used in this \gls{entrytype}.
+
+\section{Glossary Entry Types}
+\label{sec:glossaryentrytypes}
+
+Each of the bib entry types listed below corresponds to one or more glossary
+entries, which may be referenced in the document with commands such
+as \cs{gls}.
+
+\subsection{Standard Entry Types}
 \label{sec:standardentry}
 
 \entrysection{string}
@@ -5439,7 +5745,7 @@ Alternatively to avoid links with \csfmt{gcard} as well:
 Now \csfmt{gset} and \csfmt{gcard} are simply formatting commands,
 but their actual definitions are determined in the \ext{bib} file.
 
-\section{Single Entry Types}
+\subsection{Single Entry Types}
 \label{sec:singleentry}
 
 The \glspl{entrytype} described in this section create a single glossary
@@ -5820,7 +6126,7 @@ The resource options then need to include:
 If the \atentry{contributor} entry is deferred until after the
 corresponding \atentry{bibtexentry} then you will end up with a label clash.
 
-\section{Dual Entry Types}
+\subsection{Dual Entry Types}
 \label{sec:dualentry}
 
 The \glspl{entrytype} described in this section create two separate (but
@@ -7036,7 +7342,7 @@ the \idx!{postdescriptionhook} is no longer required.
 As \atentry{dualabbreviation} but defines the entries with
 \gls!{bibglsnewdualacronym}.
 
-\section{Tertiary Entry Types}
+\subsection{Tertiary Entry Types}
 \label{sec:tertiaryentry}
 
 A \igls{tertiaryentry} type is essentially a \gls{dualentry} that creates three
@@ -7121,7 +7427,7 @@ corresponding \gls{secondaryentry}.  The \primary\ may be defined
 earlier or later in the file depending on the way the entries are
 sorted and on the \csopt{dual-sort} setting.
 
-\section{Multi-Entry Types}
+\subsection{Multi-Entry Types}
 \label{sec:multientry}
 
 A \gls{multientrytype} is an entry that may spawn multiple 
@@ -7618,227 +7924,6 @@ the \ext{glstex} file with \gls{bibglsnewspawndualindexentry} and
 \gls{bibglsnewspawndualindexentrysecondary}. The spawned
 \gls{progeny} are defined with \gls{bibglsnewspawnedindex}.
 
-\section{Compound Entry Sets}
-\label{sec:compoundsetentry}
-
-A \gls{compoundentry} isn't an entry in the same sense as the above
-but corresponds to a multi-entry (compound or combined) set provided
-by \sty{glossaries-extra} v1.48+, which is defined by the command
-\ics{multiglossaryentry} (or \ics{providemultiglossaryentry}).
-These are referred to as multi-entries in \sty{glossaries-extra} but
-are referred to as \glspl{compoundentry} here to avoid confusion
-with the \glspl{multientrytype}.
-
-Essentially, a label is defined that refers to a set of labels
-corresponding to entries that \emph{have already been defined}. One
-element in the set is considered the \gls{compmainlabel}. Entry
-labels may appear in multiple sets.
-
-\begin{important}
-Since \gls{compoundentry} aren't normal entries, they cannot be
-matched in options such as \csopt{match}.
-\end{important}
-
-A \gls{compoundentry} provides a convenient way to apply commands
-like \ics{gls} to multiple entries in one command (such as \ics{mgls}).
-\Gls{compoundentry} labels may only be used in the \cs{mgls}-like
-commands or in a \gls{cross-referencefield}.
-
-For example, consider the following document:
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\marg{hyperref}
-\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
-\cs{setabbreviationstyle}\marg{long-only-short-only}
-\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
-  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
-}
-\cs{newabbreviation}\marg{clostridium}\marg{C.}\marg{Clostridium}
-\gls{newglossaryentry}\marg{botulinum}\marg{name=botulinum,
-  description=\marg{},parent=clostridium}
-\gls{newglossaryentry}\marg{perfringens}\marg{name=perfringens,
-  description=\marg{},parent=clostridium}
-\cmd{begin}\marg{document}
-\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum},
-\cs{gls}\marg{clostridum} \cs{gls}\marg{perfringens},
-\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}.
-\cs{printunsrtglossary}
-\cmd{end}\marg{document}
-\end{codeenv}
-This produces:
-\begin{quote}
-Clostridium botulinum,
-C. perfringens,
-C. botulinum.
-\end{quote}
-followed by the glossary. This is very cumbersome. Defining a
-\gls{compoundentry} label simply provides a shortcut:
-\begin{codeenv*}
-\ics{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
-\ics{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
-\end{codeenv*}
-(This has to be done after the entries have been defined.) Now the
-entries can be more compactly referenced:
-\begin{codeenv*}
-\ics{mgls}\marg{cbot},
-\ics{mgls}\marg{cperf},
-\ics{mgls}\marg{cbot}.
-\end{codeenv*}
-Each \gls{compoundentry} set must contain at least two elements. The
-\gls{compmainlabel} is the label of the element that is considered
-the main entry of the set. If the \gls{compmainlabel} isn't
-identified in \cs{multiglossaryentry} then it's assumed to be the
-last element in the set.
-
-In the above example, \code{botulinum} is the \gls{compmainlabel} of
-the \code{cbot} set, and \code{perfringens} is the
-\gls{compmainlabel} of the \code{cperf} set.  In both sets,
-\code{clostridium} is the \qt{\gls{compotherlabel}}. If there are
-more than two elements in the set then \qt{others} refers to all the
-elements except for the \gls{compmainlabel}. An entry can be a
-\gls{compmainlabel} of one set and an \gls{compotherlabel} of
-another set.
-
-The options, which can be applied to all sets with
-\ics{multiglossaryentrysetup} or to a specific set using the
-first optional argument of \ics{multiglossaryentry}, determine
-if each element of the list has a separate hyperlink to their
-own target, or if only the main element should have a hyperlink, or 
-if the entire content of \ics{mgls} should be a single hyperlink to
-the main entry's target.
-
-With \bibgls, the entries that form the set should be in \ext{bib} files as usual. 
-The \gls{compoundentry} set may either be defined in the document \ext{tex}
-file using \ics{multiglossaryentry} (or \ics{providemultiglossaryentry})
-or they can be defined in the \ext{bib} file using
-\atentry{compoundset}. Remember that the set can only be defined
-after the entries that make up the elements of the set have been
-defined. If any \ext{bib} files in a \gls{resourceset} contain
-\atentry{compoundset}, the definitions will be added at the end of
-the \ext{glstex} file (using \gls{bibglsdefcompoundset}).
-
-If you have multiple \glspl{resourceset} that reuse the same
-\ext{bib} file containing \atentry{compoundset} then either redefine
-\gls{bibglsdefcompoundset} to use \ics{providemultiglossaryentry} or
-prevent duplicate definitions with \csopt[false]{compound-write-def}.
-
-The elements of the set will still need to be indexed as usual to
-ensure that they have \glspl{record} to enable selection.
-
-The above example can be converted to \bibgls\ as follows
-(\glspl{compoundentry} defined in the document \ext{tex} file):
-\begin{codeenv}
-\cmd{documentclass}\marg{article}
-\cmd{usepackage}\marg{hyperref}
-\cmd{usepackage}[\styopt{record},\styopt[tree]{style}]\marg{glossaries-extra}
-\cs{setabbreviationstyle}\marg{long-only-short-only}
-\cs{renewcommand}*\marg{\cs{glsxtronlyname}}\marg{\comment{}
-  \cs{protect}\cs{glslongonlyfont}\marg{\cs{the}\cs{glslongtok}}\comment{}
-}
-\gls{GlsXtrLoadResources}\oarg{\csopt[bacteria]{src}}
-\cs{multiglossaryentry}\marg{cbot}\marg{clostridium,botulinum}
-\cs{multiglossaryentry}\marg{cperf}\marg{clostridium,perfringens}
-\cmd{begin}\marg{document}
-\cs{mgls}\marg{cbot}, \cs{mgls}\marg{cperf}, \cs{mgls}\marg{cbot}.
-\cs{printunsrtglossary}
-\cmd{end}\marg{document}
-\end{codeenv}
-Note that \cs{multiglossaryentry} must come after \gls{GlsXtrLoadResources}.
-
-The \file{bacteria.bib} contains the definitions in the usual way:
-\begin{codeenv}
-\atentry{abbreviation}\marg{clostridium,
- \field{short}=\marg{C.},
- \field{long}=\marg{Clostridium}
-}
-\atentry{index}\marg{botulinum,
- \field{parent}=\marg{clostridium}
-}
-\atentry{index}\marg{perfringens,
- \field{parent}=\marg{clostridium}
-}
-\end{codeenv}
-
-Alternatively, the \glspl{compoundentry} can be defined in the
-\ext{bib} file instead:
-\begin{codeenv}
-\atentry{compoundset}\marg{cbot,
-  \field{elements}=\marg{clostridium,botulinum}
-}
-\atentry{compoundset}\marg{cperf,
-  \field{elements}=\marg{clostridium,perfringens}
-}
-\end{codeenv}
-The \cs{multiglossaryentry} commands should now be removed from the
-\ext{tex} file.
-
-There's a difference between these two methods on the first \LaTeX\
-build. In the first example, \code{cbot} is known, so
-\code{\cs{mgls}\marg{cbot}} can perform
-\code{\cs{gls}\marg{clostridum} \cs{gls}\marg{botulinum}}. These
-commands aren't yet defined so they are both replaced by \qt{??}
-(resulting in \qt{?? ??}). As usual, the \gls{locationlist} is
-unreliable until entries are defined and the unknown markers \qt{??}
-can be replaced with the correct content. If the document is in a
-file called \filefmt{myDoc.tex} then the document build:
-\begin{codeenv}
-pdflatex myDoc
-bib2gls myDoc
-pdflatex myDoc
-\end{codeenv}
-will have \glspl{location} in the resulting PDF file, but they may
-be incorrect if the associated temporary files were initially
-missing.
-
-In the second example, \code{cbot} is unknown, so
-\code{\cs{mgls}\marg{cbot}} is simply displayed as \qt{??}.
-In this case, the \ext{aux} file contains information that
-\code{cbot} has been referenced, but there are no associated
-\glspl{record}. The entries that belong to the \code{cbot} set will
-be selected as they are considered dependent on the
-\gls{compoundentry}. In this case, if you are starting from scratch
-(no associated temporary files), you will need:
-\begin{codeenv}
-pdflatex myDoc
-bib2gls myDoc
-pdflatex myDoc
-bib2gls myDoc
-pdflatex myDoc
-\end{codeenv}
-At this point, the \glspl{locationlist} will appear.
-After that, you can reduce the document build to:
-\begin{codeenv}
-pdflatex myDoc
-bib2gls myDoc
-pdflatex myDoc
-\end{codeenv}
-(Until you later add new entries.)
-
-If you don't want \glspl{location} for the 
-\glslink{compotherlabel}{other elements} then set the 
-\idx{encap} to \encap{glsignore}:
-\begin{codeenv*}
-\ics{multiglossaryentrysetup}\marg{encapothers=\encap{glsignore}}
-\end{codeenv*} 
-
-\entrysection{compoundset}
-The following fields are available:
-\begin{description}
-\item[\field{elements}] The comma-separated list of element labels.
-This corresponds to the final argument of \cs{multiglossaryentry}.
-(Required.)
-\item[\field{main}] The \gls{compmainlabel}. This field is optional.
-If omitted, the main label is assumed to be the last element.
-\item[\field{options}] A comma-separated list of options. This
-corresponds to the first optional argument of
-\cs{multiglossaryentry}. This field may be omitted.
-\end{description}
-These fields can only be used in this \gls{entrytype}.
-
-Most resource options don't apply to this \gls{entrytype}. Options
-specific to \glspl{compoundentry} are listed in
-\sectionref{sec:compoundentries}.
-
 \chapter{Resource File Options}
 \label{sec:resourceopts}
 
@@ -7859,46 +7944,31 @@ in which case you need to prevent \bibgls\ from sorting using the
 \csopt[none]{sort} resource option).
 
 The \iext{glstex} resource files created by \bibgls\ are loaded in
-the document using
-\nosecformatdef{glsxtrresourcefile}
-where \meta{filename} is the name of the resource file without the
-\ext{glstex} extension.
-You can have multiple \gls{glsxtrresourcefile} commands within your
-document, but each \meta{filename} must be unique, otherwise \LaTeX\
-would attempt to input the same \ext{glstex} file multiple times
-(\bibgls\ checks for non-unique file names). The associated data for each
+the document using:
+\nosecformatdef{GlsXtrLoadResources}
+You can have multiple \gls{GlsXtrLoadResources} commands within your
+document. The associated data for each
 resource file is called the \igls{resourceset} (see
 \sectionref{sec:resourcesets}).
 
-There's a shortcut command that uses
-\ics{jobname} in the \meta{filename}:
-\nosecformatdef{GlsXtrLoadResources}
-The first instance of this command is equivalent to:
+There's a shortcut command:
+\nosecformatdef{glsbibdata}
+This simply does:
 \begin{codeenv}
-\gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}}
+\gls{GlsXtrLoadResources}\oarg{\csopt[\margm{bib-list}]{src},\meta{options}}
 \end{codeenv}
-Any additional use of \gls{GlsXtrLoadResources} is equivalent to:
-\begin{codeenv}
-\gls{glsxtrresourcefile}\oargm{options}\marg{\ics{jobname}-\meta{n}}
-\end{codeenv}
-where \meta{n} is number. For example:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries-en]{src},\csopt[en]{sort}}
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries-fr]{src},\csopt[fr]{sort}}
-\gls{GlsXtrLoadResources}\oarg{\csopt[entries-de]{src},\csopt[de-1996]{sort}}
-\end{codeenv}
-This is equivalent to:
-\begin{codeenv}
-\gls{glsxtrresourcefile}\oarg{\csopt[entries-en]{src},\csopt[en]{sort}}\marg{\cs{jobname}}
-\gls{glsxtrresourcefile}\oarg{\csopt[entries-fr]{src},\csopt[fr]{sort}}\marg{\cs{jobname}-1}
-\gls{glsxtrresourcefile}\oarg{\csopt[entries-de]{src},\csopt[de-1996]{sort}}\marg{\cs{jobname}-2}
-\end{codeenv}
-In general, it's simplest just to use \gls{GlsXtrLoadResources}.
+
+Note that the older command \inlinedef{glsxtrresourcefile} is deprecated
+as from \sty{glossaries-extra} v1.55 because it has the potential to cause
+a filename clash. If you actually intend to share
+\glspl{resourceset}\dash as opposed to sharing \ext{bib} files\dash
+across multiple documents then you need to use the \csopt{master}
+resource option (see \sectionref{sec:master}).
 
 The optional argument \meta{options} is a comma-separated
 \keyvallist.  Allowed options are listed below.  The option list
 applies only to that specific \meta{filename}\ext{glstex} and are
-not carried over to the next instance of \gls{glsxtrresourcefile}.
+not carried over to the next instance of \gls{GlsXtrLoadResources}.
 Only the definitions provided in \atentry{preamble} (if the
 interpreter is on and \csopt[true]{interpret-preamble}) are carried
 over to the next resource set and, possibly,
@@ -7938,7 +8008,7 @@ This acts like:
 
 If you have multiple \ext{bib} files you can either select them all
 using \csopt[\meta{bib list}]{src} in a single
-\gls{glsxtrresourcefile} call, if they all require the same settings,
+\gls{GlsXtrLoadResources} call, if they all require the same settings,
 or you can load them separately with different settings applied.
 
 For example, if the files \filefmt{entries-terms.bib} and
@@ -7954,7 +8024,7 @@ Alternatively, if they have different settings:
 
 Note that the sorting is applied to each \igls{resourceset} independently
 of other \iglspl{resourceset}. This means that if you have multiple instances
-of \gls{glsxtrresourcefile} but only one glossary type, the glossary
+of \gls{GlsXtrLoadResources} but only one glossary type, the glossary
 will effectively contain blocks of sorted entries. For example, if
 \filefmt{file1.bib} contains:
 \begin{codeenv}
@@ -7991,7 +8061,7 @@ Abbreviation styles must be set (using \ics{setabbreviationstyle})
 before the resource command that selects the abbreviations from the
 appropriate \ext{bib} file, since the entries are defined (through
 \gls{newabbreviation} or \gls{newacronym}) when
-\gls{glsxtrresourcefile} inputs the \ext{glstex} file. (Similarly for any
+\gls{GlsXtrLoadResources} inputs the \ext{glstex} file. (Similarly for any
 associated abbreviation style commands that must be set before
 abbreviations are defined, such as \cs{glsxtrlongshortdescname}.)
 
@@ -8109,9 +8179,10 @@ has the following syntax:
 \meta{group-ref} ::= \meta{index} | \meta{name}
 \meta{string} ::= \qtdelim{\meta{tokens}} | \margm{tokens}
 \end{codeenv}
-The \meta{field-ref} syntax is described below, and is used to
+The \meta{field-ref} syntax is described below in \sectionref{sec:fieldref}, and is used to
 reference a field value.
-The element quarks (\meta{element-quark}, described below) take an
+The element quarks (\meta{element-quark}, described below in
+\sectionref{sec:elementquarks}) take an
 \meta{element-list} argument. If the \meta{element-list} argument evaluates
 to null, they will return null.
 
@@ -8170,6 +8241,9 @@ parser before the content is parsed as an \meta{element-list}.
 If only a single set of braces was used, those braces would be
 stripped leaving a bare \code{index}, which would be parsed as a
 field reference.
+
+\subsection{Element Quarks}
+\label{sec:elementquarks}
 
 The element \idxpl{quark} are uppercase tokens that start with a leading
 backslash. They have no meaning to \bibgls's interpreter nor are
@@ -8495,7 +8569,10 @@ content passed to the resource command. For example:
 }
 \end{codeenv}
 
-The field reference (\meta{field-ref}) syntax is more complicated:
+\subsection{Field Reference}
+\label{sec:fieldref}
+
+The \idx{field-reference} (\meta{field-ref}) syntax is more complicated:
 \begin{codeenv}
 \meta{field-ref} ::= \meta{value-ref} | \meta{entry-ref} \idx{follow} \meta{field-ref}
 \meta{entry-ref} ::= self | parent | root
@@ -8540,7 +8617,8 @@ which may be \code{original} or \code{actual}. Available keywords:
 \code{@}, where \code{original} refers to the original
 \gls{entrytype} used in the \ext{bib} file and \code{actual} refers
 to the actual \gls{entrytype}, which may have changed as a result of
-\csopt{entry-type-aliases};
+\csopt{entry-type-aliases} (but remember that you can't match the
+special entry types described in \sectionref{sec:specialentrytypes});
 
 \item[\code{entrylabel}] the entry label, where \code{original}
 refers to the original label used in the \ext{bib} file and
@@ -9419,32 +9497,15 @@ For example:
 \gls{GlsXtrLoadResources}\oarg{\csopt[entries-terms,entries-symbols]{src}}
 \end{codeenv}
 indicates that \bibgls\ must read the files
-\filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib} and
-create the file given by \ics{jobname}\iext{glstex} on the first
-instance or \ics{jobname}\code{-}\meta{n}\ext{glstex} on subsequent
-use.
+\filefmt{entries-terms.bib} and \filefmt{entries-symbols.bib}.
 
-With \code{\gls!{glsxtrresourcefile}\oargm{options}\margm{filename}}, if 
-the \csopt{src} option is omitted, 
-the \ext{bib} file is assumed to be \meta{filename}\ext{bib}. For example:
-\begin{codeenv}
-\gls{glsxtrresourcefile}\marg{entries-symbols}
-\end{codeenv}
-indicates that \bibgls\ needs to read the file
-\filefmt{entries-symbols.bib}, which contains the entry data, and create the file
-\filefmt{entries-symbols.glstex}. If the \ext{bib} file is
-different or if you have multiple \ext{bib} files, you need to use
-the \csopt{src} option.
-
-\gls{GlsXtrLoadResources} uses \ics{jobname} as the argument of 
-\gls{glsxtrresourcefile} on the first instance, so:
-\begin{codeenv}
-\gls{GlsXtrLoadResources}\oarg{}
-\end{codeenv}
-will assume \csopt[\ics{jobname}]{src}. Remember that subsequent uses
-of \gls{GlsXtrLoadResources} append a suffix, so in general it's
-best to always supply \csopt{src}, except for small test cases with
-a single \gls{resourcecommand}.
+If \csopt{src} is omitted or if the value is empty, it's assumed to
+be the same as the basename of the \ext{glstex} file. This is
+\ics{jobname} for the first instance of \gls{GlsXtrLoadResources}.
+Remember that subsequent uses of \gls{GlsXtrLoadResources} append a
+suffix \code{\cs{jobname}-\meta{n}}, so in general it's best to
+always supply \csopt{src} (or use \gls{glsbibdata}), except for
+small test cases with a single \gls{resourcecommand}.
 
 With old \LaTeX\ kernels, if you have non-ASCII characters in the
 \ext{bib} filename but aren't using \XeLaTeX\ or \LuaLaTeX, then you
@@ -9656,7 +9717,9 @@ the original \gls{entrytype} specified in the \ext{bib} file.
 
 \begin{important}
 Filtering options don't apply directly to \atentry{compoundset}
-entries, so you can't match the entry type to \atentry{compoundset}.
+entries (or any of the other special entry types described in
+\sectionref{sec:specialentrytypes}), so you can't 
+match the entry type to \atentry{compoundset}.
 However, if any elements within a \gls{compoundentry} are filtered
 then the \gls{compoundentry} won't be written to the \ext{glstex}
 file. Use the \csopt{compound-write-def} option to determine whether
@@ -9739,7 +9802,8 @@ set, the last one listed takes precedence.
 
 \begin{important}
 Filtering options don't apply directly to \atentry{compoundset}
-entries, so you can't match the entry type to \atentry{compoundset}.
+entries (or any of the other special entry types described in
+\sectionref{sec:specialentrytypes}), so you can't match the entry type to \atentry{compoundset}.
 However, if any elements within a \gls{compoundentry} are filtered
 then the \gls{compoundentry} won't be written to the \ext{glstex}
 file. Use the \csopt{compound-write-def} option to determine whether
@@ -10774,14 +10838,11 @@ then by default all the \gls{masterdocument}['s]
 you can use \optfmt{master-resources} to specify
 only those files that should be included. The value \meta{list} is 
 a comma-separated list of names, where each name corresponds
-to the final argument of \gls!{glsxtrresourcefile}.
-Remember that \gls{GlsXtrLoadResources} is just a shortcut
-for \gls{glsxtrresourcefile} that bases the name on \ics{jobname}.
-(Note that, as with the argument of \gls{glsxtrresourcefile},
-the \ext{glstex} extension should not be included in \meta{list}.) The file
-\primaryresourcefmt\ is considered the primary
-resource file and the files \suppresourcefmt{\meta{n}}
-(starting with \meta{n} equal to 1) are considered the supplementary resource files.
+to the basename of the applicable \gls{resourceset}.
+The file \primaryresourcefmt\ is considered the primary resource
+file and the files \suppresourcefmt{\meta{n}} (starting with
+\meta{n} equal to 1) are considered the supplementary resource
+files.
 
 For example, to just select the first and third of the
 supplementary resource files (omitting the primary
@@ -16276,7 +16337,7 @@ sequences are the same, so the test is retried with the first
 In this example, the \gls{location} has been written to the file as
 \code{\csfmt{@alph}\margm{number}} instead of fully expanding according to the
 normal behaviour of \code{\ics{alph}\margm{counter}}.  (Note that
-\gls!{glsxtrresourcefile} changes the category code of \code{@} to allow for
+\gls!{GlsXtrLoadResources} changes the category code of \code{@} to allow for
 internal commands in \glspl{location}.) This unusual case is for illustrative purposes.
 \end{enumerate}
 
@@ -16454,7 +16515,7 @@ is left unchanged).
 Note that with \csopt[transfer]{alias-loc}, both the aliased
 entry and the target entry must be in the same resource set.
 (That is, both entries have been selected by the same instance of
-\gls!{glsxtrresourcefile}.) If you have \sty{glossaries-extra} version~1.12, 
+\gls!{GlsXtrLoadResources}.) If you have \sty{glossaries-extra} version~1.12, 
 you may need to redefine \ics{glsxtrsetaliasnoindex} to do
 nothing if the \glspl{locationlist} aren't showing correctly
 with aliased entries. (This was corrected in version~1.13.)
@@ -20211,7 +20272,7 @@ hook could contain:
 \end{codeenv}
 Note that this new field won't be available for use within the
 \iext{bib} file (unless it was previously defined in the document
-before \gls!{glsxtrresourcefile}).
+before \gls!{GlsXtrLoadResources}).
 
 \optsection[\subsubsection]{dual-date-time-field-format}
 

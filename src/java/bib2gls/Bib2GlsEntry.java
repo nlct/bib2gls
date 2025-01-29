@@ -3830,6 +3830,9 @@ public class Bib2GlsEntry extends BibEntry
             if (primary != null 
                  && setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
             {
+               bib2gls.debugMessage("message.changing.primary_record.format",
+                 rec, "glsnumberformat", setting);
+
                rec = (GlsRecord)rec.clone();
                rec.setFormat("glsnumberformat");
                records.add(rec);
@@ -3857,8 +3860,11 @@ public class Bib2GlsEntry extends BibEntry
              getId(), counter);
 
             if (primary != null
-               || setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
+               && setting == GlsResource.SAVE_PRIMARY_LOCATION_DEFAULT_FORMAT)
             {
+               bib2gls.debugMessage("message.changing.primary_record.format",
+                 rec, "glsnumberformat", setting);
+
                rec = (GlsRecord)rec.clone();
                rec.setFormat("glsnumberformat");
                list.add(rec);
