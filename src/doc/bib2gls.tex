@@ -5269,6 +5269,12 @@ corresponding to entries that \emph{have already been defined}. One
 element in the set is considered the \gls{compmainlabel}. Entry
 labels may appear in multiple sets.
 
+\begin{important}
+Although the \sty{glossaries-extra} package allows the same label to
+be used for a regular entry and a compound entry, the \ext{bib}
+format doesn't allow this.
+\end{important}
+
 A \gls{compoundentry} provides a convenient way to apply commands
 like \ics{gls} to multiple entries in one command (such as \ics{mgls}).
 \Gls{compoundentry} labels may only be used in the \cs{mgls}-like
