@@ -4319,6 +4319,24 @@ public class Bib2Gls extends BibGlsTeXApp
          case '"':
             if (replaceQuotes) return "bibglsdoublequotechar";
          break;
+         case 0:
+            if (datatoolSortMarkers) return "datatoolasciistart";
+         break;
+         case 0x1C:
+            if (datatoolSortMarkers) return "datatoolpersoncomma";
+         break;
+         case 0x1D:
+            if (datatoolSortMarkers) return "datatoolplacecomma";
+         break;
+         case 0x1E:
+            if (datatoolSortMarkers) return "datatoolsubjectcomma";
+         break;
+         case 0x1F:
+            if (datatoolSortMarkers) return "datatoolctrlboundary";
+         break;
+         case 0x7F:
+            if (datatoolSortMarkers) return "datatoolasciiend";
+         break;
       }
 
       return null;
@@ -5170,6 +5188,9 @@ public class Bib2Gls extends BibGlsTeXApp
       printSyntaxItem(getMessage("syntax.break.space", "--[no-]break-space"));
 
       printSyntaxItem(getMessage("syntax.obey.aux.catcode", "--[no-]obey-aux-catcode"));
+
+      printSyntaxItem(getMessage("syntax.datatool_sort_markers",
+         "--[no-]datatool-sort-markers"));
 
       printSyntaxItem(getMessage("syntax.custom.packages", 
         "--custom-packages"));

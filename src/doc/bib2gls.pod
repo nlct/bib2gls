@@ -67,6 +67,13 @@ Instruct the TeX parser library to attempt to parse the
 packages listed in I<list>. This is intended for simple custom
 packages that don't contain complex code.
 
+=item B<--datatool-sort-markers>
+
+The interpreter will use the F<datatool-base.sty> marker commands to match their 
+localised definitions within C<\DTLsortwordlist> (F<datatool> v3.0+).
+You will need a sort method that doesn't ignore the control
+characters used by those commands.
+
 =item B<--date-in-header> (or B<-D>)
 
 The header comment at the start of the F<.glstex> file will include
@@ -273,6 +280,11 @@ Don't check for instances of C<\citation> in the F<.aux> file (default).
 
 Don't collapse an explicit range that has a duplicate start and end
 location into a normal record.
+
+=item B<--no-datatool-sort-markers>
+
+The interpreter will use the normal definition of the
+F<datatool-base.sty> sort marker commands.
 
 =item B<--no-date-in-header>
 
