@@ -1,3 +1,11 @@
+v4.4 (2025-02-07)
+
+   - use datatool sort markers for corresponding control codes when writing sort
+     value to glstex file
+
+   - bug fix: transferred locations with alias-loc=transfer not
+     merging
+
 v4.3 (2025-01-29)
 
  * bib2gls:
@@ -10,9 +18,6 @@ v4.3 (2025-01-29)
      --aux-input-action 
 
    - bug fix: save-principle-locations=retain changes encap
-
-   - bug fix: transferred locations with alias-loc=transfer not
-     merging
 
  * texparserlib.jar: Corrected definition of \textdegree
 

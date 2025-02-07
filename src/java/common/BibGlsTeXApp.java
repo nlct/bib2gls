@@ -1758,7 +1758,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "4.3.20250207";
+   public static final String VERSION = "4.4";
    public static final String DATE = "2025-02-07";
 
 }
