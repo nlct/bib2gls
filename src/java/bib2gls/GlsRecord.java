@@ -484,6 +484,285 @@ public class GlsRecord implements Comparable<GlsRecord>
            && locationMatch(rec);
    }
 
+   /**
+    * Resolve a conflict between this record and a new one.
+    * If returns true, the new record has been merged or
+    * is overridden by this record. If returns false,
+    * the conflict can't be resolved and the new record
+    * should be added. For use with partialMatch.
+    */
+   public boolean resolveConflict(GlsRecord newRecord)
+   {
+      boolean resolved = true;
+
+      // matches everything except the format
+
+      String newFmt = newRecord.getFormat();
+      String existingFmt = getFormat();
+
+      // Ranges override individual locations
+
+      String newPrefix = "";
+
+      if (newFmt.startsWith("(") || newFmt.startsWith(")"))
+      {
+         newPrefix = newFmt.substring(0, 1);
+
+         if (newFmt.length() == 1)
+         {
+            newFmt = "glsnumberformat";
+         }
+         else
+         {
+            newFmt = newFmt.substring(1);
+         }
+      }
+
+      String existingPrefix = "";
+
+      if (existingFmt.startsWith("(") || existingFmt.startsWith(")"))
+      {
+         existingPrefix = existingFmt.substring(0, 1);
+
+         if (existingFmt.length() == 1)
+         {
+            existingFmt = "glsnumberformat";
+         }
+         else
+         {
+            existingFmt = existingFmt.substring(1);
+         }
+      }
+
+      /*
+        Any format overrides the default "glsnumberformat"
+        (or the ignored formats "glsignore"
+        and "glstriggerrecordformat")
+        unless there's a range formation.
+      */
+
+      if (existingPrefix.equals(")") && newPrefix.equals("("))
+      {
+         /*
+            One range is finishing and a new range is starting
+            at the same location.
+            Can't resolve conflict. The new record will need to be added.
+          */
+
+         resolved = false;
+      }
+      else if (existingPrefix.equals("(") && newPrefix.equals(")"))
+      {// Start and end of the range occur at the same location.
+
+         if (bib2gls.isCollapseSamePageRangeOn())
+         {
+            /*
+               Remove end record and convert start
+               record into an ordinary record.
+             */
+
+            setFormat(existingFmt);
+         }
+         else if (existingFmt.equals(newFmt))
+         {
+            // Can't resolve conflict. New record needs to be added
+            resolved = false;
+         }
+         else
+         {
+            /*
+               Format isn't the same. Replace the closing
+               format with the same as the opening format.
+             */
+
+            bib2gls.warningMessage("warning.conflicting.range.format",
+              existingPrefix+existingFmt, newPrefix+newFmt, 
+              newPrefix+existingFmt);
+
+            newRecord.merge(newPrefix+existingFmt, this);
+
+            resolved = false;
+         }
+      }
+      else if (bib2gls.isRetainFormat(existingFmt) || bib2gls.isRetainFormat(newFmt))
+      {
+         /*
+            Format has been identified as one that
+            should always be kept, even if it results in
+            a duplicate location.
+          */
+
+         resolved = false;
+      }
+      else if (newPrefix.isEmpty() && !existingPrefix.isEmpty())
+      {
+         /* 
+            Discard new record.
+            (keep the record with the range formation)
+          */
+
+         if (bib2gls.isDebuggingOn())
+         {
+            bib2gls.logAndPrintMessage();
+            bib2gls.logAndPrintMessage(bib2gls.getMessage(
+             "warning.discarding.conflicting.record",
+             newFmt, existingPrefix+existingFmt,
+             newRecord, this));
+            bib2gls.logAndPrintMessage();
+         }
+      }
+      else if (!newPrefix.isEmpty() && existingPrefix.isEmpty())
+      {
+         /*
+            Override existing record
+            (keep the record with the range formation)
+          */
+
+         if (bib2gls.isDebuggingOn())
+         {
+            bib2gls.logAndPrintMessage();
+            bib2gls.logAndPrintMessage(bib2gls.getMessage(
+              "warning.discarding.conflicting.record",
+              newPrefix+newFmt, existingPrefix+existingFmt,
+              this, newRecord));
+            bib2gls.logAndPrintMessage();
+         }
+
+         merge(newPrefix+newFmt, newRecord);
+      }
+      else if (bib2gls.isIgnoredFormat(newFmt))
+      {// discard the new record
+
+         if (bib2gls.isDebuggingOn())
+         {
+            bib2gls.logAndPrintMessage();
+            bib2gls.logAndPrintMessage(bib2gls.getMessage(
+             "warning.discarding.conflicting.record",
+             newPrefix+newFmt, existingPrefix+existingFmt,
+             newRecord, this));
+            bib2gls.logAndPrintMessage();
+         }
+      }
+      else if (bib2gls.isIgnoredFormat(existingFmt))
+      {// override the existing record
+
+         if (bib2gls.isDebuggingOn())
+         {
+            bib2gls.logAndPrintMessage();
+            bib2gls.logAndPrintMessage(bib2gls.getMessage(
+              "warning.discarding.conflicting.record",
+              newPrefix+newFmt, existingPrefix+existingFmt,
+              this, newRecord));
+            bib2gls.logAndPrintMessage();
+         }
+
+         merge(newPrefix+newFmt, newRecord);
+      } 
+      else if (newFmt.equals("glsnumberformat"))
+      {// discard the new record
+
+         if (bib2gls.isDebuggingOn())
+         {
+            bib2gls.logAndPrintMessage();
+            bib2gls.logAndPrintMessage(bib2gls.getMessage(
+              "warning.discarding.conflicting.record",
+              newPrefix+newFmt, existingPrefix+existingFmt,
+              newRecord, this));
+            bib2gls.logAndPrintMessage();
+         }
+      }
+      else if (existingFmt.equals("glsnumberformat"))
+      {// override the existing record
+
+         if (bib2gls.isDebuggingOn())
+         {
+             bib2gls.logAndPrintMessage();
+             bib2gls.logAndPrintMessage(bib2gls.getMessage(
+               "warning.discarding.conflicting.record",
+               newPrefix+newFmt, existingPrefix+existingFmt,
+               this, newRecord));
+             bib2gls.logAndPrintMessage();
+         }
+
+         merge(newPrefix+newFmt, newRecord);
+      } 
+      else
+      {
+         String newMap = bib2gls.getFormatMapping(newFmt);
+         String existingMap = bib2gls.getFormatMapping(existingFmt);
+
+         if (newMap != null && newMap.equals(existingFmt))
+         {
+            // discard new record
+
+            if (bib2gls.isDebuggingOn())
+            {
+               bib2gls.logAndPrintMessage();
+               bib2gls.logAndPrintMessage(bib2gls.getMessage(
+                 "warning.discarding.conflicting.record.using.map",
+                 newPrefix+newFmt, newPrefix+newMap, 
+                 newRecord, this));
+               bib2gls.logAndPrintMessage();
+            }
+         }
+         else if (existingMap != null && existingMap.equals(newFmt))
+         {
+            // discard existing record
+
+            if (bib2gls.isDebuggingOn())
+            {
+               bib2gls.logAndPrintMessage();
+               bib2gls.logAndPrintMessage(bib2gls.getMessage(
+                 "warning.discarding.conflicting.record.using.map",
+                 existingFmt, 
+                 existingMap, 
+                 this, newRecord));
+               bib2gls.logAndPrintMessage();
+            }
+
+            merge(newPrefix+newFmt, newRecord);
+         }
+         else if (existingMap != null && newMap != null
+                  && existingMap.equals(newMap))
+         {
+            // Replace both records with mapping
+
+            if (bib2gls.isDebuggingOn())
+            {
+               bib2gls.logAndPrintMessage();
+               bib2gls.logAndPrintMessage(bib2gls.getMessage(
+                 "warning.discarding.conflicting.record.using.map2",
+                 existingFmt, existingMap, 
+                 newFmt, newMap, 
+                 this, newRecord,
+                 String.format("{%s}{%s}{%s}{%s}{%s}", 
+                  this.getLabel(),
+                  this.getPrefix(),
+                  this.getCounter(),
+                  newMap,
+                  this.getLocation())));
+               bib2gls.logAndPrintMessage();
+            }
+
+            merge(newPrefix+newMap, newRecord);
+         }
+         else
+         {
+            // no map found. Discard the new record with a warning
+
+            bib2gls.logMessage();
+            bib2gls.warningMessage(
+              "warning.discarding.conflicting.record",
+              newPrefix+newFmt, 
+              existingPrefix+existingFmt,
+              newRecord, this);
+            bib2gls.logMessage();
+         }
+      }
+
+      return resolved;
+   }
+
    // does location for this follow location for other record?
    public boolean follows(GlsRecord rec, int gap, int[] maxGap)
    {

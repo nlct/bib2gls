@@ -4,12 +4,16 @@
 \usepackage[stylemods,record]{glossaries-extra}
 
 \GlsXtrLoadResources
+[
+  alias-loc=transfer
+]
 
 \begin{document}
 
-\gls{locationlist}.
+\gls[format=hyperbf]{locationlist}.
+\gls{numberlist}.% aliased entry
 \newpage
-\gls{numberlist}.
+\gls{numberlist}.% aliased entry
 \newpage
 
 \printunsrtglossary

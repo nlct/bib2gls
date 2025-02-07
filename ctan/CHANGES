@@ -11,6 +11,9 @@ v4.3 (2025-01-29)
 
    - bug fix: save-principle-locations=retain changes encap
 
+   - bug fix: transferred locations with alias-loc=transfer not
+     merging
+
  * texparserlib.jar: Corrected definition of \textdegree
 
 v4.2 (2025-01-24)

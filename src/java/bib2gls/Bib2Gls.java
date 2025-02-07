@@ -2614,249 +2614,9 @@ public class Bib2Gls extends BibGlsTeXApp
                }
                else if (existingRecord.partialMatch(newRecord))
                {
-                  // matches everything except the format
-
-                  String newFmt = newRecord.getFormat();
-                  String existingFmt = existingRecord.getFormat();
-
-                  // Ranges override individual locations
-
-                  String newPrefix = "";
-
-                  if (newFmt.startsWith("(") || newFmt.startsWith(")"))
+                  if (!existingRecord.resolveConflict(newRecord))
                   {
-                     newPrefix = newFmt.substring(0, 1);
-
-                     if (newFmt.length() == 1)
-                     {
-                        newFmt = "glsnumberformat";
-                     }
-                     else
-                     {
-                        newFmt = newFmt.substring(1);
-                     }
-                  }
-
-                  String existingPrefix = "";
-
-                  if (existingFmt.startsWith("(") || existingFmt.startsWith(")"))
-                  {
-                     existingPrefix = existingFmt.substring(0, 1);
-
-                     if (existingFmt.length() == 1)
-                     {
-                        existingFmt = "glsnumberformat";
-                     }
-                     else
-                     {
-                        existingFmt = existingFmt.substring(1);
-                     }
-                  }
-
-                  // Any format overrides the default "glsnumberformat"
-                  // (or the ignored formats "glsignore"
-                  //  and "glstriggerrecordformat")
-                  // unless there's a range formation.
-
-                  if (existingPrefix.equals(")") && newPrefix.equals("("))
-                  {// One range is finishing and a new range is starting
-                   // at the same location.
-
                      records.add(newRecord);
-                  }
-                  else if (existingPrefix.equals("(") && newPrefix.equals(")"))
-                  {// Start and end of the range occur at the same location.
-
-                     if (collapseSamePageRange)
-                     {
-                        // Remove end record and convert start
-                        // record into an ordinary record.
-
-                        existingRecord.setFormat(existingFmt);
-                     }
-                     else if (existingFmt.equals(newFmt))
-                     {
-                        records.add(newRecord);
-                     }
-                     else
-                     {
-                        // Format isn't the same. Replace the closing
-                        // format with the same as the opening format.
-
-                        warningMessage("warning.conflicting.range.format",
-                          existingPrefix+existingFmt, newPrefix+newFmt, 
-                          newPrefix+existingFmt);
-
-                        newRecord.merge(newPrefix+existingFmt, existingRecord);
-                        records.add(newRecord);
-                     }
-                  }
-                  else if (isRetainFormat(existingFmt) || isRetainFormat(newFmt))
-                  {
-                     // Format has been identified as one that
-                     // should always be kept, even if it results in
-                     // a duplicate location.
-
-                     records.add(newRecord);
-                  }
-                  else if (newPrefix.isEmpty() && !existingPrefix.isEmpty())
-                  {// discard new record
-                   // (keep the record with the range formation)
-
-                     if (isDebuggingOn())
-                     {
-                        logAndPrintMessage();
-                        logAndPrintMessage(getMessage(
-                         "warning.discarding.conflicting.record",
-                         newFmt, existingPrefix+existingFmt,
-                         newRecord, existingRecord));
-                        logAndPrintMessage();
-                     }
-                  }
-                  else if (!newPrefix.isEmpty() && existingPrefix.isEmpty())
-                  {// discard existing record
-                   // (keep the record with the range formation)
-
-                     if (isDebuggingOn())
-                     {
-                        logAndPrintMessage();
-                        logAndPrintMessage(getMessage(
-                          "warning.discarding.conflicting.record",
-                          newPrefix+newFmt, existingPrefix+existingFmt,
-                          existingRecord, newRecord));
-                        logAndPrintMessage();
-                     }
-
-                     existingRecord.merge(newPrefix+newFmt, newRecord);
-                  }
-                  else if (isIgnoredFormat(newFmt))
-                  {// discard the new record
-
-                     if (isDebuggingOn())
-                     {
-                        logAndPrintMessage();
-                        logAndPrintMessage(getMessage(
-                         "warning.discarding.conflicting.record",
-                         newPrefix+newFmt, existingPrefix+existingFmt,
-                         newRecord, existingRecord));
-                        logAndPrintMessage();
-                     }
-                  }
-                  else if (isIgnoredFormat(existingFmt))
-                  {// override the existing record
-
-                     if (isDebuggingOn())
-                     {
-                        logAndPrintMessage();
-                        logAndPrintMessage(getMessage(
-                          "warning.discarding.conflicting.record",
-                          newPrefix+newFmt, existingPrefix+existingFmt,
-                          existingRecord, newRecord));
-                        logAndPrintMessage();
-                     }
-
-                     existingRecord.merge(newPrefix+newFmt, newRecord);
-                  } 
-                  else if (newFmt.equals("glsnumberformat"))
-                  {// discard the new record
-
-                     if (isDebuggingOn())
-                     {
-                        logAndPrintMessage();
-                        logAndPrintMessage(getMessage(
-                          "warning.discarding.conflicting.record",
-                          newPrefix+newFmt, existingPrefix+existingFmt,
-                          newRecord, existingRecord));
-                        logAndPrintMessage();
-                     }
-                  }
-                  else if (existingFmt.equals("glsnumberformat"))
-                  {// override the existing record
-
-                     if (isDebuggingOn())
-                     {
-                         logAndPrintMessage();
-                         logAndPrintMessage(getMessage(
-                           "warning.discarding.conflicting.record",
-                           newPrefix+newFmt, existingPrefix+existingFmt,
-                           existingRecord, newRecord));
-                         logAndPrintMessage();
-                     }
-
-                     existingRecord.merge(newPrefix+newFmt, newRecord);
-                  } 
-                  else
-                  {
-                     String newMap = formatMap.get(newFmt);
-                     String existingMap = formatMap.get(existingFmt);
-
-                     if (newMap != null && newMap.equals(existingFmt))
-                     {
-                        // discard new record
-
-                        if (isDebuggingOn())
-                        {
-                           logAndPrintMessage();
-                           logAndPrintMessage(getMessage(
-                             "warning.discarding.conflicting.record.using.map",
-                             newPrefix+newFmt, newPrefix+newMap, 
-                             newRecord, existingRecord));
-                           logAndPrintMessage();
-                        }
-                     }
-                     else if (existingMap != null && existingMap.equals(newFmt))
-                     {
-                        // discard existing record
-
-                        if (isDebuggingOn())
-                        {
-                           logAndPrintMessage();
-                           logAndPrintMessage(getMessage(
-                             "warning.discarding.conflicting.record.using.map",
-                             existingFmt, 
-                             existingMap, 
-                             existingRecord, newRecord));
-                           logAndPrintMessage();
-                        }
-
-                        existingRecord.merge(newPrefix+newFmt, newRecord);
-                     }
-                     else if (existingMap != null && newMap != null
-                              && existingMap.equals(newMap))
-                     {
-                        // replace both records with mapping
-
-                        if (isDebuggingOn())
-                        {
-                           logAndPrintMessage();
-                           logAndPrintMessage(getMessage(
-                             "warning.discarding.conflicting.record.using.map2",
-                             existingFmt, existingMap, 
-                             newFmt, newMap, 
-                             existingRecord, newRecord,
-                             String.format("{%s}{%s}{%s}{%s}{%s}", 
-                              existingRecord.getLabel(),
-                              existingRecord.getPrefix(),
-                              existingRecord.getCounter(),
-                              newMap,
-                              existingRecord.getLocation())));
-                           logAndPrintMessage();
-                        }
-
-                        existingRecord.merge(newPrefix+newMap, newRecord);
-                     }
-                     else
-                     {
-                        // no map found. Discard the new record with a warning
-
-                        logMessage();
-                        warningMessage(
-                          "warning.discarding.conflicting.record",
-                          newPrefix+newFmt, 
-                          existingPrefix+existingFmt,
-                          newRecord, existingRecord);
-                        logMessage();
-                     }
                   }
 
                   found = true;
@@ -3171,7 +2931,7 @@ public class Bib2Gls extends BibGlsTeXApp
       return isIgnoredFormat(rec.getFormat());
    }
 
-   private boolean isIgnoredFormat(String fmt)
+   public boolean isIgnoredFormat(String fmt)
    {
       return fmt.equals("glsignore") || fmt.equals("glstriggerrecordformat");
    }
@@ -4345,6 +4105,16 @@ public class Bib2Gls extends BibGlsTeXApp
    public boolean hasNewHyperGroupSupport()
    {
       return hasNewHyperGroupSupport;
+   }
+
+   public boolean isCollapseSamePageRangeOn()
+   {
+      return collapseSamePageRange;
+   }
+
+   public String getFormatMapping(String fmt)
+   {
+      return formatMap.get(fmt);
    }
 
    public void writeCommonCommands(PrintWriter writer)

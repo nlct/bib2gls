@@ -3998,8 +3998,18 @@ public class Bib2GlsEntry extends BibEntry
       {
          GlsRecord r = list.get(i);
 
-         if (r.equals(rec))
+         if (r.locationMatch(rec))
          {
+            return;
+         }
+
+         if (r.partialMatch(rec))
+         {
+            if (!r.resolveConflict(rec))
+            {
+               list.add(i, rec);
+            }
+
             return;
          }
 
