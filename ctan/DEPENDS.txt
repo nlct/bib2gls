@@ -1,2 +1,1 @@
 glossaries-extra
-java
