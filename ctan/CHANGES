@@ -1,3 +1,8 @@
+v4.5 (2025-04-15)
+
+   - enforce .glstex extension
+     Fixes https://github.com/nlct/bib2gls/issues/34
+
 v4.4 (2025-02-07)
 
    - use datatool sort markers for corresponding control codes when writing sort
