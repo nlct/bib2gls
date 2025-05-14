@@ -132,8 +132,8 @@ public class GlsResource
       dualSortSettings = new SortSettings(this);
       secondarySortSettings = new SortSettings(this);
 
-      TeXPath texPath = new TeXPath(parser, 
-        glstexBasename.toString(parser), "glstex", false);
+      TeXPath texPath = TeXPath.newOutputPath(parser, 
+        glstexBasename.toString(parser), "glstex");
 
       texFile = bib2gls.resolveFile(texPath.getFile());
 
