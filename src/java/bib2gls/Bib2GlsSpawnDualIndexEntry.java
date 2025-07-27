@@ -26,6 +26,8 @@ import com.dickimawbooks.texparserlib.*;
 import com.dickimawbooks.texparserlib.bib.*;
 import com.dickimawbooks.texparserlib.latex.CsvList;
 
+import com.dickimawbooks.bibgls.common.Bib2GlsException;
+
 public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry 
   implements Bib2GlsMultiEntry
 {
@@ -60,7 +62,7 @@ public class Bib2GlsSpawnDualIndexEntry extends Bib2GlsDualIndexEntry
    protected Vector<String> processSpecialFields(
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
-    throws IOException
+    throws IOException,Bib2GlsException
    {
       interpretFields = super.processSpecialFields(mfirstucProtect,
         protectFields, idField, interpretFields);

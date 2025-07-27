@@ -447,6 +447,13 @@ public class GlsResource
                postDescDot = POST_DESC_DOT_CHECK;
             }
          }
+         else if (opt.equals("post-description-dot-exclude"))
+         {
+            // For use with post-description-dot=check
+            // if set and true, don't add dot (in addition to other
+            // exclusions)
+            postDescriptionDotConditional = getCondition(list, opt);
+         }
          else if (opt.equals("word-boundaries"))
          {
             String[] array = getStringArray(list, opt);
@@ -12446,6 +12453,19 @@ public class GlsResource
       }
    }
 
+   public boolean isPostDescriptionDotExcludeTrue(Bib2GlsEntry entry)
+     throws IOException,Bib2GlsException
+   {
+      if (postDescriptionDotConditional == null)
+      {
+         return false;
+      }
+      else
+      {
+         return postDescriptionDotConditional.booleanValue(entry);
+      }
+   }
+
    /**
     * Assigns the glossary type for the given entry, if applicable.
     * If the type has been identified by the relevant setting, the
@@ -18409,6 +18429,7 @@ public class GlsResource
      = FLATTEN_LONELY_RULE_ONLY_UNRECORDED_PARENTS;
 
    private Conditional flattenLonelyConditional = null;
+   private Conditional postDescriptionDotConditional = null;
 
    private MissingFieldAction missingFieldFlattenLonely = MissingFieldAction.FALLBACK;
 

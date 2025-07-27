@@ -8660,6 +8660,17 @@ cases, such as \csopt{match}, the condition is provided as a
 \csopt{assign-fields}) are complex. This section describes that
 complex conditional syntax.
 
+For example, suppose you want to use \csopt{post-description-dot}
+to automatically append a dot to descriptions but not to entries 
+that have been defined with \atentry{symbol} or \atentry{number}:
+\begin{codeenv}
+ \csopt[check]{post-description-dot},
+ \csopt[
+   entrytype \idx{follow} original = \qtdelim{symbol}
+   \idx{pipeor} entrytype \idx{follow} original = \qtdelim{number}
+ ]{post-description-dot-exclude}
+\end{codeenv}
+
 The tokens \idx{ampand} and \idx{pipeor} indicate logical
 \qt{AND} and \qt{OR}, respectively, and \idx{exclamnot} indicates
 negation. Parentheses \idx{openparenchar} and \idx{closeparenchar}
@@ -12787,6 +12798,8 @@ punctuation comes after any category-specific hook.
 The \csopt[check]{post-description-dot} setting determines whether
 to append the dot as follows:
 \begin{itemize}
+\item If the \csopt{post-description-dot-exclude} condition
+evaluates to true, then a dot isn't appended.
 \item If the \field{description} field ends with
 \ics{nopostdesc} or \ics{glsxtrnopostpunc}, then a dot isn't appended.
 \item If the \field{description} field doesn't end with a regular
@@ -12807,6 +12820,14 @@ appended (unless it's \cs{glsxtrnopostpunc} or \cs{nopostdesc}) even if
 that command expands in such a way that it ends with a terminating
 punctuation character. This option only applies to the
 \field{description} field.
+
+\optsection{post-description-dot-exclude}
+
+The value may either be empty, to indicate false (the default), or a
+complex condition using syntax described in
+\sectionref{sec:conditionals}. This option is only applicable with
+\csopt[check]{post-description-dot}.
+
 
 \optsection[\subsubsection]{strip-trailing-nopost}
 

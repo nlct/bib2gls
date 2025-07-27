@@ -1452,7 +1452,7 @@ public class Bib2GlsEntry extends BibEntry
    protected Vector<String> processSpecialFields(
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
-    throws IOException
+    throws IOException, Bib2GlsException
    {
        String defIndexField = resource.getDefinitionIndexField();
 
@@ -1469,7 +1469,7 @@ public class Bib2GlsEntry extends BibEntry
    protected Vector<String> processField(String field,
      boolean mfirstucProtect, String[] protectFields, String idField,
      Vector<String> interpretFields)
-    throws IOException
+    throws IOException, Bib2GlsException
    {
       TeXParser parser = resource.getBibParser();
 
@@ -1695,78 +1695,7 @@ public class Bib2GlsEntry extends BibEntry
 
          if (field.equals("description"))
          {
-            if (resource.isStripTrailingNoPostOn())
-            {
-               int n = list.size();
-
-               for (int i = n-1; i >= 0; i--)
-               {
-                  TeXObject obj = list.get(i);
-
-                  if (obj instanceof Ignoreable)
-                  {
-                     list.remove(i);
-                  }
-                  else
-                  {
-                     if (obj instanceof ControlSequence)
-                     {
-                        String name = ((ControlSequence)obj).getName();
-
-                        if (name.equals("nopostdesc")
-                         || name.equals("glsxtrnopostpunc"))
-                        {
-                           list.remove(i);
-                        }
-                     }
-
-                     break;
-                  }
-               }
-            }
-
-            switch (resource.getPostDescDot())
-            {
-               case GlsResource.POST_DESC_DOT_ALL:
-                 list.add(parser.getListener().getOther('.'));
-                 break;
-               case GlsResource.POST_DESC_DOT_CHECK:
-
-                 int n = list.size();
-
-                 for (int i = n-1; i >= 0; i--)
-                 {
-                    TeXObject obj = list.get(i);
-
-                    if (obj instanceof CharObject)
-                    {
-                       int codePoint = ((CharObject)obj).getCharCode();
-                       int charType = Character.getType(codePoint);
-
-                       if (charType != Character.END_PUNCTUATION
-                        && charType != Character.FINAL_QUOTE_PUNCTUATION)
-                       {
-                          if (charType != Character.OTHER_PUNCTUATION)
-                          {
-                             list.add(parser.getListener().getOther('.'));
-                          }
-
-                          break;
-                       }
-                    }
-                    else if (obj instanceof ControlSequence
-                    && (((ControlSequence)obj).getName().equals("nopostdesc")
-                      || ((ControlSequence)obj).getName().equals("glsxtrnopostpunc")))
-                    {
-                       break;
-                    }
-                    else if (!(obj instanceof Ignoreable))
-                    {
-                       list.add(parser.getListener().getOther('.'));
-                       break;
-                    }
-                 }
-            }
+            checkDescriptionField(list);
          }
 
          if (resource.isCheckEndPuncOn(field))
@@ -1788,6 +1717,90 @@ public class Bib2GlsEntry extends BibEntry
       }
 
       return interpretFields;
+   }
+
+   protected void checkDescriptionField(TeXObjectList list)
+    throws IOException, Bib2GlsException
+   {
+      TeXParser parser = resource.getBibParser();
+
+      if (resource.isStripTrailingNoPostOn())
+      {
+         int n = list.size();
+
+         for (int i = n-1; i >= 0; i--)
+         {
+            TeXObject obj = list.get(i);
+
+            if (obj instanceof Ignoreable)
+            {
+               list.remove(i);
+            }
+            else
+            {
+               if (obj instanceof ControlSequence)
+               {
+                  String name = ((ControlSequence)obj).getName();
+
+                  if (name.equals("nopostdesc")
+                   || name.equals("glsxtrnopostpunc"))
+                  {
+                     list.remove(i);
+                  }
+               }
+
+               break;
+            }
+         }
+      }
+
+      switch (resource.getPostDescDot())
+      {
+         case GlsResource.POST_DESC_DOT_ALL:
+           list.add(parser.getListener().getOther('.'));
+           break;
+         case GlsResource.POST_DESC_DOT_CHECK:
+
+           if (resource.isPostDescriptionDotExcludeTrue(this))
+           {
+              break;
+           }
+
+           int n = list.size();
+
+           for (int i = n-1; i >= 0; i--)
+           {
+              TeXObject obj = list.get(i);
+
+              if (obj instanceof CharObject)
+              {
+                 int codePoint = ((CharObject)obj).getCharCode();
+                 int charType = Character.getType(codePoint);
+
+                 if (charType != Character.END_PUNCTUATION
+                  && charType != Character.FINAL_QUOTE_PUNCTUATION)
+                 {
+                    if (charType != Character.OTHER_PUNCTUATION)
+                    {
+                       list.add(parser.getListener().getOther('.'));
+                    }
+
+                    break;
+                 }
+              }
+              else if (obj instanceof ControlSequence
+              && (((ControlSequence)obj).getName().equals("nopostdesc")
+                || ((ControlSequence)obj).getName().equals("glsxtrnopostpunc")))
+              {
+                 break;
+              }
+              else if (!(obj instanceof Ignoreable))
+              {
+                 list.add(parser.getListener().getOther('.'));
+                 break;
+              }
+           }
+      }
    }
 
    protected void appendShortPluralSuffix(

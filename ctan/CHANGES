@@ -1,3 +1,7 @@
+v4.6 (2025-07-27)
+
+   - added resource option post-description-dot-exclude
+
 v4.5 (2025-04-15)
 
    - enforce .glstex extension
