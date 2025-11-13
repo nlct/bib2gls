@@ -42,6 +42,7 @@ public class Bib2GlsNbsp extends Nbsp
       return new Bib2GlsNbsp(getCharCode(), useNonBreakSpace);
    }
 
+   @Override
    public TeXObjectList expandonce(TeXParser parser)
      throws IOException
    {
@@ -59,6 +60,14 @@ public class Bib2GlsNbsp extends Nbsp
       return list;
    }
 
+   @Override
+   public TeXObjectList expandonce(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      return expandonce(parser);
+   }
+
+   @Override
    public void process(TeXParser parser)
      throws IOException
    {
@@ -70,6 +79,13 @@ public class Bib2GlsNbsp extends Nbsp
       {
          parser.getListener().getWriteable().writeCodePoint(0x0020);
       }
+   }
+
+   @Override
+   public void process(TeXParser parser, TeXObjectList stack)
+     throws IOException
+   {
+      process(parser);
    }
 
    private boolean useNonBreakSpace;
