@@ -4036,15 +4036,15 @@ or for an individual entry:
 If, however, entries are referenced before the first subsection of a
 section (or chapter), this can lead to locations that end with \qtt{.0} (because
 the \counter{subsection} counter is zero at that point).
-For example, suppose the package option \styopt[\counter{subsection}]{counter}
+Suppose the package option \code{\styopt{counter}=\counter{subsection}}
 is in effect and the document starts with:
 \begin{codeenv}
 \cmd{chapter}\marg{Sample Chapter}
 \cs{gls}\marg{sample}.
 \cmd{section}\marg{Sample Section}
-\cs{gls}{sample}.
+\cs{gls}\marg{sample}.
 \cmd{subsection}\marg{Sample Sub-Section}
-\cs{gls}{sample}.
+\cs{gls}\marg{sample}.
 \end{codeenv}
 Then the \gls{locationlist} for the \qtt{sample} entry will be:
 1.0.0, 1.1.0, 1.1.1 and, if \sty{hyperref} is also loaded, the anchors
@@ -4052,7 +4052,7 @@ will be \code{subsection.1.0.0}, \code{subsection.1.1.0}
 and \code{subsection.1.1.1}, but of these, only the last one is
 defined. The transcript will contain warnings such as:
 \begin{quote}
-pdfTeX warning (dest): name{subsection.1.0.0} has been referenced but does not 
+pdfTeX warning (dest): name\marg{subsection.1.0.0} has been referenced but does not 
 exist, replaced by a fixed one
 \end{quote}
 
@@ -4092,12 +4092,12 @@ For the above example, this action will change the
 \gls{locationlist} for the \qtt{sample} entry to: 1, 1.1, 1.1.1 and,
 if \sty{hyperref} is also loaded, the anchors will be
 \code{chapter.1}, \code{section.1.1} and \code{subsection.1.1.1}
-which are now valid.
+which are now all valid.
 
 \argsection{no-shift-zero-sections}
 
 Don't adjust records with sectioning locations ending in \qtt{.0} (default).
-If used in \gls{BibGlsOptions}, this option should be specified as
+If used in \gls{BibGlsOptions}, this option should be specified as:
 \begin{codeenv}
 \gls{BibGlsOptions}\marg{shift-zero-sections=false}
 \end{codeenv}
@@ -27344,6 +27344,14 @@ the default format. In case the format provided in the \ext{bib}
 file isn't recognised, the required format can be set with:
 \begin{codeenv}
   \csopt[d MMM YYYY G]{secondary-date-sort-format}
+\end{codeenv}
+
+Since the dates contain \glsname{idx.nbspchar}, this will need to be
+converted to a space in the sort value for the pattern to match.
+This can either be done with the \longarg{break-space} switch or
+add to the global \bibgls\ options in the document:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{break-space}
 \end{codeenv}
 
 I've changed the date group headings by redefining \gls{bibglsdategroup} and
