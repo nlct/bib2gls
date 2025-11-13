@@ -8436,6 +8436,11 @@ long form on \idx{firstuse}. The default definition just uses
   category={counter}
 }
 
+@counter{ctr.subsection,
+  name={\counterfmt{subsection}},
+  category={counter}
+}
+
 @counter{ctr.chapter,
   name={\counterfmt{chapter}},
   category={counter}
@@ -10591,6 +10596,20 @@ primary formats, if enabled.},
 
 @switch{switch.no-collapse-same-location-range,
   name={\longargfmt{no\dhyphen collapse\dhyphen same\dhyphen location\dhyphen range}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.shift-zero-sections,
+  name={\longargfmt{shift\dhyphen zero\dhyphen sections}},
+  user1={},
+  category={switch},
+  parent={commandlineoptions}
+}
+
+@switch{switch.no-shift-zero-sections,
+  name={\longargfmt{no\dhyphen shift\dhyphen zero\dhyphen sections}},
   user1={},
   category={switch},
   parent={commandlineoptions}
@@ -14147,10 +14166,11 @@ can be referenced in \meta{true} or \meta{false} with
 
 @glscommand{newglossary,
   name={\csfmt{newglossary}},
-  user1={\oargm{log}\margm{type}\margm{gls}\margm{glo}\margm{title}},
+  user1={\oargm{log}\margm{type}\margm{gls}\margm{glo}\margm{title}\oargm{counter}},
   description={defines a new glossary identified by \meta{type}
    with the given title and associated file extensions used by
-   \appfmt{makeindex} or \appfmt{xindy}},
+   \appfmt{makeindex} or \appfmt{xindy}. If \meta{counter} is supplied it will be
+the default location counter for all entries in this glossary},
   topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}
@@ -14158,9 +14178,10 @@ can be referenced in \meta{true} or \meta{false} with
 
 @glscommand{newglossary*,
   name={\csfmt{newglossary*}},
-  user1={\margm{type}\margm{title}},
+  user1={\margm{type}\margm{title}\oargm{counter}},
   description={defines a new glossary identified by \meta{type}
-   with the given title},
+   with the given title. If \meta{counter} is supplied it will be
+the default location counter for all entries in this glossary},
   topics={glossrefs},
   note={\styfmt{glossaries}},
   category={command}

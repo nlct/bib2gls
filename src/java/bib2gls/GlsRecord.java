@@ -300,6 +300,40 @@ public class GlsRecord implements Comparable<GlsRecord>
       location = newLocation;
    }
 
+   public void shiftEndZeroSection()
+   {
+      if (location.endsWith(".0"))
+      {
+         int sectionIdx = -1;
+
+         for (int i = 0; i < SECTIONS.length; i++)
+         {
+            if (counter.equals(SECTIONS[i]))
+            {
+               sectionIdx = i;
+               break;
+            }
+         }
+
+         if (sectionIdx > 0)
+         {
+            String newLocation = location.substring(0, location.length()-2);
+            String newCounter = SECTIONS[sectionIdx-1];
+
+            bib2gls.verboseMessage("message.shifting_zero_section",
+             counter, location, newCounter, newLocation);
+
+            location = newLocation;
+            counter = newCounter;
+
+            if (sectionIdx > 1)
+            {
+               shiftEndZeroSection();
+            }
+         }
+      }
+   }
+
    public void merge(String newFmt, GlsRecord otherRecord)
    {
       setFormat(newFmt);
@@ -1495,13 +1529,23 @@ public class GlsRecord implements Comparable<GlsRecord>
          label, prefix, counter, format, location);
    }
 
-   private String label, prefix, counter, format, location;
+   protected String label, prefix, counter, format, location;
 
    private long index=0;
 
    protected Bib2Gls bib2gls;
 
    private static long globalIndex=0L;
+
+   static final String[] SECTIONS = new String[]
+    {
+      "chapter",
+      "section",
+      "subsection",
+      "subsubsection",
+      "paragraph",
+      "subparagraph"
+    };
 
    private static final Pattern DIGIT_PATTERN
      = Pattern.compile("(.*?)([^\\p{javaDigit}]?)(\\p{javaDigit}+)");

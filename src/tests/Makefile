@@ -43,7 +43,8 @@ all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.p
 	  test-glslike.pdf test-xr-recordcount.pdf test-emptyloc.pdf \
 	  test-merge-ranges.pdf test-secondary2.pdf test-assign-fields.pdf \
 	  test-nl.pdf test-match-action.pdf test-assign-fields2.pdf \
-	  test-see-entries.pdf test-compoundset.pdf
+	  test-see-entries.pdf test-compoundset.pdf \
+	  test-section-counters.pdf
 	make -C conversion/gls2bib
 	make -C conversion/datagidx
 	make -C conversion/datatool
@@ -851,6 +852,14 @@ test-compoundset.glstex	: test-compoundset.tex $(DEPS) test-compoundset.bib
 		pdflatex test-compoundset
 		$(BIB2GLS) test-compoundset
 
+test-section-counters.pdf	: test-section-counters.glstex
+		pdflatex test-section-counters
+		pdflatex test-section-counters
+		pdflatex test-section-counters
+
+test-section-counters.glstex	: test-section-counters.tex $(DEPS) test-entries.bib
+		pdflatex test-section-counters
+		$(BIB2GLS) test-section-counters
 clean	:
 	$(RM) *.aux
 	$(RM) *.log

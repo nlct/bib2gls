@@ -205,6 +205,47 @@ public class GlsRecordNameRef extends GlsRecord
       return href.equals(((GlsRecordNameRef)rec).href);
    }
 
+   @Override
+   public void shiftEndZeroSection()
+   {
+      if (hcounter.endsWith(".0"))
+      {
+         int sectionIdx = -1;
+
+         for (int i = 0; i < SECTIONS.length; i++)
+         {
+            if (counter.equals(SECTIONS[i]))
+            {
+               sectionIdx = i;
+               break;
+            }
+         }
+
+         if (sectionIdx > 0)
+         {
+            String newHcounter = hcounter.substring(0, hcounter.length()-2);
+            String newCounter = SECTIONS[sectionIdx-1];
+
+            bib2gls.verboseMessage("message.shifting_zero_section",
+             counter, hcounter, newCounter, newHcounter);
+
+            hcounter = newHcounter;
+            counter = newCounter;
+
+            if (location.endsWith(".0"))
+            {
+               location = location.substring(0, location.length()-2);
+            }
+
+            if (sectionIdx > 1)
+            {
+               shiftEndZeroSection();
+            }
+         }
+      }
+   }
+
+   @Override
    public String toString()
    {
       return String.format(

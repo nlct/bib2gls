@@ -4007,6 +4007,101 @@ If used in \gls{BibGlsOptions}, this option should be specified as
 \gls{BibGlsOptions}\marg{collapse-same-location-range=false}
 \end{codeenv}
 
+\argsection{shift-zero-sections}
+
+Shift up \glspl{location} ending with \qtt{.0} for any section counters
+deeper than \counter{chapter}. This action is applied recursively.
+\strong{The setting is ignored for \glspl{location} with other types of
+counter.}
+
+For example, suppose the indexing counter has been set to
+\counter{subsection}. This could be done globally through the 
+\styopt{counter} package option:
+\begin{codeenv}
+\cmd{usepackage}\oarg{\styopt{counter}=\counter{subsection},\styopt{record}}\marg{glossaries-extra}
+\end{codeenv}
+or set for a specific glossary:
+\begin{codeenv}
+\cs{newglossary*}\marg{samples}\marg{Samples}\oarg{\counter{subsection}}
+\end{codeenv}
+or automatically for a particular format:
+\begin{codeenv}
+\cs{GlsXtrAutoAddOnFormat}\marg{primaryfmt}\marg{\glsopt{counter}=\counter{subsection},\glsopt{format}=primaryfmt}
+\end{codeenv}
+or for an individual entry:
+\begin{codeenv}
+\cs{gls}\oarg{\glsopt{counter}=\counter{subsection}}\margm{sample}
+\end{codeenv}
+
+If, however, entries are referenced before the first subsection of a
+section (or chapter), this can lead to locations that end with \qtt{.0} (because
+the \counter{subsection} counter is zero at that point).
+For example, suppose the package option \styopt[\counter{subsection}]{counter}
+is in effect and the document starts with:
+\begin{codeenv}
+\cmd{chapter}\marg{Sample Chapter}
+\cs{gls}\marg{sample}.
+\cmd{section}\marg{Sample Section}
+\cs{gls}{sample}.
+\cmd{subsection}\marg{Sample Sub-Section}
+\cs{gls}{sample}.
+\end{codeenv}
+Then the \gls{locationlist} for the \qtt{sample} entry will be:
+1.0.0, 1.1.0, 1.1.1 and, if \sty{hyperref} is also loaded, the anchors
+will be \code{subsection.1.0.0}, \code{subsection.1.1.0}
+and \code{subsection.1.1.1}, but of these, only the last one is
+defined. The transcript will contain warnings such as:
+\begin{quote}
+pdfTeX warning (dest): name{subsection.1.0.0} has been referenced but does not 
+exist, replaced by a fixed one
+\end{quote}
+
+There are two ways to deal with this. The first is quite tedious and
+involves changing the \glsopt{counter} setting according to the
+current sectioning level:
+\begin{codeenv}
+\cmd{chapter}\marg{Sample Chapter}
+\cs{gls}\oarg{\glsopt{counter}=\counter{chapter}}\marg{sample}.
+\cmd{section}\marg{Sample Section}
+\cs{gls}\oarg{\glsopt{counter}=\counter{section}}\marg{sample}.
+\cmd{subsection}\marg{Sample Sub-Section}
+\cs{gls}\oarg{\glsopt{counter}=\counter{subsection}}\marg{sample}.
+\end{codeenv}
+This method is not only tedious but doesn't lend itself well to
+editing where the document structure changes with new sections
+introduced or removed.
+
+An easier solution is to use the \longarg{shift-zero-sections}
+switch. This setting can also be used in \gls{BibGlsOptions}:
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{shift-zero-sections}
+\end{codeenv}
+
+Each \gls{record} that has a \gls{location} ending with \qtt{.0} and has a
+sectioning counter below \counter{chapter} will have the \qtt{.0}
+removed and the counter will be changed to the counter for the next
+level up. So the \gls{record} with counter \counter{subsection} and
+\gls{location} \qtt{1.0.0} will have the counter changed to \counter{section}
+and the \gls{location} will be changed to \qtt{1.0} but this function is
+performed recursively. Since \qtt{1.0} also ends with \qtt{.0} and
+the counter level is still less than \counter{chapter}, the function is
+repeated: the counter is now changed from \counter{section} to \counter{chapter}
+and the \gls{location} is changed from \qtt{1.0} to \qtt{1}.
+
+For the above example, this action will change the
+\gls{locationlist} for the \qtt{sample} entry to: 1, 1.1, 1.1.1 and,
+if \sty{hyperref} is also loaded, the anchors will be
+\code{chapter.1}, \code{section.1.1} and \code{subsection.1.1.1}
+which are now valid.
+
+\argsection{no-shift-zero-sections}
+
+Don't adjust records with sectioning locations ending in \qtt{.0} (default).
+If used in \gls{BibGlsOptions}, this option should be specified as
+\begin{codeenv}
+\gls{BibGlsOptions}\marg{shift-zero-sections=false}
+\end{codeenv}
+
 \argsection{map-format}
 
 This sets up the rule of precedence for partial \gls{location}
@@ -5237,7 +5332,7 @@ for general comments, but not for the \gls{encoding}.
 \subsection{Preamble}
 \label{sec:preamble}
 
-As with \BibTeX, \entrydef{preamble} is also supported by \bibgls.
+As with \BibTeX, \atentry{preamble} is also supported by \bibgls.
 This will be written to the \ext{glstex} file unless
 prevented with \csopt[false]{write-preamble}.
 The \texparserlib\ used by \bibgls\ will parse the contents of

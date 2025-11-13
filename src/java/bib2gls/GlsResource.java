@@ -17651,7 +17651,7 @@ public class GlsResource
                     field, subStr, list.toString(bibParser), prefixFieldNbspPattern));
                }
 
-               return new Nbsp();
+               return new Bib2GlsNbsp(useNonBreakSpace());
             }
 
             if (bib2gls.isDebuggingOn())

@@ -2591,6 +2591,11 @@ public class Bib2Gls extends BibGlsTeXApp
                   recordHref, recordHcounter);
             }
 
+            if (shiftZeroSections)
+            {
+               newRecord.shiftEndZeroSection();
+            }
+
             incRecordCount(newRecord);
 
             // skip duplicates
@@ -4289,6 +4294,9 @@ public class Bib2Gls extends BibGlsTeXApp
          parser.setDebugMode(debugLevel, logWriter);
       }
 
+      parser.putActiveChar(new Bib2GlsNbsp(useNonBreakSpace));
+      parser.putControlSequence(new Bib2GlsNoBreakSpace(useNonBreakSpace));
+
       return parser;
    }
 
@@ -4989,6 +4997,9 @@ public class Bib2Gls extends BibGlsTeXApp
       printSyntaxItem(getMessage("syntax.collapse.same.location.range",
          "--[no-]collapse-same-location-range"));
 
+      printSyntaxItem(getMessage("syntax.shift.zero.sections",
+         "--[no-]shift-zero-sections"));
+
       printSyntaxItem(getMessage("syntax.format.map",
          "--map-format", "-m"));
 
@@ -5435,11 +5446,11 @@ public class Bib2Gls extends BibGlsTeXApp
 
             if (val.isEmpty() || val.equals("true"))
             {
-               useNonBreakSpace = true;
+               useNonBreakSpace = false;
             }
             else if (val.equals("false"))
             {
-               useNonBreakSpace = false;
+               useNonBreakSpace = true;
             }
             else
             {
@@ -5618,6 +5629,30 @@ public class Bib2Gls extends BibGlsTeXApp
             else if (val.equals("false"))
             {
                collapseSamePageRange = false;
+            }
+            else
+            {
+               throw new Bib2GlsSyntaxException(
+                  getMessage("error.invalid.opt.bool.value", key, val));
+            }
+         }
+         else if (key.equals("shift-zero-sections"))
+         {
+            TeXObject obj = options.getValue(key);
+            String val = "";
+
+            if (obj != null)
+            {
+               val = obj.toString(parser).trim();
+            }
+
+            if (val.isEmpty() || val.equals("true"))
+            {
+               shiftZeroSections = true;
+            }
+            else if (val.equals("false"))
+            {
+               shiftZeroSections = false;
             }
             else
             {
@@ -6392,6 +6427,14 @@ public class Bib2Gls extends BibGlsTeXApp
       {
          collapseSamePageRange = false;
       }
+      else if (arg.equals("--shift-zero-sections"))
+      {
+         shiftZeroSections = true;
+      }
+      else if (arg.equals("--no-shift-zero-sections"))
+      {
+         shiftZeroSections = false;
+      }
       else if (arg.equals("--no-mfirstuc-protection"))
       {
          mfirstucProtect = false;
@@ -7095,6 +7138,8 @@ public class Bib2Gls extends BibGlsTeXApp
    private boolean multiSuppSupported=false;
 
    private boolean collapseSamePageRange = true;
+
+   private boolean shiftZeroSections = false;
 
    private String glossariesExtraVersion="????/??/??";
 

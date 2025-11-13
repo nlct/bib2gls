@@ -357,6 +357,10 @@ Don't replace quote characters (default).
 
 Normal location merging rules apply (default).
 
+=item B<--no-shift-zero-sections>
+
+Don't check for locations ending with ".0" (default).
+
 =item B<--no-support-unicode-script>
 
 Text superscript (C<\textsuperscript>) or subscripts (C<\textsubscript>)
@@ -447,6 +451,20 @@ and group information written to the F<.glstex> file.
 
 Indicates which location formats should always be retained even if
 it causes a partial duplicate. Only exact duplicates will be merged.
+
+=item B<--shift-zero-sections>
+
+Shift up section locations ending with ".0" (for sections deeper
+than chapter). This action is applied recursively.
+
+For example, if a record has counter C<subsection> and location
+C<2.0.0> then this will first be replaced with counter C<section>
+and location C<2.0> but since this still has a section location
+ending with ".0" the function will be applied again and the counter
+will be changed to C<chapter> and the location will be changed to
+C<2> (so the location subsection 2.0.0 ends up as chapter 2).
+The log file (and verbose mode) will have a line for each change in the
+recursion.
 
 =item B<--shortcuts> I<option>
 

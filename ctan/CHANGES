@@ -1,3 +1,11 @@
+v4.7 (2025-11-13)
+
+   - new command line switch:
+
+     --[no-]shift-zero-sections
+
+   - bug fix: corrected break-space option
+
 v4.6 (2025-07-27)
 
    - added resource option post-description-dot-exclude

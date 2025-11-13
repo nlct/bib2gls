@@ -1,0 +1,101 @@
+% arara: pdflatex
+% arara: bib2gls
+% arara: pdflatex
+\documentclass{report}
+
+\usepackage{lipsum}
+\usepackage[colorlinks]{hyperref}
+\usepackage[
+ %counter=section,
+ counter=subsection,
+ %record,
+ record=nameref,
+ style=tree]{glossaries-extra}
+
+\BibGlsOptions{shift-zero-sections}
+
+\newcommand*{\bibglslocationgroupsep}{; }
+
+\newcommand*{\locationgroupmarkerchapter}{Ch.}
+\newcommand*{\locationgroupmarkersection}{\S}
+\newcommand*{\locationgroupmarkersubsection}{\P}
+
+\newcommand*{\locationgroupmarkerchapters}{Chs.}
+\newcommand*{\locationgroupmarkersections}{\S\S}
+\newcommand*{\locationgroupmarkersubsections}{\P\P}
+
+\newcommand*{\locationgroupmarkerpage}{p.~}
+\newcommand*{\locationgroupmarkerpages}{pp.~}
+
+\newcommand{\locationgroupencapchapter}[1]{\textbf{#1}}
+
+\newcommand{\bibglslocationgroup}[3]{%
+  \csuse{locationgroupencap#2}% 
+  {%
+    \ifcsdef{locationgroupmarker#2}%
+    {\ifcase#1
+     \or
+       \csuse{locationgroupmarker#2}% 
+     \else
+       \ifcsdef{locationgroupmarker#2s}%
+       {\csuse{locationgroupmarker#2s}}%
+       {%
+         \csuse{locationgroupmarker#2}% 
+         \csuse{locationgroupmarker#2}% 
+       }%
+     \fi
+    }%
+    {}%
+    #3%
+  }%
+}
+
+\GlsXtrLoadResources[
+  loc-counters={chapter,section,subsection,page},% group locations by counter
+  src={test-entries}]
+
+\begin{document}
+\chapter{Sample Chapter}
+
+\gls{sample}.
+
+\section{Sample Section}
+
+\gls{sample}.
+
+\section{Another Sample Section}
+
+\gls{sample}.
+
+\section{A Third Sample Section}
+
+\gls{sample}.
+
+\subsection{Sample Subsection}
+
+\gls{sample}.
+
+\chapter{Example Chapter}
+
+\lipsum[1-5]
+
+\gls{duck}.
+
+\section{Example Section}
+
+\gls{duck}.
+
+\lipsum[6-10]
+
+\gls{duck}.
+
+\section{Another Example Section}
+
+\lipsum[11-20]
+
+\section{A Third Example Section}
+
+\gls{duck}.
+
+\printunsrtglossaries
+\end{document}

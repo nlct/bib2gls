@@ -61,6 +61,7 @@ file is in or in a location that can be found by kpsewhich.</entry>
 
 <entry key="syntax.cite.as.record">{0}	Treat \citation as an ignored record.</entry>
 <entry key="syntax.collapse.same.location.range">{0}	Collapse explicit location ranges with coincident end-points.</entry>
+<entry key="syntax.shift.zero.sections">{0}	Shift up section locations ending with ".0".</entry>
 <entry key="syntax.retain.formats">{0}	Retain non-identical locations with the given formats even if a partial match exists.</entry>
 <entry key="syntax.merge.wrglossary.records">{0}	Merge wrglossary counter records.</entry>
 <entry key="syntax.merge.nameref.on">{0} &lt;rule&gt;	Rule for merging locations with record=nameref. &lt;rule&gt; may be one of: ''hcounter'', ''href'', ''title'' or ''location''.</entry>
@@ -283,7 +284,8 @@ Defaulting to: {0}.
 <entry key="message.calculating.omitlist">Calculating field exclusion list for entry {0}</entry>
 <entry key="message.adding.omitlist">Adding ''{0}'' to field exclusion list.</entry>
 <entry key="message.compound_element_missing">Element ''{0}'' in compound entry ''{1}'' has not been selected</entry>
-<entry key="message.skipping_compound_element">Skipping compound entry ''{1}''</entry>
+<entry key="message.skipping_compound_element">Skipping compound entry ''{0}''</entry>
+<entry key="message.shifting_zero_section">Shifting up counter ''{0}'' value ''{1}'' to counter ''{2}'' value ''{3}''</entry>
 
 <entry key="comment.header">% This file was created by {0} v{1} on {2}.</entry>
 <entry key="comment.header.no_date">% This file was created by {0} v{1}.</entry>
