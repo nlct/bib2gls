@@ -1,5 +1,5 @@
 BIB2GLS=../bin/bib2gls --verbose --log-encoding ISO-8859-1
-DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
+DEPS=../lib/bib2gls.jar
 
 all	: sample-chemical.pdf sample-units1.pdf sample-units2.pdf \
 	sample-units3.pdf sample-people.pdf sample-bacteria.pdf \

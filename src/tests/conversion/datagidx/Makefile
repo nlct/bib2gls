@@ -1,6 +1,6 @@
 DATATOOL2BIB=../../../bin/datatool2bib
 BIB2GLS=../../../bin/bib2gls
-DEPS=../../../lib/datatool2bib.jar ../../../lib/bib2gls.jar ../../../lib/texparserlib.jar
+DEPS=../../../lib/datatool2bib.jar ../../../lib/bib2gls.jar 
 ARARA=arara --verbose
 RM=\rm -f
 

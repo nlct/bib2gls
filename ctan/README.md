@@ -168,7 +168,6 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/scripts/bib2gls/datatool2bib.jar` (Java application.)
  - *TEXMF*`/scripts/bib2gls/bibglscommon.jar` (Java library
    providing code shared by `bib2gls` and the conversion tools.)
- - *TEXMF*`/scripts/bib2gls/texparserlib.jar` (Java library.)
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml` (main English
    resource file.)
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-extra-en.xml` 
@@ -184,14 +183,18 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/doc/support/bib2gls/bib2gls-begin.pdf` (Introductory Guide.)
  - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
-Note that `texparserlib.jar` isn't an application. It's
-a library used by `bib2gls.jar` and the `*2bib` conversion tools
-and so needs to be on the same class path as them.
+The TeX Java Parser Library must also be install:
+
+ - *TEXMF*`/scripts/texjavaparser/texjavaparserlib.jar`
 
 The bash `.sh` scripts are provided for Unix-like users.
-They're not required for Windows. The `.1` files are `man`
-files and should be placed where `man` can find them. (They
-are created from the `.pod` files.)
+They're not required for Windows. These assume that the files are
+installed as indicated above. If `texjavaparser` has for some reason
+been installed on a different TEXMF tree, then the TeX Lua script
+needs to be used instead so that the library can be found.
+
+The `.1` files are `man` files and should be placed where `man` can
+find them. (They are created from the `.pod` files.)
 
 To test installation:
 ```bash
@@ -236,37 +239,37 @@ Create the following directories:
 `lib/resources`
 `java`
 `classes/com/dickimawbooks/bib2gls`
+`classes/com/dickimawbooks/common`
+`classes/com/dickimawbooks/datatool2bib`
 `classes/com/dickimawbooks/gls2bib`
-`classes/com/dickimawbooks/texparserlib`
 
-Unpack the zip files:
+Unpack the zip file:
 
 ```bash
-unzip -d java bib2gls-src.zip
-unzip -d java gls2bib-src.zip
-unzip -d java texparserlib-src.zip
+unzip bib2gls-src.zip
 ```
 
 Copy the `.xml` language file to `lib/resources/`
 
-Compile `texparserlib.jar`:
+bib2gls depends on the TeX Java Parser Library (TJP), 
+`texjavaparserlib.jar`. This jar file needs to be on
+the class path.
 
-```bash
-cd java/lib 
-javac -d ../../classes
--Xlint:unchecked -Xlint:deprecation *.java */*.java */*/*.java
-cd ../../classes 
-jar cf ../lib/texparserlib.jar 
-com/dickimawbooks/texparserlib/*.class \
-com/dickimawbooks/texparserlib/*/*.class \
-com/dickimawbooks/texparserlib/*/*/*.class 
-```
+There are two ways of doing this. Either ensure that
+it is located relative to the directory that will contain
+`bib2gls.jar` (`lib`) where the relative path is
+`../texjavaparser/texjavaparserlib.jar` or ensure that 
+TJP has been installed in _TEXMF_`/scripts/texjavaparser/`
+and find its location with `kpsewhich`.
+
+Below, `path/to/texjavaparserlib.jar` indicates the path to the
+TJP jar file.
 
 Compile `bib2gls.jar`:
 
 ```bash
 cd java/bib2gls
-javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+javac -d ../../classes -cp path/to/texjavaparserlib.jar *.java
 cd ../classes
 jar cmf ../java/bib2gls/Manifest.txt ../lib/bib2gls.jar
 com/dickimawbooks/bib2gls/*.class
@@ -276,8 +279,18 @@ Compile `convertgls2bib.jar`:
 
 ```bash
 cd java/gls2bib
-javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+javac -d ../../classes -cp path/to/texjavaparserlib.jar *.java
 cd ../classes
 jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar
 com/dickimawbooks/gls2bib/*.class
+```
+
+Compile `datatool2bib.jar`:
+
+```bash
+cd java/datatool2bib
+javac -d ../../classes -cp path/to/texjavaparserlib.jar *.java
+cd ../classes
+jar cmf ../java/datatool2bib/Manifest.txt ../lib/datatool2bib.jar
+com/dickimawbooks/datatool2bib/*.class
 ```

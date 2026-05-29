@@ -1,2 +1,2 @@
 Main-Class: com/dickimawbooks/bibgls/gls2bib/Gls2Bib
-Class-Path: . texparserlib.jar bibglscommon.jar
+Class-Path: . ../texjavaparser/texjavaparserlib.jar bibglscommon.jar

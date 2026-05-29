@@ -3,7 +3,7 @@ all	: bib2gls.man1.pdf convertgls2bib.man1.pdf datatool2bib.man1.pdf bib2gls.pdf
 	@grep -E '(Warning|Exception)' *.glg ../examples/*.glg || true
 
 bib2gls.pdf	: bib2gls.tex bib2gls.bib bib2gls-terms.bib bib2gls-cite.bib\
-		   ../lib/bib2gls.jar ../lib/texparserlib.jar \
+		   ../lib/bib2gls.jar  \
 		   ../examples/*.tex ../examples/*.bib version.tex
 		make -C ../examples
 		arara --verbose bib2gls
@@ -11,7 +11,7 @@ bib2gls.pdf	: bib2gls.tex bib2gls.bib bib2gls-terms.bib bib2gls-cite.bib\
 		@grep -E '(Warning|Exception)' bib2gls.glg || true
 
 bib2gls.glstex	: bib2gls.tex bib2gls.bib bib2gls-terms.bib bib2gls-cite.bib\
-		   ../lib/bib2gls.jar ../lib/texparserlib.jar \
+		   ../lib/bib2gls.jar  \
 		   ../examples/*.tex ../examples/*.bib version.tex
 		lualatex bib2gls
 		bib2gls --group --packages mfirstuc-english bib2gls

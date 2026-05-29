@@ -4,6 +4,12 @@ else
   target_version =
 endif
 
+texjavaparserlib=$(shell kpsewhich --format=texmfscripts texjavaparserlib.jar)
+
+ifeq ($(texjavaparserlib),)
+  texjavaparserlib = ../../texjavaparser/texjavaparserlib.jar
+endif
+
 all	: lib/bib2gls.jar lib/convertgls2bib.jar lib/datatool2bib.jar
 
 lib/bib2gls.jar	: java/bib2gls/Manifest.txt classes/com/dickimawbooks/bibgls/bib2gls/Bib2Gls.class
@@ -16,7 +22,7 @@ classes/com/dickimawbooks/bibgls/bib2gls/Bib2Gls.class	: classes/com/dickimawboo
 	cd java/bib2gls; \
 	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
+	 -cp $(texjavaparserlib):../../lib/bibglscommon.jar *.java
 
 classes/com/dickimawbooks/bibgls/bib2gls	:
 	mkdir -p classes/com/dickimawbooks/bibgls/bib2gls
@@ -31,7 +37,7 @@ classes/com/dickimawbooks/bibgls/gls2bib/Gls2Bib.class	: classes/com/dickimawboo
 	cd java/gls2bib; \
 	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
+	 -cp $(texjavaparserlib):../../lib/bibglscommon.jar *.java
 
 classes/com/dickimawbooks/bibgls/gls2bib	:
 	mkdir -p classes/com/dickimawbooks/bibgls/gls2bib
@@ -46,7 +52,7 @@ classes/com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib.class	: classes/com/d
 	cd java/datatool2bib; \
 	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	 -cp ../../lib/texparserlib.jar:../../lib/bibglscommon.jar *.java
+	 -cp $(texjavaparserlib):../../lib/bibglscommon.jar *.java
 
 classes/com/dickimawbooks/bibgls/datatool2bib	:
 	mkdir -p classes/com/dickimawbooks/bibgls/datatool2bib
@@ -61,19 +67,18 @@ classes/com/dickimawbooks/bibgls/common/BibGlsTeXApp.class	: classes/com/dickima
 	cd java/common; \
 	javac $(target_version) -d ../../classes \
 	 -Xlint:unchecked -Xlint:deprecation \
-	 -cp ../../lib/texparserlib.jar *.java
+	 -cp $(texjavaparserlib) *.java
 
 classes/com/dickimawbooks/bibgls/common	:
 	mkdir -p classes/com/dickimawbooks/bibgls/common
 
 expl	: ../unstable/bib2gls.zip
 
-../unstable/bib2gls.zip	: lib/bib2gls.jar lib/texparserlib.jar lib/convertgls2bib.jar
+../unstable/bib2gls.zip	: lib/bib2gls.jar lib/convertgls2bib.jar
 	make -C doc
 	mkdir -p ../unstable/bib2gls/lib/resources
 	mkdir -p ../unstable/bib2gls/bin
 	mkdir -p ../unstable/bib2gls/doc
-	cp -L lib/texparserlib.jar ../unstable/bib2gls/lib/
 	cp lib/*.jar ../unstable/bib2gls/lib/
 	cp lib/resources/*.xml ../unstable/bib2gls/lib/resources/
 	cp bin/bib2gls ../unstable/bib2gls/bin/

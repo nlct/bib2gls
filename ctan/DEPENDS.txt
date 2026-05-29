@@ -1,1 +1,2 @@
 glossaries-extra
+texjavaparser

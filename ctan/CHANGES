@@ -1,3 +1,8 @@
+v4.8 (pending)
+
+   - Switched from texparserlib.jar to texjavaparserlib.jar which
+     now needs to be installed separately
+
 v4.7 (2025-11-13)
 
    - new command line switch:

@@ -1,5 +1,5 @@
 BIB2GLS=../bin/bib2gls --verbose --group
-DEPS=../lib/bib2gls.jar ../lib/texparserlib.jar
+DEPS=../lib/bib2gls.jar
 RM=\rm -f
 
 all	: test.pdf test-utf8.pdf test-inputenc-utf8.pdf test-xr.pdf test-crossrefs.pdf \

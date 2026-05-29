@@ -1,2 +1,2 @@
 Main-Class: com/dickimawbooks/bibgls/datatool2bib/DataTool2Bib
-Class-Path: . texparserlib.jar bibglscommon.jar
+Class-Path: . ../texjavaparser/texjavaparserlib.jar bibglscommon.jar
