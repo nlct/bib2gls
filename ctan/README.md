@@ -183,15 +183,9 @@ your local or home TEXMF path (for example, `~/texmf/`):
  - *TEXMF*`/doc/support/bib2gls/bib2gls-begin.pdf` (Introductory Guide.)
  - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
-The TeX Java Parser Library must also be install:
+The TeX Java Parser Library must also be installed:
 
  - *TEXMF*`/scripts/texjavaparser/texjavaparserlib.jar`
-
-The bash `.sh` scripts are provided for Unix-like users.
-They're not required for Windows. These assume that the files are
-installed as indicated above. If `texjavaparser` has for some reason
-been installed on a different TEXMF tree, then the TeX Lua script
-needs to be used instead so that the library can be found.
 
 The `.1` files are `man` files and should be placed where `man` can
 find them. (They are created from the `.pod` files.)
@@ -253,12 +247,7 @@ Copy the `.xml` language file to `lib/resources/`
 
 bib2gls depends on the TeX Java Parser Library (TJP), 
 `texjavaparserlib.jar`. This jar file needs to be on
-the class path.
-
-There are two ways of doing this. Either ensure that
-it is located relative to the directory that will contain
-`bib2gls.jar` (`lib`) where the relative path is
-`../texjavaparser/texjavaparserlib.jar` or ensure that 
+the class path so ensure that 
 TJP has been installed in _TEXMF_`/scripts/texjavaparser/`
 and find its location with `kpsewhich`.
 
