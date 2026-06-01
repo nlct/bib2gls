@@ -206,7 +206,11 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
          if (isDebuggingOn())
          {
             logMessage("Java "+System.getProperty("java.version"));
-            logMessage(String.format("texparserlib.jar %s (%s)",
+
+            logMessage(String.format("%s %s (%s)",
+               getMessageWithFallback(
+                 "texjavaparserlib.name",
+                 "TeX Java Parser Library"),
                TeXParser.VERSION, TeXParser.VERSION_DATE));
          }
       }
@@ -901,11 +905,6 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       logMessage(msg);
    }
 
-   public String getLanguageFileName(String tag)
-   {
-      return String.format("/resources/bib2gls-%s.xml", tag);
-   }
-
    protected Locale initMessageLocale(Locale locale)
    {
       return Locale.forLanguageTag(langTag);
@@ -935,7 +934,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
 
       if (url == null)
       {
-         throw new Bib2GlsException("Can't find language resource file.");
+         throw new Bib2GlsException("Can't find bib2gls language resource file.");
       }
 
       InputStream in = null;
@@ -953,7 +952,34 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
          in.close();
          in = null;
 
+         // Define messages before loading TJP resources to provide localised
+         // warning message if not found. (Instead of adding to
+         // prop here.)
+
          messages = new Bib2GlsMessages(prop);
+
+         url = TeXParser.getLanguageResourceUrl(locale);
+
+         if (url == null)
+         {
+            warningMessage("warning.cant_find_prop_file",
+               "texjavaparserlib", locale, "en");
+         }
+         else
+         {
+            debug("Reading "+url);
+
+            in = url.openStream();
+
+            prop.clear();
+
+            prop.loadFromXML(in);
+
+            in.close();
+            in = null;
+
+            messages.addProperties(prop);
+         }
       }
       finally
       {
@@ -965,8 +991,13 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       }
    }
 
+   public String getLanguageFileName(String tag)
+   {
+      return String.format("/resources/bib2gls-%s.xml", tag);
+   }
+
    protected String getLanguageFileName(String prefix, String tag)
-   {   
+   {
       return String.format("/resources/%s-%s.xml", prefix, tag);
    } 
 
@@ -1178,7 +1209,10 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       System.out.println();
       System.out.println(getMessageWithFallback("about.library.version",
         "Bundled with {0} version {1} ({2})",
-        "texparserlib.jar", TeXParser.VERSION, TeXParser.VERSION_DATE));
+        getMessageWithFallback(
+          "texjavaparserlib.name",
+          "TeX Java Parser Library"),
+        TeXParser.VERSION, TeXParser.VERSION_DATE));
       System.out.println("https://github.com/nlct/texparser");
 
       System.out.println();
@@ -1649,7 +1683,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       printSyntaxItem(getMessage("common.syntax.help", "--help", "-h"));
       printSyntaxItem(getMessage("common.syntax.version", "--version", "-v"));
       printSyntaxItem(getMessage("common.syntax.debug", "--[no-]debug"));
-      printSyntaxItem(getMessage("common.syntax.debug-mode", "--debug-mode"));
+      printSyntaxItem(getMessage("texparser.syntax.debug-mode", "--debug-mode"));
       printSyntaxItem(getMessage("common.syntax.verbose", "--[no-]verbose"));
       printSyntaxItem(getMessage("common.syntax.silent",
         "--silent", "-q", "--quiet"));
@@ -1758,7 +1792,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public static final int SYNTAX_ITEM_LINEWIDTH=78;
    public static final int SYNTAX_ITEM_TAB=30;
 
-   public static final String VERSION = "4.7";
-   public static final String DATE = "2025-11-13";
+   public static final String VERSION = "4.7.20260601";
+   public static final String DATE = "2026-06-01";
 
 }
