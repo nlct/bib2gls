@@ -18,7 +18,7 @@ datatool2bib --version
 
 ## Licence
 
-Copyright (C) 2017-2025 Nicola L. C. Talbot (dickimaw-books.com)
+Copyright (C) 2017-2026 Nicola L. C. Talbot (dickimaw-books.com)
 
 License GPLv3+: GNU GPL version 3 or later
 http://gnu.org/licenses/gpl.html
@@ -28,6 +28,8 @@ There is NO WARRANTY, to the extent permitted by law.
 ## Requirements
 
   - Java Runtime Environment (at least Java 8).
+
+  - TeX Java Parser Library (texjavaparser)
 
   - TeX distribution that includes `glossaries-extra.sty` 
     and dependent packages (such as `glossaries.sty`).
@@ -174,18 +176,16 @@ your local or home TEXMF path (for example, `~/texmf/`):
    (supplementary English resource file.)
  - *TEXMF*`/scripts/bib2gls/resources/bib2gls-extra-nl.xml` 
    (supplementary Dutch resource file.)
- - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only.)
- - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems
-   only.)
- - *TEXMF*`/scripts/bib2gls/datatool2bib.sh` (Unix-like systems
-   only.)
+ - *TEXMF*`/scripts/bib2gls/bib2gls.tlu`
+ - *TEXMF*`/scripts/bib2gls/convertgls2bib.tlu`
+ - *TEXMF*`/scripts/bib2gls/datatool2bib.tlu`
  - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf` (User manual.)
  - *TEXMF*`/doc/support/bib2gls/bib2gls-begin.pdf` (Introductory Guide.)
  - *TEXMF*`/doc/support/bib2gls/examples/` (example files)
 
-The TeX Java Parser Library must also be installed:
-
- - *TEXMF*`/scripts/texjavaparser/texjavaparserlib.jar`
+The TeX Java Parser Library (texjavaparser) must also be installed, which is
+distributed separately. The `.tlu` files search for
+`texjavaparserlib.jar` in the *TEXMF*`/scripts/` path.
 
 The `.1` files are `man` files and should be placed where `man` can
 find them. (They are created from the `.pod` files.)
@@ -194,6 +194,7 @@ To test installation:
 ```bash
 bib2gls --version
 convertgls2bib --version
+datatool2bib --version
 ```
 These should display the version details.
 
@@ -243,7 +244,7 @@ Unpack the zip file:
 unzip bib2gls-src.zip
 ```
 
-Copy the `.xml` language file to `lib/resources/`
+The `.xml` language file should be in `lib/resources/`
 
 bib2gls depends on the TeX Java Parser Library (TJP), 
 `texjavaparserlib.jar`. This jar file needs to be on
