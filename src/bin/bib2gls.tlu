@@ -1,0 +1,202 @@
+#!/usr/bin/env texlua
+
+--[[
+
+   This is a script to invoke a command line Java application that requires the
+   TeX Java Parser Library and TeX Java Help Library on its class path.
+
+   This is a little complicated as the library jar files need to be found
+   in the 'texmfscript' path and added to the Java class path,
+   but jar files are supposed to be self-contained with the class path 
+   specified in the Manifest file, which means that the -classpath switch 
+   is ignored if used with -jar.
+
+   Therefore it's necessary to add the application jar file to the class
+   path as well and call the main class instead of the jar file.
+
+--]]
+
+dir_sep = package.config:sub(1,1)
+
+kpse.set_program_name('texlua')
+
+function run_jar(mainclass, jarlist, progname, isGUI)
+
+   progname = progname or basename(arg[0])
+
+   isGUI = isGUI or false
+
+   local progjar = progname .. '.jar'
+
+   local javacmd = 'java'
+   local path_sep = ':'
+
+   local isCygwin = check_if_cygwin()
+
+   if dir_sep == '\\'
+   then
+
+      if isGUI then javacmd = 'javaw' end
+
+      path_sep = ';'
+
+   end
+
+   local classpath = { }
+
+   add_to_classpath(classpath, progjar )
+
+   for _, jarfile in ipairs(jarlist)
+   do
+      add_to_classpath(classpath, jarfile)
+   end
+
+   local cmd = string.format('%s -classpath %s %s',
+           quote_if_spaced(javacmd),
+           quote_if_spaced(table.concat(classpath, path_sep)),
+           mainclass
+         )
+
+   for _ , value in ipairs(arg)
+   do
+     cmd = cmd .. ' ' .. quote_if_spaced(value)
+   end
+
+   assert(os.execute(cmd),
+     string.format("Failed to execute '%s'", cmd))
+
+end
+
+function quote_if_spaced(str)
+  
+   if string.find(str, " ") then
+      str = '"' .. string.replace(str, "\"", "\\\"") .. '"' 
+   end
+  
+   return str
+  
+end
+
+function add_to_classpath(array, jarfile, add_dir)
+
+   add_dir = add_dir or true
+
+   local fullpath = kpse.find_file(jarfile, 'texmfscripts')
+
+   if fullpath == nil
+   then
+      io.stderr:write("Library '" .. jarfile .. "' not found\n")
+      os.exit(1)
+   else
+
+      if isCygwin then fullpath = get_cygwin_path(fullpath) end
+
+      table.insert(array, fullpath)
+
+      if add_dir then
+
+        dir = dirname(fullpath)
+
+        if not is_in_table(array, dir) then table.insert(array, dir) end
+
+      end
+
+   end
+
+end
+
+-- Test if running on Cygwin (is there a better method?)
+
+function check_if_cygwin()
+
+   if os.getenv('TERM') == 'cygwin'
+   then
+
+      local handle = io.popen('cygpath -w /')
+      local result = handle.read('*a')
+      handle:close()
+
+      if result ~= nil
+      then
+
+         os.setenv('CYGWIN_ROOT', result.gsub('[\n\r]', ''))
+
+         return true
+
+      end
+
+   end
+
+   return false
+
+end
+
+function get_cygwin_path(path)
+
+   local handle = io.popen('cygpath -w ' .. quote_if_spaced(path))
+   local result = handle:read('*a')
+   handle:close()
+
+    if result ~= nil
+    then
+       path = result.gsub('[\n\r]', '')
+    end
+
+    return path
+
+end
+
+function is_in_table(haystack, needle)
+
+  for _, value in ipairs(haystack)
+  do
+
+     if value == needle then return true end
+
+  end
+
+  return false
+
+end
+
+function basename(path)
+
+   local name = path
+   local startIndex, endIndex = string.find(string.reverse(name), dir_sep, 1, true)
+
+   if startIndex ~= nil
+   then
+     name = string.sub(name, string.len(name)-endIndex+2)
+   end
+
+   startIndex, endIndex = string.find(string.reverse(name), '.', 1, true)
+
+   if startIndex ~= nil
+   then
+     name = string.sub(name, 1, string.len(name)-startIndex)
+   end
+
+   return name
+
+end
+
+function dirname(path)
+
+  local name = path
+  local startIndex, endIndex = string.find(name, dir_sep, -1, true)
+
+  if startIndex ~= nil
+  then
+    name = string.sub(name, 1, startIndex)
+  end
+
+end
+
+run_jar(  
+         'com.dickimawbooks.bibgls.bib2gls.Bib2Gls' ,
+         {
+          'texjavaparserlib.jar',
+          'bibglscommon.jar'
+         }
+       )
+
