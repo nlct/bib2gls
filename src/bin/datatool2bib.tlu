@@ -48,7 +48,7 @@ function run_jar(mainclass, jarlist, progname, isGUI)
 
    for _, jarfile in ipairs(jarlist)
    do
-      add_to_classpath(classpath, jarfile)
+      add_to_classpath(classpath, jarfile, jarfile ~= 'texjavaparserlib')
    end
 
    local cmd = string.format('%s -classpath %s %s',
