@@ -2,7 +2,11 @@
 
 # This bash script is just for testing the development
 # ../lib/datatool2bib.jar
-# file. The file datatool2bib.sh will be the script that's distributed.
+# file. The file datatool2bib.tlu will be the script that's distributed.
+#
+# The file texjavaparserlib.jar will
+# needs to be placed in the same directory as datatool2bib.jar 
+# for this to work.
 
 bindir=`dirname "$0"`
 java -jar "$bindir/../lib/datatool2bib.jar" "$@"

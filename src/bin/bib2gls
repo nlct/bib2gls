@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # This bash script is just for testing the development ../lib/bib2gls.jar
-# file. The file bib2gls.sh will be the script that's distributed.
+# file. The file bib2gls.tlu will be the script that's distributed.
+#
+# The file texjavaparserlib.jar 
+# needs to be placed in the same directory as bib2gls.jar 
+# for this to work.
 
 bindir="$(dirname "$(readlink -f "$0")")"
 
