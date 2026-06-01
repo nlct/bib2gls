@@ -140,30 +140,12 @@ pdflatex myDoc
 
 # Installation
 
-First ensure that you have Java installed.
+You will need to have Java installed. (At least Java 8.)
 
-Now that `bib2gls` is available in both TeX Live and MiKTeX,
-the best installation method is via your TeX package manager.
-Below are instructions for manual installation.
+[TODO: The TeX Java Parser Library will also need to be installed]
 
-The files should be installed as follows where *TEXMF* indicates
-your local or home TEXMF path (for example, `~/texmf/`):
-
- - *TEXMF*`/scripts/bib2gls/bib2gls.sh` (Unix-like systems only)
- - *TEXMF*`/scripts/bib2gls/bib2gls.jar`
- - *TEXMF*`/scripts/bib2gls/convertgls2bib.sh` (Unix-like systems only)
- - *TEXMF*`/scripts/bib2gls/convertgls2bib.jar`
- - *TEXMF*`/scripts/bib2gls/texparserlib.jar`
- - *TEXMF*`/scripts/bib2gls/resources/bib2gls-en.xml`
- - *TEXMF*`/doc/support/bib2gls/bib2gls.pdf`
-
-For Unix-like systems, add a symbolic link called `bib2gls` somewhere on
-your path that links to the `bib2gls.sh` bash script.
-For example:
-```bash
-cd ~/bin
-ln -s ~/texmf/scripts/bib2gls/bib2gls.sh bib2gls
-```
+`bib2gls` is available in both TeX Live and MiKTeX,
+so you can install it via your TeX package manager.
 
 To test the installation run the following from your command 
 prompt or terminal:
@@ -177,33 +159,22 @@ Fatal error: Can't find language resource file.
 then check that the `resources` sub-directory has been correctly
 copied over.
 
-Windows users may find that their TeX distribution has converted the
-`bib2gls.jar` file to an executable `bib2gls.exe`. If not, you can create a
-batch script analogous to `bib2gls.sh` called `bib2gls.bat` that
-contains the following:
-```com
-@ECHO OFF
-FOR /F "tokens=*" %%I IN ('kpsewhich --progname=bib2gls --format=texmfscripts bib2gls.jar') DO SET JARPATH=%%I
-java -Djava.locale.providers=CLDR,JRE -jar "%JARPATH%" %*
-```
-(Similarly for `convertgls2bib.jar`.)
-
 # Compile Source Code
 
 Create sub-directories `src/lib`,
 `src/classes/com/dickimawbooks/bib2gls` and
 `src/classes/com/dickimawbooks/gls2bib`
 
-Requires `texparserlib.jar` which can be compiled from
+Requires `texjavaparserlib.jar` which can be compiled from
 [texparser](https://github.com/nlct/texparser).
 
-Copy `texparserlib.jar` to `src/lib`.
+Copy `texjavaparserlib.jar` and `texjavaparserlib-en.xml` to `src/lib`.
 
 Compile from `src` using:
 
 ```bash 
 cd java/bib2gls
-javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+javac -d ../../classes -cp ../../lib/texjavaparserlib.jar *.java
 cd ../classes
 jar cmf ../java/bib2gls/Manifest.txt ../lib/bib2gls.jar com/dickimawbooks/bib2gls/*.class
 ```
@@ -214,7 +185,7 @@ using the wrong application.
 
 ```bash 
 cd java/gls2bib
-javac -d ../../classes -cp ../../lib/texparserlib.jar *.java
+javac -d ../../classes -cp ../../lib/texjavaparserlib.jar *.java
 cd ../classes
 jar cmf ../java/gls2bib/Manifest.txt ../lib/convertgls2bib.jar com/dickimawbooks/gls2bib/*.class
 ```
