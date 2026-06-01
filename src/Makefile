@@ -88,11 +88,10 @@ expl	: ../unstable/bib2gls.zip
 	cd ../unstable; zip -r bib2gls.zip bib2gls/
 
 clean	:
-	\rm -f classes/com/dickimawbooks/bibgls/bib2gls/*.class
-	\rm -f classes/com/dickimawbooks/bibgls/gls2bib/*.class
-	\rm -f classes/com/dickimawbooks/bibgls/common/*.class
+	\rm -f classes/com/dickimawbooks/bibgls/*/*.class
 
 squeaky	:
 	\rm -f lib/bib2gls.jar
 	\rm -f lib/convertgls2bib.jar
+	\rm -f lib/datatool2bib.jar
 	\rm -f lib/bibglscommon.jar
