@@ -36,6 +36,7 @@ import java.io.*;
 import java.net.URL;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.nio.file.Files;
@@ -1769,7 +1770,9 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
         "https://www.dickimaw-books.com/faq.php?category=bib2gls"));
    }
 
-   protected Charset defaultCharset = Charset.defaultCharset();
+   // If the .tlu script is used, the default charset ends up as
+   // US-ASCII so explicitly set to UTF-8
+   protected Charset defaultCharset = StandardCharsets.UTF_8;
    protected Locale defaultLocale = null;
 
    protected Bib2GlsMessages messages;

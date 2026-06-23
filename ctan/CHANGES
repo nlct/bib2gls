@@ -1,7 +1,19 @@
 v4.8 (pending)
 
    - Switched from texparserlib.jar to texjavaparserlib.jar which
-     now needs to be installed separately
+     now needs to be installed separately. This has had knock-on
+     effects:
+
+   - bib2gls.sh has been replaced with bib2gls.tlu which searches
+     for texjavaparserlib.jar in texmfscripts
+
+   - The default encoding is explicitly set to UTF-8. This is
+     because the .tlu script doesn't pick up the correct default for
+     the platform, which causes US-ASCII to be the default.
+     Since the LaTeX kernel now sets UTF-8 as the default, hopefully
+     this shouldn't cause too much interference. If you require a 
+     different default, you will need to set the default charset
+     explicitly with --default-charset.
 
 v4.7 (2025-11-13)
 
