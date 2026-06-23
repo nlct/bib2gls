@@ -44,11 +44,11 @@ function run_jar(mainclass, jarlist, progname, isGUI)
 
    local classpath = { }
 
-   add_to_classpath(classpath, progjar )
+   add_to_classpath(classpath, progjar, true )
 
    for _, jarfile in ipairs(jarlist)
    do
-      add_to_classpath(classpath, jarfile, jarfile ~= 'texjavaparserlib')
+      add_to_classpath(classpath, jarfile)
    end
 
    local cmd = string.format('%s -classpath %s %s',
@@ -69,17 +69,16 @@ end
 
 function quote_if_spaced(str)
   
-   if string.find(str, " ") then
-      str = '"' .. string.replace(str, "\"", "\\\"") .. '"' 
-   end
-  
-   return str
+-- copied from runscript.tlu:
+
+  str = string.gsub(str, '"', '') -- disallow embedded double quotes
+  return string.find(str, "%s") and '"'..str..'"' or str
   
 end
 
 function add_to_classpath(array, jarfile, add_dir)
 
-   add_dir = add_dir or true
+   add_dir = add_dir or false
 
    local fullpath = kpse.find_file(jarfile, 'texmfscripts')
 
