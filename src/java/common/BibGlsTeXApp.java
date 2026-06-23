@@ -1076,112 +1076,160 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
       return url;
    }
 
-   public void printSyntaxItem(String message)
+   protected void printSyntaxItem(String syntax, int syntaxLength, String description)
    {
-      String[] split = message.split("\t", 2);
+      String desc = description.replaceAll(" *\\n", " ");
 
-      if (split.length == 2)
+      int descLength = desc.length();
+       
+      System.out.print("  ");
+
+      if (syntax != null)
       {
-         String desc = split[1].replaceAll(" *\\n", " ");
-
-         int syntaxLength = split[0].length();
-         int descLength = desc.length();
-
-         System.out.print("  "+split[0]);
-
-         int numSpaces = SYNTAX_ITEM_TAB - syntaxLength - 2;
-
-         if (numSpaces <= 0)
+         if (syntaxLength <= 0)
          {
-            numSpaces = 2;
+            syntaxLength = syntax.length();
          }
 
-         int indent = syntaxLength+2+numSpaces;
-
-         int width = SYNTAX_ITEM_LINEWIDTH-indent;
-
-         for (int i = 0; i < numSpaces; i++)
+         System.out.print(syntax);
+      }
+      else
+      {
+         for (int i = 0; i < syntaxLength; i++)
          {
             System.out.print(' ');
          }
-
-         if (width >= descLength)
-         {
-            System.out.println(desc);
-         }
-         else
-         {
-            BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(desc);
-
-            int start = boundary.first();
-            int n = 0;
-
-            int defWidth = SYNTAX_ITEM_LINEWIDTH - SYNTAX_ITEM_TAB;
-            numSpaces = SYNTAX_ITEM_TAB;
-
-            for (int end = boundary.next();
-               end != BreakIterator.DONE;
-               start = end, end = boundary.next())
-            {
-               int len = end-start;
-               n += len;
-
-               if (n >= width)
-               {
-                  System.out.println();
-
-                  for (int i = 0; i < numSpaces; i++)
-                  {
-                     System.out.print(' ');
-                  }
-
-                  n = len;
-                  width = defWidth;
-               }
-
-               System.out.print(desc.substring(start,end));
-            }
-
-            System.out.println();
-
-         }
       }
-      else if (split.length == 1)
+
+      int numSpaces = SYNTAX_ITEM_TAB - syntaxLength - 2;
+
+      if (numSpaces <= 0)
       {
-         String desc = split[0].replaceAll(" *\\n", " ");
+         numSpaces = 2;
+      }
 
-         int descLength = desc.length();
+      int indent = syntaxLength+2+numSpaces;
 
-         if (descLength <= SYNTAX_ITEM_LINEWIDTH)
+      int width = SYNTAX_ITEM_LINEWIDTH-indent;
+
+      for (int i = 0; i < numSpaces; i++)
+      {
+         System.out.print(' ');
+      }
+
+      if (width >= descLength)
+      {
+         System.out.println(desc);
+      }
+      else
+      {
+         BreakIterator boundary = BreakIterator.getLineInstance();
+         boundary.setText(desc);
+
+         int start = boundary.first();
+         int n = 0;
+
+         int defWidth = SYNTAX_ITEM_LINEWIDTH - SYNTAX_ITEM_TAB;
+         numSpaces = SYNTAX_ITEM_TAB;
+
+         for (int end = boundary.next();
+            end != BreakIterator.DONE;
+            start = end, end = boundary.next())
          {
-            System.out.println(desc);
+            int len = end-start;
+            n += len;
+
+            if (n >= width)
+            {
+               System.out.println();
+
+               for (int i = 0; i < numSpaces; i++)
+               {
+                  System.out.print(' ');
+               }
+
+               n = len;
+               width = defWidth;
+            }
+
+            System.out.print(desc.substring(start,end));
+         }
+
+         System.out.println();
+      }
+   }
+
+   public void printSyntaxItem(String syntax, String desc)
+   {
+      printSyntaxItem(syntax, 0, desc);
+   }
+
+   public void printSyntaxItem(int syntaxLength, String desc)
+   {
+      printSyntaxItem(null, syntaxLength, desc);
+   }
+
+   public void printWordWrapped(String message)
+   {
+      String desc = message.replaceAll(" *\\n", " ");
+
+      int descLength = desc.length();
+
+      if (descLength <= SYNTAX_ITEM_LINEWIDTH)
+      {
+         System.out.println(desc);
+      }
+      else
+      {
+         BreakIterator boundary = BreakIterator.getLineInstance();
+         boundary.setText(desc);
+         int start = boundary.first();
+         int n = 0;
+
+         for (int end = boundary.next();
+            end != BreakIterator.DONE;
+            start = end, end = boundary.next())
+         {
+            int len = end-start;
+            n += len;
+
+            if (n >= SYNTAX_ITEM_LINEWIDTH)
+            {
+               System.out.println();
+               n = len;
+            }
+
+            System.out.print(desc.substring(start,end));
+         }
+
+         System.out.println();
+      }
+   }
+
+   public void printSyntaxItem(String message)
+   {
+      String[] messageList = message.split("\n\t");
+      int syntaxLength = 0;
+
+      for (int i = 0 ; i < messageList.length; i++)
+      {
+         String[] split = messageList[i].split("\t", 2);
+
+         if (split.length == 2)
+         {
+            if (split[0].isEmpty())
+            {
+               printSyntaxItem(syntaxLength, messageList[i]);
+            }
+            else
+            {
+               syntaxLength = split[0].length();
+               printSyntaxItem(split[0], split[1]);
+            }
          }
          else
          {
-            BreakIterator boundary = BreakIterator.getLineInstance();
-            boundary.setText(desc);
-
-            int start = boundary.first();
-            int n = 0;
-
-            for (int end = boundary.next();
-               end != BreakIterator.DONE;
-               start = end, end = boundary.next())
-            {
-               int len = end-start;
-               n += len;
-
-               if (n >= SYNTAX_ITEM_LINEWIDTH)
-               {
-                  System.out.println();
-                  n = len;
-               }
-
-               System.out.print(desc.substring(start,end));
-            }
-
-            System.out.println();
+            printWordWrapped(messageList[i]);
          }
       }
    }
