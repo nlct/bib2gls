@@ -208,11 +208,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
          {
             logMessage("Java "+System.getProperty("java.version"));
 
-            logMessage(String.format("%s %s (%s)",
-               getMessageWithFallback(
-                 "texjavaparserlib.name",
-                 "TeX Java Parser Library"),
-               TeXParser.VERSION, TeXParser.VERSION_DATE));
+            logMessage(getTeXParserVersionInfo());
          }
       }
    }
@@ -1256,12 +1252,7 @@ public abstract class BibGlsTeXApp extends AbstractTeXApp
    public void libraryVersion()
    {
       System.out.println();
-      System.out.println(getMessageWithFallback("about.library.version",
-        "Bundled with {0} version {1} ({2})",
-        getMessageWithFallback(
-          "texjavaparserlib.name",
-          "TeX Java Parser Library"),
-        TeXParser.VERSION, TeXParser.VERSION_DATE));
+      System.out.println(getTeXParserVersionInfo());
       System.out.println("https://github.com/nlct/texparser");
 
       System.out.println();

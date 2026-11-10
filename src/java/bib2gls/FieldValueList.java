@@ -214,9 +214,9 @@ public class FieldValueList extends Vector<FieldValueElement>
          else if (object instanceof SingleToken)
          {
             int cp = ((SingleToken)object).getCharCode();
-            int catCode = ((SingleToken)object).getCatCode();
+            CategoryCode catCode = ((SingleToken)object).getCategoryCode();
 
-            if (catCode == TeXParser.TYPE_BG)
+            if (catCode == CategoryCode.BG)
             {
                if (add)
                {

@@ -41,21 +41,21 @@ public class Bib2GlsBibParser extends BibParser
    {
       bibParser = new TeXParser(this);
 
-      int atcode = bibParser.getCatCode('@');
-      int hashcode = bibParser.getCatCode('#');
-      int tildecode = TeXParser.TYPE_ACTIVE;
+      CategoryCode atcode = bibParser.getCategoryCode('@');
+      CategoryCode hashcode = bibParser.getCategoryCode('#');
+      CategoryCode tildecode = CategoryCode.ACTIVE;
 
       if (maketildeother)
       {
-         tildecode = bibParser.getCatCode('~');
+         tildecode = bibParser.getCategoryCode('~');
       }
 
-      bibParser.setCatCode('@', TeXParser.TYPE_ACTIVE);
-      bibParser.setCatCode('#', TeXParser.TYPE_OTHER);
+      bibParser.setCategoryCode('@', CategoryCode.ACTIVE);
+      bibParser.setCategoryCode('#', CategoryCode.OTHER);
 
       if (maketildeother)
       {
-         parser.setCatCode('~', TeXParser.TYPE_OTHER);
+         parser.setCategoryCode('~', CategoryCode.OTHER);
       }
    }
 

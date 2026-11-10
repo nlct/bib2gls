@@ -253,7 +253,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
       int cp = 0;
       int nextCp = 0;
-      int nextCatCode = -1;
+      CategoryCode nextCatCode = null;
 
       if (obj instanceof SingleToken)
       {
@@ -263,7 +263,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
       if (nextObj instanceof SingleToken)
       {
          nextCp = ((SingleToken)nextObj).getCharCode();
-         nextCatCode = ((SingleToken)nextObj).getCatCode();
+         nextCatCode = ((SingleToken)nextObj).getCategoryCode();
       }
 
       if (cp == '=' && nextCp == '/')
@@ -313,7 +313,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
             if (nextObj instanceof SingleToken)
             {
                nextCp = ((SingleToken)nextObj).getCharCode();
-               nextCatCode = ((SingleToken)nextObj).getCatCode();
+               nextCatCode = ((SingleToken)nextObj).getCategoryCode();
             }
          }
          else if (nextCp == '>')
@@ -326,7 +326,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
             if (nextObj instanceof SingleToken)
             {
                nextCp = ((SingleToken)nextObj).getCharCode();
-               nextCatCode = ((SingleToken)nextObj).getCatCode();
+               nextCatCode = ((SingleToken)nextObj).getCategoryCode();
             }
          }
          else
@@ -346,7 +346,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
             if (nextObj instanceof SingleToken)
             {
                nextCp = ((SingleToken)nextObj).getCharCode();
-               nextCatCode = ((SingleToken)nextObj).getCatCode();
+               nextCatCode = ((SingleToken)nextObj).getCategoryCode();
             }
          }
          else
@@ -407,7 +407,7 @@ public class ConditionalList extends Vector<ConditionalListElement>
 
          return new FieldStringMatch(fieldValueElem, rel, strValue, true, insensitive);
       }
-      else if (nextObj instanceof Group || nextCatCode == TeXParser.TYPE_BG)
+      else if (nextObj instanceof Group || nextCatCode == CategoryCode.BG)
       {
          String strValue = TeXParserUtils.popArg(parser, stack).toString(parser);
 

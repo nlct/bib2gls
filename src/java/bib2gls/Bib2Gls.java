@@ -1286,7 +1286,7 @@ public class Bib2Gls extends BibGlsTeXApp
 
       interpreter = createTeXParser(listener);
 
-      interpreter.setCatCode('@', TeXParser.TYPE_LETTER);
+      interpreter.setCategoryCode('@', CategoryCode.LETTER);
 
       mfirstucSty = 
         (MfirstucSty)listener.usepackage(null, "mfirstuc", false);
@@ -1320,7 +1320,7 @@ public class Bib2Gls extends BibGlsTeXApp
                         // Provide the commands associated with this
                         // encoding.
 
-                        encoding.addDefinitions(interpreter.getSettings());
+                        encoding.addDefinitions(interpreter.getCurrentSettings());
                      }
                   }
 
