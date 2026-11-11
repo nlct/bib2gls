@@ -1,6 +1,11 @@
 # bib2gls
 Command line application to convert `.bib` files to `glossaries-extra.sty` resource file
 
+I'm in the process of updating bib2gls to work with a separately
+installed instance of the [TeX Java Parser Library](https://github.com/nlct/texparser).
+This requires the provided TeX Lua scripts to find `texjavaparserlib.jar` in
+the texmf/scripts/ tree.
+
 Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
 
 Related TUGboat articles:
