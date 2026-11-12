@@ -3,8 +3,16 @@ Command line application to convert `.bib` files to `glossaries-extra.sty` resou
 
 I'm in the process of updating bib2gls to work with a separately
 installed instance of the [TeX Java Parser Library](https://github.com/nlct/texparser).
-This requires the provided TeX Lua scripts to find `texjavaparserlib.jar` in
-the texmf/scripts/ tree.
+
+  - _TEXMF_`/scripts/texjavaparser/texjavaparserlib.jar`
+
+The provided TeX Lua scripts search for `texjavaparserlib.jar` in
+the _TEXMF_`/scripts/` tree and run the application with the appropriate
+class paths set.
+
+If you want to run the `bib2gls.jar` directly (according to the
+usual way) then you need to copy `texjavaparserlib.jar` to the same
+directory as `bib2gls.jar`.
 
 Related resources: [bib2gls FAQ](https://www.dickimaw-books.com/faq.php?category=bib2gls) and [bib2gls gallery](https://www.dickimaw-books.com/gallery/#bib2gls).
 
